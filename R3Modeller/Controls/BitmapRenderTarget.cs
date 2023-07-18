@@ -16,7 +16,7 @@ namespace R3Modeller.Controls {
         private WriteableBitmap bitmap; // stuff draws into this, then it is rendered
 
         [Category("Appearance")]
-        public event EventHandler<OGLDrawEventArgs> Paint;
+        public event EventHandler<DrawEventArgs> Paint;
 
         public BitmapRenderTarget() {
             this.designMode = DesignerProperties.GetIsInDesignMode(this);
@@ -28,32 +28,33 @@ namespace R3Modeller.Controls {
         protected override void OnRender(DrawingContext dc) {
             base.OnRender(dc);
             PresentationSource source;
-            if (this.designMode || this.Visibility != Visibility.Visible || (source = PresentationSource.FromVisual(this)) == null)
+            EventHandler<DrawEventArgs> paint = this.Paint;
+            if (this.designMode || paint == null || (source = PresentationSource.FromVisual(this)) == null) {
                 return;
-            SKSizeI size;
-            double scaleX, scaleY;
+            }
+
             double actualWidth = this.ActualWidth;
             double actualHeight = this.ActualHeight;
-            if (IsPositive(actualWidth) && IsPositive(actualHeight)) {
-                Matrix transformToDevice = source.CompositionTarget.TransformToDevice;
-                scaleX = (float) transformToDevice.M11;
-                scaleY = (float) transformToDevice.M22;
-                size = new SKSizeI((int) Math.Ceiling(actualWidth * scaleX), (int) Math.Ceiling(actualHeight * scaleY));
-            }
-            else {
-                scaleX = scaleY = 1d;
-                size = new SKSizeI();
-            }
-
-            if (size.Width <= 0 || size.Height <= 0)
+            if (!IsPositive(actualWidth) || !IsPositive(actualHeight)) {
                 return;
-            if (this.bitmap == null || size.Width != this.bitmap.PixelWidth || size.Height != this.bitmap.PixelHeight)
-                this.bitmap = new WriteableBitmap(size.Width, size.Height, 96.0 * scaleX, 96.0 * scaleY, PixelFormats.Pbgra32, null);
+            }
+
+            Matrix matrix = source.CompositionTarget.TransformToDevice;
+            double scaleX = (float) matrix.M11;
+            double scaleY = (float) matrix.M22;
+            int width = (int) (actualWidth * scaleX);
+            int height = (int) (actualHeight * scaleY);
+            if (width <= 0 || height <= 0) {
+                return;
+            }
+
+            if (this.bitmap == null || width != this.bitmap.PixelWidth || height != this.bitmap.PixelHeight) {
+                this.bitmap = new WriteableBitmap(width, height, 96.0 * scaleX, 96.0 * scaleY, PixelFormats.Pbgra32, null);
+            }
+
             this.bitmap.Lock();
-
-            this.Paint?.Invoke(this, new OGLDrawEventArgs(size.Width, size.Height, scaleX, scaleY));
-
-            this.bitmap.AddDirtyRect(new Int32Rect(0, 0, size.Width, size.Height));
+            paint(this, new DrawEventArgs(this.bitmap.BackBuffer, width, height, scaleX, scaleY));
+            this.bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             this.bitmap.Unlock();
             dc.DrawImage(this.bitmap, new Rect(0.0, 0.0, this.ActualWidth, this.ActualHeight));
         }

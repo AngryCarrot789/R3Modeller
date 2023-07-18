@@ -121,7 +121,7 @@
     <Compile Include="Controls\InfiniteScrollViewer.cs" />
     <Compile Include="Controls\InlineHelper.cs" />
     <Compile Include="Controls\BitmapRenderTarget.cs" />
-    <Compile Include="Controls\OGLDrawEventArgs.cs" />
+    <Compile Include="Controls\DrawEventArgs.cs" />
     <Compile Include="Controls\OGLRenderPort.cs" />
     <Compile Include="Controls\SelectionAdorder.cs" />
     <Compile Include="Controls\VerticalIncrement.cs" />
@@ -150,6 +150,7 @@
     <Compile Include="Converters\VolumeToDbConverter.cs" />
     <Compile Include="Notifications\NotificationControl.cs" />
     <Compile Include="Notifications\NotificationList.cs" />
+    <Compile Include="OGLContextWrapper.cs" />
     <Compile Include="Resources\IconTypeToImageSourceConverter.cs" />
     <Compile Include="Services\ClipboardService.cs" />
     <Compile Include="Services\WinExplorerService.cs" />

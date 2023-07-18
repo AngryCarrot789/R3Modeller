@@ -20,6 +20,7 @@ namespace R3Modeller {
     /// </summary>
     public partial class App : Application {
         private AppSplashScreen splash;
+        private OGLContextWrapper oglContext;
 
         public App() {
         }
@@ -86,6 +87,9 @@ namespace R3Modeller {
             else {
                 await IoC.MessageDialogs.ShowMessageAsync("No keymap available", "Keymap file does not exist: " + keymapFilePath + $".\nCurrent directory: {Directory.GetCurrentDirectory()}\nCommand line args:{string.Join("\n", Environment.GetCommandLineArgs())}");
             }
+
+            await this.SetActivity("Loading OpenGL...");
+            this.oglContext = new OGLContextWrapper();
         }
 
         private async void Application_Startup(object sender, StartupEventArgs e) {
@@ -119,7 +123,7 @@ namespace R3Modeller {
             }
 
             await this.SetActivity("Loading FramePFX main window...");
-            MainWindow window = new MainWindow();
+            MainWindow window = new MainWindow(this.oglContext);
             this.splash.Close();
             this.MainWindow = window;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
