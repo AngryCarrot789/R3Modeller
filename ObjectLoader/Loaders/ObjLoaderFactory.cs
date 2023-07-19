@@ -1,8 +1,8 @@
 using System.IO;
-using ObjLoader.Data.DataStore;
-using ObjLoader.TypeParsers;
+using ObjectLoader.Data.DataStore;
+using ObjectLoader.TypeParsers;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public interface IMaterialStreamProvider {
         Stream Open(string materialFilePath);
     }

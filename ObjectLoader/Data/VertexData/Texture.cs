@@ -1,4 +1,4 @@
-namespace ObjLoader.Data.VertexData {
+namespace ObjectLoader.Data.VertexData {
     public struct Texture {
         public Texture(float x, float y) : this() {
             this.X = x;

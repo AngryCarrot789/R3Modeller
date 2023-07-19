@@ -1,4 +1,4 @@
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public interface IElementGroup {
         void SetMaterial(string materialName);
     }

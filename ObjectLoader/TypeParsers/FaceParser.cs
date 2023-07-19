@@ -1,10 +1,10 @@
 ﻿using System;
-using ObjLoader.Common;
-using ObjLoader.Data.DataStore;
-using ObjLoader.Data.Elements;
-using ObjLoader.TypeParsers.Interfaces;
+using ObjectLoader.Common;
+using ObjectLoader.Data.DataStore;
+using ObjectLoader.Data.Elements;
+using ObjectLoader.TypeParsers.Interfaces;
 
-namespace ObjLoader.TypeParsers {
+namespace ObjectLoader.TypeParsers {
     public class FaceParser : TypeParserBase, IFaceParser {
         private readonly IFaceGroup _faceGroup;
 

@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public abstract class LoaderBase {
         private StreamReader _lineStreamReader;
 

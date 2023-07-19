@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using ObjLoader.Data;
-using ObjLoader.Data.Elements;
-using ObjLoader.Data.VertexData;
+using ObjectLoader.Data;
+using ObjectLoader.Data.Elements;
+using ObjectLoader.Data.VertexData;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public class LoadResult {
         public IList<Vertex> Vertices { get; set; }
         public IList<Texture> Textures { get; set; }

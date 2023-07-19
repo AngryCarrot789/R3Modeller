@@ -1,4 +1,6 @@
-﻿namespace ObjLoader.Data {
+﻿using System.Numerics;
+
+namespace ObjectLoader.Data {
     public class Material {
         public Material(string materialName) {
             this.Name = materialName;
@@ -6,9 +8,9 @@
 
         public string Name { get; set; }
 
-        public Vec3 AmbientColor { get; set; }
-        public Vec3 DiffuseColor { get; set; }
-        public Vec3 SpecularColor { get; set; }
+        public Vector3 AmbientColor { get; set; }
+        public Vector3 DiffuseColor { get; set; }
+        public Vector3 SpecularColor { get; set; }
         public float SpecularCoefficient { get; set; }
 
         public float Transparency { get; set; }

@@ -1,4 +1,4 @@
-namespace ObjLoader.Data.VertexData {
+namespace ObjectLoader.Data.VertexData {
     public struct Normal {
         public Normal(float x, float y, float z) : this() {
             this.X = x;

@@ -1,6 +1,6 @@
-using ObjLoader.Data.Elements;
+using ObjectLoader.Data.Elements;
 
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public interface IFaceGroup {
         void AddFace(Face face);
     }

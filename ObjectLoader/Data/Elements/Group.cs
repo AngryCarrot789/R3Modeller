@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ObjLoader.Data.DataStore;
+using ObjectLoader.Data.DataStore;
 
-namespace ObjLoader.Data.Elements {
+namespace ObjectLoader.Data.Elements {
     public class Group : IFaceGroup {
         private readonly List<Face> _faces = new List<Face>();
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ObjLoader.Data.DataStore;
-using ObjLoader.TypeParsers.Interfaces;
+using ObjectLoader.Data.DataStore;
+using ObjectLoader.TypeParsers.Interfaces;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public class ObjLoader : LoaderBase, IObjLoader {
         private readonly IDataStore _dataStore;
         private readonly List<ITypeParser> _typeParsers = new List<ITypeParser>();

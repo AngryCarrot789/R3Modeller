@@ -1,7 +1,7 @@
-﻿using ObjLoader.Common;
-using ObjLoader.TypeParsers.Interfaces;
+﻿using ObjectLoader.Common;
+using ObjectLoader.TypeParsers.Interfaces;
 
-namespace ObjLoader.TypeParsers {
+namespace ObjectLoader.TypeParsers {
     public abstract class TypeParserBase : ITypeParser {
         protected abstract string Keyword { get; }
 

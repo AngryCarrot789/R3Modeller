@@ -1,7 +1,7 @@
-﻿using ObjLoader.Data.DataStore;
-using ObjLoader.TypeParsers.Interfaces;
+﻿using ObjectLoader.Data.DataStore;
+using ObjectLoader.TypeParsers.Interfaces;
 
-namespace ObjLoader.TypeParsers {
+namespace ObjectLoader.TypeParsers {
     public class GroupParser : TypeParserBase, IGroupParser {
         private readonly IGroupDataStore _groupDataStore;
 

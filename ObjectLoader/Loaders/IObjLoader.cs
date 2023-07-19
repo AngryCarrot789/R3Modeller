@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public interface IObjLoader {
         LoadResult Load(Stream lineStream);
     }

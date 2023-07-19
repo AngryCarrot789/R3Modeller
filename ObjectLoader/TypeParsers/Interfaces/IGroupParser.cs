@@ -1,4 +1,4 @@
-namespace ObjLoader.TypeParsers.Interfaces {
+namespace ObjectLoader.TypeParsers.Interfaces {
     public interface IGroupParser : ITypeParser {
     }
 }

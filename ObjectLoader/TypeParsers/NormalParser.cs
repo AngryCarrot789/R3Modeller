@@ -1,9 +1,9 @@
-using ObjLoader.Common;
-using ObjLoader.Data.DataStore;
-using ObjLoader.Data.VertexData;
-using ObjLoader.TypeParsers.Interfaces;
+using ObjectLoader.Common;
+using ObjectLoader.Data.DataStore;
+using ObjectLoader.Data.VertexData;
+using ObjectLoader.TypeParsers.Interfaces;
 
-namespace ObjLoader.TypeParsers {
+namespace ObjectLoader.TypeParsers {
     public class NormalParser : TypeParserBase, INormalParser {
         private readonly INormalDataStore _normalDataStore;
 

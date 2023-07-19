@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ObjLoader.Common;
-using ObjLoader.Data.Elements;
-using ObjLoader.Data.VertexData;
+using ObjectLoader.Common;
+using ObjectLoader.Data.Elements;
+using ObjectLoader.Data.VertexData;
 
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public class DataStore : IDataStore, IGroupDataStore, IVertexDataStore, ITextureDataStore, INormalDataStore,
         IFaceGroup, IMaterialLibrary, IElementGroup {
         private Group _currentGroup;

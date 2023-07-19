@@ -1,9 +1,16 @@
 using System.IO;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public class MaterialStreamProvider : IMaterialStreamProvider {
+        public string LoadFolder { get; }
+
+        public MaterialStreamProvider(string loadFolder = null) {
+            this.LoadFolder = loadFolder;
+        }
+
         public Stream Open(string materialFilePath) {
-            return File.Open(materialFilePath, FileMode.Open, FileAccess.Read);
+            string file = this.LoadFolder != null ? Path.Combine(this.LoadFolder, materialFilePath) : materialFilePath;
+            return File.Open(file, FileMode.Open, FileAccess.Read);
         }
     }
 

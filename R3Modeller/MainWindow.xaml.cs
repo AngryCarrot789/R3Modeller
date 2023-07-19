@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using R3Modeller.Controls;
 using System.Windows;
+using ObjectLoader.Loaders;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -15,7 +17,13 @@ namespace R3Modeller {
 
         public MainWindow(OGLContextWrapper ogl) {
             this.ogl = ogl;
-            InitializeComponent();
+            this.InitializeComponent();
+            ObjLoaderFactory factory = new ObjLoaderFactory();
+
+
+            // this.ogl.MakeCurrent(true);
+            //
+            // this.ogl.MakeCurrent(false);
         }
 
         // TODO: Could have ViewPortViewModel, which stores a reference to an interface (implemented by an

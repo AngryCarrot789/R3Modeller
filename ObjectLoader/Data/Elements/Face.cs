@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ObjLoader.Data.Elements {
+namespace ObjectLoader.Data.Elements {
     public class Face {
         private readonly List<FaceVertex> _vertices = new List<FaceVertex>();
 

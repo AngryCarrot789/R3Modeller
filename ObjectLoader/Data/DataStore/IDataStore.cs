@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using ObjLoader.Data.Elements;
-using ObjLoader.Data.VertexData;
+using ObjectLoader.Data.Elements;
+using ObjectLoader.Data.VertexData;
 
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public interface IDataStore {
         IList<Vertex> Vertices { get; }
         IList<Texture> Textures { get; }

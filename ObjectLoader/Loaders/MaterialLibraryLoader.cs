@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ObjLoader.Common;
-using ObjLoader.Data;
-using ObjLoader.Data.DataStore;
+using System.Numerics;
+using ObjectLoader.Common;
+using ObjectLoader.Data;
+using ObjectLoader.Data.DataStore;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public class MaterialLibraryLoader : LoaderBase, IMaterialLibraryLoader {
         private readonly IMaterialLibrary _materialLibrary;
         private Material _currentMaterial;
@@ -72,14 +73,14 @@ namespace ObjLoader.Loaders {
             this._materialLibrary.Push(this._currentMaterial);
         }
 
-        private Vec3 ParseVec3(string data) {
+        private Vector3 ParseVec3(string data) {
             string[] parts = data.Split(' ');
 
             float x = parts[0].ParseInvariantFloat();
             float y = parts[1].ParseInvariantFloat();
             float z = parts[2].ParseInvariantFloat();
 
-            return new Vec3(x, y, z);
+            return new Vector3(x, y, z);
         }
 
         public void Load(Stream lineStream) {

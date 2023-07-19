@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.33801.447
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "R3Modeller", "R3Modeller\R3Modeller.csproj", "{D453BFAC-5316-4FF4-9ED7-90C819BDDB39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "R3Modeller.Core", "R3Modeller.Core\R3Modeller.Core.csproj", "{72C9259D-C385-463A-83C2-52761A3FBA68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R3Modeller.Core", "R3Modeller.Core\R3Modeller.Core.csproj", "{72C9259D-C385-463A-83C2-52761A3FBA68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{84883E91-BD7D-422C-83BC-81DD5DA6E384}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectLoader", "ObjectLoader\ObjectLoader.csproj", "{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,16 @@ Global
 		{72C9259D-C385-463A-83C2-52761A3FBA68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72C9259D-C385-463A-83C2-52761A3FBA68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72C9259D-C385-463A-83C2-52761A3FBA68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4} = {84883E91-BD7D-422C-83BC-81DD5DA6E384}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24CD7E81-1E95-4D92-BF42-71E6D0EBBAD3}

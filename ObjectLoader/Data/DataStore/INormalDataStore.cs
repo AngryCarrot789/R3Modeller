@@ -1,6 +1,6 @@
-using ObjLoader.Data.VertexData;
+using ObjectLoader.Data.VertexData;
 
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public interface INormalDataStore {
         void AddNormal(Normal normal);
     }

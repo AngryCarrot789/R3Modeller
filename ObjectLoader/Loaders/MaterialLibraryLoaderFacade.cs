@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace ObjLoader.Loaders {
+namespace ObjectLoader.Loaders {
     public class MaterialLibraryLoaderFacade : IMaterialLibraryLoaderFacade {
         private readonly IMaterialLibraryLoader _loader;
         private readonly IMaterialStreamProvider _materialStreamProvider;

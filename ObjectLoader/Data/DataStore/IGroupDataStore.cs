@@ -1,4 +1,4 @@
-namespace ObjLoader.Data.DataStore {
+namespace ObjectLoader.Data.DataStore {
     public interface IGroupDataStore {
         void PushGroup(string groupName);
     }
