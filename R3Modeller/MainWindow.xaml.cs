@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using R3Modeller.Controls;
 using System.Windows;
 using System.Windows.Input;
+using ObjectLoader.Data.Elements;
+using ObjectLoader.Loaders;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -24,8 +29,7 @@ namespace R3Modeller {
         // private readonly float[] verts;
 
         private readonly Camera camera;
-        private readonly TriangleObject triangle;
-        private readonly FloorPlaneObject floor;
+        private readonly List<SceneObject> objects;
 
         private readonly LineObject lineX;
         private readonly LineObject lineY;
@@ -45,16 +49,16 @@ namespace R3Modeller {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
             GL.DepthMask(true);
+            this.objects = new List<SceneObject>();
 
             this.camera = new Camera();
             this.camera.SetYawPitch(0.45f, -0.35f);
-            this.triangle = new TriangleObject();
-
+            this.objects.Add(new TriangleObject());
             TriangleObject tri = new TriangleObject();
             tri.SetPosition(new Vector3(3f, 2f, 3f));
-            this.triangle.AddChild(tri);
+            this.objects[0].AddChild(tri);
 
-            this.floor = new FloorPlaneObject();
+            this.objects.Add(new FloorPlaneObject());
             this.lineX = new LineObject(new Vector3(), new Vector3(1f, 0f, 0f));
             this.lineY = new LineObject(new Vector3(), new Vector3(0f, 1f, 0f));
             this.lineZ = new LineObject(new Vector3(), new Vector3(0f, 0f, 1f));
@@ -71,28 +75,14 @@ namespace R3Modeller {
             //     "void main() { gl_FragColor = vec4(0.8, 0.2, 1.0, 1.0); }\n";
             // this.shader = new Shader(vertexShader, fragmentShader);
 
-            // ObjLoaderFactory factory = new ObjLoaderFactory();
-            // IObjLoader loader = factory.Create(new MaterialStreamProvider("F:\\VSProjsV2\\R3Modeller\\Resources"));
-            // using (FileStream stream = File.OpenRead("F:\\VSProjsV2\\R3Modeller\\Resources\\untitled.obj")) {
-            //     // LoadResult result = loader.Load(stream);
-            //     // List<float> v = new List<float>();
-            //     // foreach (Vector3 vertex in result.Vertices) {
-            //     //     v.Add(vertex.X);
-            //     //     v.Add(vertex.Y);
-            //     //     v.Add(vertex.Z);
-            //     // }
-            //     uint VBO, VAO;
-            //     GL.GenVertexArrays(1, &VAO);
-            //     GL.BindVertexArray(VAO);
-            //     GL.GenBuffers(1, &VBO);
-            //     GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            //     GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * this.verts.Length, this.verts, BufferUsageHint.StaticDraw);
-            //     GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, true, 3 * sizeof(float), IntPtr.Zero);
-            //     GL.EnableVertexAttribArray(0);
-            //     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            //     GL.BindVertexArray(0);
-            //     this.vao = VAO;
-            // }
+            ObjLoaderFactory factory = new ObjLoaderFactory();
+            IObjLoader loader = factory.Create(new MaterialStreamProvider(ResourceLocator.ResourceDirectory));
+            using (FileStream stream = File.OpenRead(ResourceLocator.GetResourceFile("untitled.obj"))) {
+                LoadResult result = loader.Load(stream);
+                foreach (Group group in result.Groups) {
+                    this.objects.Add(new WavefrontObject(result, group));
+                }
+            }
 
             #endregion
 
@@ -232,9 +222,8 @@ namespace R3Modeller {
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
             // Render scene
-            {
-                this.triangle.Render(this.camera);
-                this.floor.Render(this.camera);
+            foreach (SceneObject obj in this.objects) {
+                obj.Render(this.camera);
             }
 
             // Render XYZ axis
@@ -273,7 +262,7 @@ namespace R3Modeller {
 
         private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             double diff = e.NewValue - e.OldValue;
-            this.triangle.SetPosition(this.triangle.Pos + new Vector3((float) diff));
+            this.objects[0].SetPosition(this.objects[0].Pos + new Vector3((float) diff));
             this.OGLViewPort.InvalidateVisual();
         }
     }
