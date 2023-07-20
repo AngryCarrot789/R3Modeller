@@ -4,25 +4,18 @@ using R3Modeller.Core.Engine.Objs;
 
 namespace R3Modeller.Core.Engine {
     /// <summary>
-    /// A class which contains information about an R3 project's scene, which is a collection of
+    /// A class which contains information about an R3 project's scene, which is a collection of objects
     /// </summary>
     public class SceneGraph {
-        public readonly List<SceneObject> rootList;
+        /// <summary>
+        /// The scene's root object, which is primarily used to store the hierarchy of objects
+        /// </summary>
+        public readonly SceneObject Root;
+        public readonly Project project;
 
         public SceneGraph(Project project) {
-            this.rootList = new List<SceneObject>();
-        }
-
-        /// <summary>
-        /// Adds an item to the internal root list. This function just does a few precondition checks
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <exception cref="Exception"></exception>
-        public void AddItem(SceneObject obj) {
-            if (this.rootList.Contains(obj))
-                throw new Exception("Item already added");
-            SceneObject.ValidateHasNoParent(obj);
-            this.rootList.Add(obj);
+            this.project = project;
+            this.Root = new SceneObject() {DisplayName = "<root>"};
         }
     }
 }

@@ -91,8 +91,8 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             this.Model = model ?? throw new ArgumentNullException(nameof(model));
             this.children = new ObservableCollection<SceneObjectViewModel>();
             this.Children = new ReadOnlyObservableCollection<SceneObjectViewModel>(this.children);
-            foreach (SceneObject root in model.Children) {
-                this.AddInternal(SORegistry.Instance.CreateViewModelFromModel(root));
+            for (int i = 0; i < model.Items.Count; i++) {
+                this.InsertInternal(i, SORegistry.Instance.CreateViewModelFromModel(model.Items[i]));
             }
         }
 
@@ -102,12 +102,12 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                 throw new Exception("Object is already stored in this object");
             }
 
-            this.AddInternal(obj);
+            this.InsertInternal(this.children.Count, obj);
         }
 
-        private void AddInternal(SceneObjectViewModel obj) {
+        private void InsertInternal(int index, SceneObjectViewModel obj) {
             obj.parent = this;
-            this.children.Add(obj);
+            this.children.Insert(index, obj);
             obj.RaisePropertyChanged(nameof(obj.Parent));
         }
 

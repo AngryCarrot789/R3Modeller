@@ -78,7 +78,12 @@
                         </TreeViewItem>
 
                         <!-- Data rows -->
-                        <TreeView DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObjects}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                        <TreeView DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                    <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
                             <TreeView.ItemTemplate>
 
                                 <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
@@ -96,7 +101,7 @@
 
                                     <!-- Level 1 template leaves space for 1 child "Toggle" level -->
                                     <HierarchicalDataTemplate.ItemTemplate>
-                                        <HierarchicalDataTemplate ItemsSource="{Binding SubItems}">
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition SharedSizeGroup="DisplayName"/>
@@ -110,7 +115,7 @@
 
                                             <!-- Level 2 template has no children -->
                                             <HierarchicalDataTemplate.ItemTemplate>
-                                                <HierarchicalDataTemplate ItemsSource="{Binding SubItems}">
+                                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition SharedSizeGroup="DisplayName"/>

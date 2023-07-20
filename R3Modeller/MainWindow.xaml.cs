@@ -62,12 +62,12 @@ namespace R3Modeller {
             this.OGLViewPort.BeginFrame();
             this.camera = new Camera();
             this.camera.SetYawPitch(0.45f, -0.35f);
-            this.project.Scene.AddItem(new TriangleObject());
+            this.project.Scene.Root.AddItem(new TriangleObject());
             TriangleObject tri = new TriangleObject();
             tri.SetPosition(new Vector3(3f, 2f, 3f));
-            this.project.Scene.rootList[0].AddChild(tri);
+            this.project.Scene.Root.Items[0].AddItem(tri);
 
-            this.project.Scene.AddItem(new FloorPlaneObject());
+            this.project.Scene.Root.AddItem(new FloorPlaneObject());
             this.axisLineX = new LineObject(new Vector3(), new Vector3(1f, 0f, 0f));
             this.axisLineY = new LineObject(new Vector3(), new Vector3(0f, 1f, 0f));
             this.axisLineZ = new LineObject(new Vector3(), new Vector3(0f, 0f, 1f));
@@ -97,10 +97,10 @@ namespace R3Modeller {
                 };
 
                 foreach (Group group in result.Groups) {
-                    objFile.AddChild(new WavefrontObject(result, group));
+                    objFile.AddItem(new WavefrontObject(result, group));
                 }
 
-                this.project.Scene.AddItem(objFile);
+                this.project.Scene.Root.AddItem(objFile);
             }
 
             this.OGLViewPort.EndFrame();
@@ -259,27 +259,17 @@ namespace R3Modeller {
 
         protected override void OnPreviewKeyDown(KeyEventArgs e) {
             base.OnPreviewKeyDown(e);
-            Vector3 pos = this.camera.target;
             switch (e.Key) {
-                case Key.W: pos.Z -= 0.1f; break;
-                case Key.A: pos.X -= 0.1f; break;
-                case Key.S: pos.Z += 0.1f; break;
-                case Key.D: pos.X += 0.1f; break;
-                case Key.Space:     pos.Y += 0.1f; break;
-                case Key.LeftShift: pos.Y -= 0.1f; break;
                 case Key.System: {
                     if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
                         this.isOrbitActive = true;
+                        this.OGLViewPort.InvalidateRender();
                     }
 
                     break;
                 }
                 default: return;
             }
-
-            this.camera.SetTarget(pos);
-            this.UpdateTextInfo();
-            this.OGLViewPort.InvalidateRender();
         }
 
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e) {
@@ -303,14 +293,13 @@ namespace R3Modeller {
                 case Key.System: {
                     if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
                         this.isOrbitActive = false;
+                        this.OGLViewPort.InvalidateRender();
                     }
 
                     break;
                 }
                 default: return;
             }
-
-            this.OGLViewPort.InvalidateRender();
         }
 
         private Point? lastMouse;
@@ -402,7 +391,7 @@ namespace R3Modeller {
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
             // Render scene
-            foreach (SceneObject obj in this.project.Scene.rootList) {
+            foreach (SceneObject obj in this.project.Scene.Root.Items) {
                 obj.Render(this.camera);
             }
 
@@ -438,7 +427,7 @@ namespace R3Modeller {
 
         private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             double diff = e.NewValue - e.OldValue;
-            this.project.Scene.rootList[0].SetPosition(this.project.Scene.rootList[0].pos + new Vector3((float) diff));
+            this.project.Scene.Root.Items[0].SetPosition(this.project.Scene.Root.Items[0].pos + new Vector3((float) diff));
             this.OGLViewPort.InvalidateRender();
         }
     }

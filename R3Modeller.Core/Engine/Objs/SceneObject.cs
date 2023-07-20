@@ -18,18 +18,20 @@ namespace R3Modeller.Core.Engine.Objs {
         protected Matrix4x4 modelMatrix;
 
         protected SceneObject parent;
-        protected readonly List<SceneObject> children;
+        protected readonly List<SceneObject> items;
 
         public SceneObject Parent => this.parent;
-        public IEnumerable<SceneObject> Children => this.children;
+        public IReadOnlyList<SceneObject> Items => this.items;
 
         public string DisplayName;
+
+        public bool IsRoot => this.parent == null;
 
         public SceneObject() {
             this.pos = Vector3.Zero;
             this.scale = Vector3.One;
             this.rotation = Vector3.Zero;
-            this.children = new List<SceneObject>();
+            this.items = new List<SceneObject>();
             this.UpdateModelMatrix();
             this.DisplayName = this.GetType().Name;
         }
@@ -46,53 +48,70 @@ namespace R3Modeller.Core.Engine.Objs {
             }
         }
 
-        public void AddChild(SceneObject obj) {
+        public void AddItem(SceneObject obj) => this.InsertItemAt(this.items.Count, obj);
+
+        public void InsertItemAt(int index, SceneObject obj) {
             if (ReferenceEquals(this, obj))
                 throw new Exception("Cannot add ourself to our children collection");
-            if (this.children.Contains(obj))
-                throw new Exception("Item already added");
+            if (this.items.Contains(obj))
+                throw new Exception("Item already stored in this object");
 
             ValidateHasNoParent(obj);
-            this.children.Add(obj);
+            this.items.Insert(index, obj);
             obj.parent = this;
-            obj.OnParentChanged(null, this);
+            obj.OnAddedToGraph();
         }
 
-        public bool RemoveChild(SceneObject obj) {
-            int index = this.children.IndexOf(obj);
+        public bool RemoveItem(SceneObject obj) {
+            int index = this.items.IndexOf(obj);
             if (index == -1) {
                 return false;
             }
 
-            this.RemoveChildAt(index);
+            this.RemoveItemAt(index);
             return true;
         }
 
-        public void RemoveChildAt(int index) {
-            SceneObject obj = this.children[index];
+        public void RemoveItemAt(int index) {
+            SceneObject obj = this.items[index];
             ValidateOwnsObject(this, obj);
-            obj.parent = null;
-            this.children.RemoveAt(index);
-            obj.OnParentChanged(this, null);
+            this.items.RemoveAt(index);
+            try {
+                obj.OnRemovedFromGraph(false);
+            }
+            finally {
+                obj.parent = null;
+            }
         }
 
         // Primarily used to convert a "friendly" object into a standard mesh
-        public SceneObject ReplaceChild(int index, SceneObject obj) {
-            SceneObject oldObj = this.children[index];
+        /// <summary>
+        /// Removes the item at the given index, and then inserts the given object at that index. This is a more efficient
+        /// implementation than calling <see cref="RemoveItemAt"/> and then <see cref="InsertItemAt"/>
+        /// </summary>
+        /// <param name="index">The index of the object to replace</param>
+        /// <param name="obj">The object to add to this object</param>
+        /// <returns>The object that was replaced/removed</returns>
+        public SceneObject ReplaceItemAt(int index, SceneObject obj) {
+            SceneObject oldObj = this.items[index];
             if (ReferenceEquals(oldObj, obj))
                 throw new Exception("Cannot replace an object with itself");
-            if (this.children.Contains(obj))
+            if (this.items.Contains(obj))
                 throw new Exception("Object is already in this object");
 
             ValidateHasNoParent(obj);
             ValidateOwnsObject(this, oldObj);
 
-            this.children[index] = obj;
-            oldObj.parent = null;
-            oldObj.OnParentChanged(this, null);
+            this.items[index] = obj;
+            try {
+                oldObj.OnRemovedFromGraph(true);
+            }
+            finally { // OnRemovedFromGraph should result in an app crash
+                oldObj.parent = null;
+            }
 
             obj.parent = this;
-            oldObj.OnParentChanged(null, this);
+            obj.OnAddedToGraph();
             return oldObj;
         }
 
@@ -119,8 +138,30 @@ namespace R3Modeller.Core.Engine.Objs {
             this.UpdateModelMatrix();
         }
 
-        protected virtual void OnParentChanged(SceneObject oldParent, SceneObject newParent) {
+        /// <summary>
+        /// Called when this object is added to the scene graph, either as a root object or a child of a parent. <see cref="Parent"/> will be set before this call
+        /// </summary>
+        protected virtual void OnAddedToGraph() {
             this.UpdateModelMatrix();
+        }
+
+        /// <summary>
+        /// <para>
+        /// Called when this object is moved from one object to another. <see cref="Parent"/> and <see cref="oldParent"/> will not be null.
+        /// Use <see cref="IsRoot"/> to check if on <see cref="oldParent"/> to check if this object was moved from the root collection deeper into the hierarchy
+        /// </para>
+        /// </summary>
+        /// <param name="oldParent">The previous parent</param>
+        protected virtual void OnParentChanged(SceneObject oldParent) {
+            this.UpdateModelMatrix();
+        }
+
+        /// <summary>
+        /// Called when this object is removed from the scene graph (the parent object), or the root. <see cref="Parent"/> will be set after this call
+        /// </summary>
+        /// <param name="isBeingReplaced">This item is being replaced with another at the same index</param>
+        protected virtual void OnRemovedFromGraph(bool isBeingReplaced) {
+
         }
 
         public virtual void Render(Camera camera) {
@@ -128,7 +169,7 @@ namespace R3Modeller.Core.Engine.Objs {
         }
 
         public virtual void RenderChildren(Camera camera) {
-            foreach (SceneObject obj in this.children) {
+            foreach (SceneObject obj in this.items) {
                 obj.Render(camera);
             }
         }
@@ -158,7 +199,7 @@ namespace R3Modeller.Core.Engine.Objs {
                 this.modelMatrix = this.parent.modelMatrix * matrix;
             }
 
-            foreach (SceneObject obj in this.children) {
+            foreach (SceneObject obj in this.items) {
                 obj.UpdateModelMatrix();
             }
         }

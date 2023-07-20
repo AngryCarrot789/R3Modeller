@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Attribution" />
     <Folder Include="Utils\Collections\" />
   </ItemGroup>
 
