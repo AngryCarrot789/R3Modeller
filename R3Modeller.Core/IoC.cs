@@ -33,7 +33,7 @@ namespace R3Modeller.Core {
         /// <summary>
         /// The application dispatcher, used to execute actions on the main thread
         /// </summary>
-        public static IDispatcher Dispatcher { get; set; }
+        public static IApplicationDispatcher Dispatcher { get; set; }
         public static IClipboardService Clipboard => Provide<IClipboardService>();
         public static IMessageDialogService MessageDialogs => Provide<IMessageDialogService>();
         public static IProgressionDialogService ProgressionDialogs => Provide<IProgressionDialogService>();

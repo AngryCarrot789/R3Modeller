@@ -56,7 +56,7 @@ namespace R3Modeller.Controls {
             paint(this, new DrawEventArgs(this.bitmap.BackBuffer, width, height, scaleX, scaleY));
             this.bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             this.bitmap.Unlock();
-            dc.DrawImage(this.bitmap, new Rect(0.0, 0.0, this.ActualWidth, this.ActualHeight));
+            dc.DrawImage(this.bitmap, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
         private static bool IsPositive(double value) => !double.IsNaN(value) && !double.IsInfinity(value) && value > 0.0;

@@ -1,7 +1,7 @@
-using ObjectLoader.Data.VertexData;
+using System.Numerics;
 
 namespace ObjectLoader.Data.DataStore {
     public interface IVertexDataStore {
-        void AddVertex(Vertex vertex);
+        void AddVertex(Vector3 vertex);
     }
 }

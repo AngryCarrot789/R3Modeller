@@ -1,7 +1,7 @@
 using System;
+using System.Numerics;
 using ObjectLoader.Common;
 using ObjectLoader.Data.DataStore;
-using ObjectLoader.Data.VertexData;
 using ObjectLoader.TypeParsers.Interfaces;
 
 namespace ObjectLoader.TypeParsers {
@@ -23,7 +23,7 @@ namespace ObjectLoader.TypeParsers {
             float y = parts[1].ParseInvariantFloat();
             float z = parts[2].ParseInvariantFloat();
 
-            Vertex vertex = new Vertex(x, y, z);
+            Vector3 vertex = new Vector3(x, y, z);
             this._vertexDataStore.AddVertex(vertex);
         }
     }

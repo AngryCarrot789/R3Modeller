@@ -4,7 +4,7 @@ using System.Windows.Threading;
 using R3Modeller.Core.Services;
 
 namespace R3Modeller.Utils {
-    public class DispatcherDelegate : IDispatcher {
+    public class DispatcherDelegate : IApplicationDispatcher {
         private readonly Dispatcher dispatcher;
 
         public bool IsOnOwnerThread => this.dispatcher.CheckAccess();

@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 
 namespace R3Modeller {
     public class OGLContextWrapper : IDisposable {
@@ -30,12 +31,19 @@ namespace R3Modeller {
         }
 
         public void UpdateSize(int width, int height) {
+            bool changed = false;
             if (this.window.Width != width) {
                 this.window.Width = width;
+                changed = true;
             }
 
             if (this.window.Height != height) {
                 this.window.Height = height;
+                changed = true;
+            }
+
+            if (changed) {
+                GL.Viewport(0, 0, width, height);
             }
         }
 

@@ -1,12 +1,19 @@
-﻿<Window x:Class="R3Modeller.MainWindow"
+﻿<views:WindowEx x:Class="R3Modeller.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:R3Modeller" xmlns:controls="clr-namespace:R3Modeller.Controls"
+        xmlns:views="clr-namespace:R3Modeller.Views"
         mc:Ignorable="d"
-        Title="R3Modeller - v0.0.1" Height="576" Width="1024">
+        Title="R3Modeller - v0.0.1" Height="576" Width="1024"
+        Style="{StaticResource CustomWindowStyleEx}">
     <Grid>
-        <controls:BitmapRenderTarget Paint="OnPaintViewPort"/>
+        <controls:BitmapRenderTarget x:Name="OGLViewPort" Paint="OnPaintViewPort">
+            <controls:BitmapRenderTarget.LayoutTransform>
+                <ScaleTransform ScaleY="-1"/>
+            </controls:BitmapRenderTarget.LayoutTransform>
+        </controls:BitmapRenderTarget>
+        <Label x:Name="POS_LABEL"/>
     </Grid>
-</Window>
+</views:WindowEx>

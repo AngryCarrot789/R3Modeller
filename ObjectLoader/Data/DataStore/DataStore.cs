@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using ObjectLoader.Common;
 using ObjectLoader.Data.Elements;
 using ObjectLoader.Data.VertexData;
@@ -12,11 +13,11 @@ namespace ObjectLoader.Data.DataStore {
         private readonly List<Group> _groups = new List<Group>();
         private readonly List<Material> _materials = new List<Material>();
 
-        private readonly List<Vertex> _vertices = new List<Vertex>();
+        private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Texture> _textures = new List<Texture>();
         private readonly List<Normal> _normals = new List<Normal>();
 
-        public IList<Vertex> Vertices {
+        public IList<Vector3> Vertices {
             get { return this._vertices; }
         }
 
@@ -53,7 +54,7 @@ namespace ObjectLoader.Data.DataStore {
             }
         }
 
-        public void AddVertex(Vertex vertex) {
+        public void AddVertex(Vector3 vertex) {
             this._vertices.Add(vertex);
         }
 

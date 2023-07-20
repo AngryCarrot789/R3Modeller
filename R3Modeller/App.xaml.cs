@@ -58,6 +58,8 @@ namespace R3Modeller {
                 Directory.SetCurrentDirectory(dir);
             }
 
+            ResourceLocator.Setup();
+
             IoC.Dispatcher = new DispatcherDelegate(this.Dispatcher);
             IoC.OnShortcutModified = (x) => {
                 if (!string.IsNullOrWhiteSpace(x)) {
