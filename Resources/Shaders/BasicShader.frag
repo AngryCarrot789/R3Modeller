@@ -17,8 +17,9 @@
 
 #version 330
 
+uniform vec3 in_color;
 out vec3 color;
 
 void main(void) {
-    color = vec3(0.2, 0.3, 0.8);
+    color = in_color;
 }

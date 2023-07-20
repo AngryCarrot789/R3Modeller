@@ -14,6 +14,9 @@
                 <ScaleTransform ScaleY="-1"/>
             </controls:BitmapRenderTarget.LayoutTransform>
         </controls:BitmapRenderTarget>
-        <Label x:Name="POS_LABEL"/>
+        <StackPanel Orientation="Vertical">
+            <Label x:Name="POS_LABEL"/>
+            <Label x:Name="ROT_LABEL"/>
+        </StackPanel>
     </Grid>
 </views:WindowEx>
