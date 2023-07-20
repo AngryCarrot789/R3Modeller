@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 
-namespace R3Modeller.Core.Engine {
+namespace R3Modeller.Core.Engine.Utils {
     public static class Rotation {
         public static Vector3 GetOrbitPosition(float yaw, float pitch, float range) {
             Vector3 direction = new Vector3(

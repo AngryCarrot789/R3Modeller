@@ -10,8 +10,9 @@ namespace R3Modeller {
 
         public OGLContextWrapper() {
             this.window = new GameWindow(1, 1,
-                new GraphicsMode(new ColorFormat(4, 4, 4, 4), 24, 0, 0, ColorFormat.Empty),
-                "OpenTK Hidden Render Window",
+                // 32 BBP, 8 FSAA samples (multisampling)
+                new GraphicsMode(new ColorFormat(4, 4, 4, 4), 24, 0, 8, ColorFormat.Empty),
+                "R3Modeller OpenTK Hidden Render Window",
                 GameWindowFlags.FixedWindow, DisplayDevice.Default, 1, 0,
                 GraphicsContextFlags.Offscreen | GraphicsContextFlags.Debug, null, true) {
                 VSync = VSyncMode.Off

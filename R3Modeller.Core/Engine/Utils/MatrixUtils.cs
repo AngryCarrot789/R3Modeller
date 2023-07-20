@@ -1,6 +1,7 @@
+using System;
 using System.Numerics;
 
-namespace R3Modeller.Core.Engine {
+namespace R3Modeller.Core.Engine.Utils {
     public class MatrixUtils {
         /// <summary>
         /// Creates a matrix that can be used to transform world coordinates into local coordinates, using the given position, rotation and scale
@@ -41,5 +42,40 @@ namespace R3Modeller.Core.Engine {
         /// <param name="rotation">Input rotation vector</param>
         /// <returns>Output rotation matrix</returns>
         public static Matrix4x4 CreateNegativeRotationZXY(Vector3 rotation) => Matrix4x4.CreateRotationZ(-rotation.Z) * Matrix4x4.CreateRotationX(-rotation.X) * Matrix4x4.CreateRotationY(-rotation.Y);
+
+        public static Matrix4x4 CreateHeading(float heading) {
+            float cos = (float) Math.Cos(heading);
+            float sin = (float) Math.Sin(heading);
+            Matrix4x4 mat = Matrix4x4.Identity;
+            mat.M11 = cos;
+            mat.M12 = -sin;
+            mat.M21 = sin;
+            mat.M22 = cos;
+            return mat;
+        }
+
+        public static Matrix4x4 CreatePitch(float pitch) {
+            float cos = (float) Math.Cos(pitch);
+            float sin = (float) Math.Sin(pitch);
+            Matrix4x4 mat = Matrix4x4.Identity;
+            mat.M11 = cos;
+            mat.M13 = sin;
+            mat.M31 = -sin;
+            mat.M33 = cos;
+            return mat;
+        }
+
+        public static Matrix4x4 CreateBearing(float pitch) {
+            float cos = (float) Math.Cos(pitch);
+            float sin = (float) Math.Sin(pitch);
+            Matrix4x4 mat = Matrix4x4.Identity;
+            mat.M22 = cos;
+            mat.M23 = -sin;
+            mat.M32 = sin;
+            mat.M33 = cos;
+            return mat;
+        }
+
+        public static Matrix4x4 CreateRotationYPR(Vector3 rotation) => CreateHeading(rotation.Y) * CreatePitch(rotation.X) * CreateBearing(rotation.Z);
     }
 }

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Threading;
 using R3Modeller.Core;
 using R3Modeller.Core.Actions;
+using R3Modeller.Core.Engine.Objs.Actions;
 using R3Modeller.Core.History.Actions;
 using R3Modeller.Core.Shortcuts.Managing;
 using R3Modeller.Core.Shortcuts.ViewModels;
@@ -20,7 +21,6 @@ namespace R3Modeller {
     /// </summary>
     public partial class App : Application {
         private AppSplashScreen splash;
-        private OGLContextWrapper oglContext;
 
         public App() {
         }
@@ -33,6 +33,7 @@ namespace R3Modeller {
             // ActionManager.Instance.Register("actions.project.SaveAs", new SaveProjectAsAction());
             ActionManager.Instance.Register("actions.project.history.Undo", new UndoAction());
             ActionManager.Instance.Register("actions.project.history.Redo", new RedoAction());
+            ActionManager.Instance.Register("actions.objlist.RenameItem", new RenameObjectAction());
             // ActionManager.Instance.Register("actions.automation.AddKeyFrame", new AddKeyFrameAction());
             // ActionManager.Instance.Register("actions.editor.timeline.TogglePlayPause", new TogglePlayPauseAction());
             // ActionManager.Instance.Register("actions.resources.DeleteItems", new DeleteResourcesAction());
@@ -89,9 +90,6 @@ namespace R3Modeller {
             else {
                 await IoC.MessageDialogs.ShowMessageAsync("No keymap available", "Keymap file does not exist: " + keymapFilePath + $".\nCurrent directory: {Directory.GetCurrentDirectory()}\nCommand line args:{string.Join("\n", Environment.GetCommandLineArgs())}");
             }
-
-            await this.SetActivity("Loading OpenGL...");
-            this.oglContext = new OGLContextWrapper();
         }
 
         private async void Application_Startup(object sender, StartupEventArgs e) {
@@ -125,7 +123,7 @@ namespace R3Modeller {
             }
 
             await this.SetActivity("Loading FramePFX main window...");
-            MainWindow window = new MainWindow(this.oglContext);
+            MainWindow window = new MainWindow();
             this.splash.Close();
             this.MainWindow = window;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;

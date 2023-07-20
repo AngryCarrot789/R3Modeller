@@ -180,7 +180,7 @@ namespace R3Modeller.Shortcuts {
 
         private async Task<bool> ActivateShortcut(GroupedShortcut shortcut, List<ActivationHandlerReference> callbacks) {
             bool result = false;
-            IoC.BroadcastShortcutActivity($"Activated global shortcut: {shortcut}. Calling {callbacks.Count} callbacks...");
+            IoC.BroadcastShortcutActivity?.Invoke($"Activated global shortcut: {shortcut}. Calling {callbacks.Count} callbacks...");
             foreach (ActivationHandlerReference reference in callbacks) {
                 ShortcutActivateHandler callback = reference.Value;
                 if (callback != null && (result = await callback(this, shortcut))) {
@@ -188,30 +188,30 @@ namespace R3Modeller.Shortcuts {
                 }
             }
 
-            IoC.BroadcastShortcutActivity($"Activated global shortcut: {shortcut}. Calling {callbacks.Count} callbacks... Complete!");
+            IoC.BroadcastShortcutActivity?.Invoke($"Activated global shortcut: {shortcut}. Calling {callbacks.Count} callbacks... Complete!");
             return result;
         }
 
         public override bool OnNoSuchShortcutForKeyStroke(string @group, in KeyStroke stroke) {
             if (stroke.IsKeyDown) {
-                IoC.BroadcastShortcutActivity("No such shortcut for key stroke: " + stroke + " in group: " + group);
+                IoC.BroadcastShortcutActivity?.Invoke("No such shortcut for key stroke: " + stroke + " in group: " + group);
             }
 
             return base.OnNoSuchShortcutForKeyStroke(@group, in stroke);
         }
 
         public override bool OnNoSuchShortcutForMouseStroke(string @group, in MouseStroke stroke) {
-            IoC.BroadcastShortcutActivity("No such shortcut for mouse stroke: " + stroke + " in group: " + group);
+            IoC.BroadcastShortcutActivity?.Invoke("No such shortcut for mouse stroke: " + stroke + " in group: " + group);
             return base.OnNoSuchShortcutForMouseStroke(@group, in stroke);
         }
 
         public override bool OnCancelUsageForNoSuchNextKeyStroke(IShortcutUsage usage, GroupedShortcut shortcut, in KeyStroke stroke) {
-            IoC.BroadcastShortcutActivity("No such shortcut for next key stroke: " + stroke);
+            IoC.BroadcastShortcutActivity?.Invoke("No such shortcut for next key stroke: " + stroke);
             return base.OnCancelUsageForNoSuchNextKeyStroke(usage, shortcut, in stroke);
         }
 
         public override bool OnCancelUsageForNoSuchNextMouseStroke(IShortcutUsage usage, GroupedShortcut shortcut, in MouseStroke stroke) {
-            IoC.BroadcastShortcutActivity("No such shortcut for next mouse stroke: " + stroke);
+            IoC.BroadcastShortcutActivity?.Invoke("No such shortcut for next mouse stroke: " + stroke);
             return base.OnCancelUsageForNoSuchNextMouseStroke(usage, shortcut, in stroke);
         }
 
@@ -221,7 +221,7 @@ namespace R3Modeller.Shortcuts {
                 joiner.Append(pair.Key.CurrentStroke.ToString());
             }
 
-            IoC.BroadcastShortcutActivity("Waiting for next input: " + joiner);
+            IoC.BroadcastShortcutActivity?.Invoke("Waiting for next input: " + joiner);
             return base.OnShortcutUsagesCreated();
         }
 
@@ -231,7 +231,7 @@ namespace R3Modeller.Shortcuts {
                 joiner.Append(pair.Key.CurrentStroke.ToString());
             }
 
-            IoC.BroadcastShortcutActivity("Waiting for next input: " + joiner);
+            IoC.BroadcastShortcutActivity?.Invoke("Waiting for next input: " + joiner);
             return base.OnSecondShortcutUsagesProgressed();
         }
     }

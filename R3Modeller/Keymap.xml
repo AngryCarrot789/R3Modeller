@@ -20,45 +20,18 @@
             <Shortcut Name="RedoShortcut2" ActionId="actions.project.history.Redo">
                 <Keystroke Mods="CTRL" Key="Y"/>
             </Shortcut>
-            <Group Name="Resources">
-                <Shortcut Name="DeleteItems" ActionId="actions.resources.DeleteItems" Description="Deletes all of the selected resources">
+            <Group Name="ObjectList">
+                <Shortcut Name="DeleteItems" ActionId="actions.objlist.DeleteItems" Description="Deletes all of the selected objects">
                     <Keystroke Key="Delete"/>
                 </Shortcut>
-                <Shortcut Name="RenameItem" ActionId="actions.resources.RenameItem" Description="Rename the selected resource item">
+                <Shortcut Name="RenameItem" ActionId="actions.objlist.RenameItem" Description="Rename the selected object item">
                     <Keystroke Key="F2"/>
                 </Shortcut>
-                <Shortcut Name="RenameItem2" ActionId="actions.resources.RenameItem" Description="Rename the selected resource item">
+                <Shortcut Name="RenameItem2" ActionId="actions.objlist.RenameItem" Description="Rename the selected object item">
                     <Keystroke Mods="CTRL" Key="R"/>
                 </Shortcut>
-                <Shortcut Name="GroupSelection" ActionId="actions.resources.GroupSelection" Description="Puts the selected items into their own group">
+                <Shortcut Name="GroupSelection" ActionId="actions.objlist.GroupSelection" Description="Puts the selected objects into their own group object">
                     <Keystroke Mods="CTRL" Key="G"/>
-                </Shortcut>
-            </Group>
-            <Group Name="Timeline">
-                <Group Name="Surface">
-                    <Shortcut Name="DeleteSelectedClips" ActionId="actions.editor.timeline.DeleteSelectedClips" Description="Deletes all of the selected clips">
-                        <Keystroke Key="Delete"/>
-                    </Shortcut>
-                    <Shortcut Name="SliceClipsAction" ActionId="actions.editor.timeline.SliceClips" Description="Cuts the selected clip in half where the play head is. If you have no selection, then all clips over the play head are sliced">
-                        <Keystroke Key="S"/>
-                    </Shortcut>
-                </Group>
-                <Group Name="TrackControllers">
-                    <Shortcut Name="DeleteSelectedTrack" Description="Deletes the selected clip">
-                        <Keystroke Key="Delete"/>
-                    </Shortcut>
-                </Group>
-                <Shortcut Name="NewVideoTrack" ActionId="actions.editor.NewVideoTrack" Description="Creates a new video clip">
-                    <Keystroke Mods="CTRL+SHIFT" Key="Q"/>
-                </Shortcut>
-                <Shortcut Name="NewAudioTrack" ActionId="actions.editor.NewAudioTrack" Description="Creates a new audio clip">
-                    <Keystroke Mods="CTRL" Key="Q"/>
-                </Shortcut>
-                <Shortcut Name="TogglePlayPause" ActionId="actions.editor.timeline.TogglePlayPause" Description="Causes the timeline to play or pause">
-                    <Keystroke Key="Space"/>
-                </Shortcut>
-                <Shortcut Name="AddKeyFrame" ActionId="actions.automation.AddKeyFrame" Description="Adds a new key frame at the play head at the playhead for the clip's or clip's active sequence">
-                    <Keystroke Key="K"/>
                 </Shortcut>
             </Group>
         </Group>

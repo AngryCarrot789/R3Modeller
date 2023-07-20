@@ -34,5 +34,10 @@ namespace R3Modeller.Core {
             string filePath = GetResourceFile(path);
             return File.ReadAllText(filePath);
         }
+
+        public static string[] ReadFileLines(string path) {
+            string filePath = GetResourceFile(path);
+            return File.ReadAllLines(filePath);
+        }
     }
 }

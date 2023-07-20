@@ -3,19 +3,14 @@ using ObjectLoader.Data.DataStore;
 
 namespace ObjectLoader.Data.Elements {
     public class Group : IFaceGroup {
-        private readonly List<Face> _faces = new List<Face>();
+        public readonly List<Face> Faces = new List<Face>();
+        public string Name;
+        public Material Material;
 
         public Group(string name) {
             this.Name = name;
         }
 
-        public string Name { get; private set; }
-        public Material Material { get; set; }
-
-        public IList<Face> Faces { get { return this._faces; } }
-
-        public void AddFace(Face face) {
-            this._faces.Add(face);
-        }
+        public void AddFace(Face face) => this.Faces.Add(face);
     }
 }

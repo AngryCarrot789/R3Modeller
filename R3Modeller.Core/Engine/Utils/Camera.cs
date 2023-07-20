@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using R3Modeller.Core.Utils;
 
-namespace R3Modeller.Core.Engine {
+namespace R3Modeller.Core.Engine.Utils {
     public class Camera {
         public float yaw;
         public float pitch;
@@ -15,6 +15,7 @@ namespace R3Modeller.Core.Engine {
         private float fov;
         public float orbitRange;
 
+        public Vector3 pos;
         public Vector3 target;
 
         // view matrix
@@ -93,8 +94,14 @@ namespace R3Modeller.Core.Engine {
          */
 
         private void UpdateViewMatrix() {
-            Vector3 position = this.target + Rotation.GetOrbitPosition(this.yaw, this.pitch, this.orbitRange);
-            this.view = Matrix4x4.CreateLookAt(position, this.target, Vector3.UnitY);
+            Vector3 direction = new Vector3(
+                (float) (Math.Cos(-this.pitch) * Math.Sin(this.yaw)),
+                (float) Math.Sin(-this.pitch),
+                (float) (Math.Cos(-this.pitch) * Math.Cos(this.yaw))
+            );
+
+            this.pos = this.target + direction * this.orbitRange;
+            this.view = Matrix4x4.CreateLookAt(this.pos, this.target, Vector3.UnitY);
         }
 
         private void UpdateProjectionMatrix() {

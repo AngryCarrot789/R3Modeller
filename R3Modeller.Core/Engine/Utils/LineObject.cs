@@ -1,7 +1,7 @@
 using System.Numerics;
 using OpenTK.Graphics.OpenGL;
 
-namespace R3Modeller.Core.Engine {
+namespace R3Modeller.Core.Engine.Utils {
     public class LineObject {
         private readonly Shader shader;
         private readonly int vao;
@@ -26,14 +26,14 @@ namespace R3Modeller.Core.Engine {
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
-        public void DrawAt(Matrix4x4 mvp, Vector3 colour) {
+        public void DrawAt(Matrix4x4 mvp, Vector3 colour, float thickness = 3f) {
             this.shader.Use();
             this.shader.SetUniformVec3("in_color", colour);
             this.shader.SetUniformMatrix4("mvp", ref mvp);
 
             GL.Disable(EnableCap.DepthTest);
             GL.BindVertexArray(this.vao);
-            GL.LineWidth(4f);
+            GL.LineWidth(thickness);
             GL.DrawArrays(PrimitiveType.Lines, 0, 2);
             GL.BindVertexArray(0);
             GL.Enable(EnableCap.DepthTest);

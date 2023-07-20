@@ -216,6 +216,7 @@
     <Compile Include="Utils\UsageCounter.cs" />
     <Compile Include="Utils\Validate.cs" />
     <Compile Include="Utils\VisualTreeUtils.cs" />
+    <Compile Include="Viewport\OGLViewPortControl.cs" />
     <Compile Include="Views\AppLoggerWindow.xaml.cs">
       <DependentUpon>AppLoggerWindow.xaml</DependentUpon>
     </Compile>

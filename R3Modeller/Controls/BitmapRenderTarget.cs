@@ -28,8 +28,7 @@ namespace R3Modeller.Controls {
         protected override void OnRender(DrawingContext dc) {
             base.OnRender(dc);
             PresentationSource source;
-            EventHandler<DrawEventArgs> paint = this.Paint;
-            if (this.designMode || paint == null || (source = PresentationSource.FromVisual(this)) == null) {
+            if (this.designMode || (source = PresentationSource.FromVisual(this)) == null) {
                 return;
             }
 
@@ -53,10 +52,14 @@ namespace R3Modeller.Controls {
             }
 
             this.bitmap.Lock();
-            paint(this, new DrawEventArgs(this.bitmap.BackBuffer, width, height, scaleX, scaleY));
+            this.OnPaint(new DrawEventArgs(this.bitmap.BackBuffer, width, height, scaleX, scaleY));
             this.bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             this.bitmap.Unlock();
             dc.DrawImage(this.bitmap, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+        }
+
+        protected virtual void OnPaint(DrawEventArgs e) {
+            this.Paint?.Invoke(this, e);
         }
 
         private static bool IsPositive(double value) => !double.IsNaN(value) && !double.IsInfinity(value) && value > 0.0;

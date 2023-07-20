@@ -31,5 +31,15 @@ namespace R3Modeller.Core.Utils {
         public static Vector2 Lerp(in this Vector2 a, in Vector2 b, float blend) {
             return new Vector2(blend * (b.X - a.X) + a.X, blend * (b.Y - a.Y) + a.Y);
         }
+
+        public static Vector2 SetX(this Vector2 v, float x) => new Vector2(x, v.Y);
+        public static Vector2 SetY(this Vector2 v, float y) => new Vector2(v.X, y);
+        public static Vector3 SetX(this Vector3 v, float x) => new Vector3(x, v.Y, v.Z);
+        public static Vector3 SetY(this Vector3 v, float y) => new Vector3(v.X, y, v.Z);
+        public static Vector3 SetZ(this Vector3 v, float z) => new Vector3(v.X, v.Y, z);
+        public static Vector4 SetX(this Vector4 v, float x) => new Vector4(x, v.Y, v.Z, v.W);
+        public static Vector4 SetY(this Vector4 v, float y) => new Vector4(v.X, y, v.Z, v.W);
+        public static Vector4 SetZ(this Vector4 v, float z) => new Vector4(v.X, v.Y, z, v.W);
+        public static Vector4 SetW(this Vector4 v, float w) => new Vector4(v.X, v.Y, v.Z, w);
     }
 }

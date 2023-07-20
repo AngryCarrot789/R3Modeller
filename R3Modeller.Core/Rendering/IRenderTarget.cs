@@ -1,16 +1,15 @@
 namespace R3Modeller.Core.Rendering {
+    /// <summary>
+    /// An interface for a view port that can be rendered into
+    /// </summary>
     public interface IRenderTarget {
         /// <summary>
-        /// Uses any available view buffers, and sets its state to be in use, meaning the main UI cannot draw using it
+        /// Notified the render target that its render is invalid, and it should re-draw the scene
         /// </summary>
-        /// <param name="buffer">The available buffer</param>
-        /// <returns>True if a buffer was available, otherwise false</returns>
-        bool Allocate(out IViewBuffer buffer);
-
-        /// <summary>
-        /// Call as soon as the buffer usage from <see cref="Allocate"/> is completed, and you want to draw it to the main UI
-        /// </summary>
-        /// <param name="buffer">The buffer that was freed</param>
-        void Free(IViewBuffer buffer);
+        /// <param name="schedule">
+        /// True to asynchronously dispatch the invalidation (render will happen at some point in the future),
+        /// or false to instead block until the scene is rendered
+        /// </param>
+        void InvalidateRender(bool schedule = false);
     }
 }

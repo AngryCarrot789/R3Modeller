@@ -6,27 +6,139 @@
         xmlns:local="clr-namespace:R3Modeller" xmlns:controls="clr-namespace:R3Modeller.Controls"
         xmlns:views="clr-namespace:R3Modeller.Views"
         xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
+        xmlns:viewport="clr-namespace:R3Modeller.Viewport"
+        xmlns:viewModels="clr-namespace:R3Modeller.Core.Engine.ViewModels;assembly=R3Modeller.Core"
+        xmlns:shortcuts="clr-namespace:R3Modeller.Shortcuts"
+        xmlns:n="clr-namespace:R3Modeller.Notifications"
+        xmlns:n1="clr-namespace:R3Modeller.Core.Notifications;assembly=R3Modeller.Core"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
-        Style="{StaticResource CustomWindowStyleEx}">
+        d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
+        Style="{StaticResource CustomWindowStyleEx}"
+        shortcuts:UIFocusGroup.IsShortcutInputSource="True"
+        shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="250"/>
-        </Grid.ColumnDefinitions>
-        <Grid>
-            <controls:BitmapRenderTarget x:Name="OGLViewPort" Paint="OnPaintViewPort">
-                <controls:BitmapRenderTarget.LayoutTransform>
-                    <ScaleTransform ScaleY="-1"/>
-                </controls:BitmapRenderTarget.LayoutTransform>
-            </controls:BitmapRenderTarget>
-            <StackPanel Orientation="Vertical">
-                <Label x:Name="POS_LABEL"/>
-                <Label x:Name="ROT_LABEL"/>
-            </StackPanel>
+        <Menu VerticalAlignment="Top" Background="{DynamicResource ABrush.Tone6.Background.Static}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 0 0 1">
+            <MenuItem Header="File">
+                <Separator/>
+            </MenuItem>
+            <MenuItem Header="Theme">
+                <MenuItem Header="Deep Dark"     Click="SetThemeClick" Uid="0"/>
+                <MenuItem Header="Soft Dark"     Click="SetThemeClick" Uid="1"/>
+                <MenuItem Header="Dark Grey"     Click="SetThemeClick" Uid="2"/>
+                <MenuItem Header="Grey"          Click="SetThemeClick" Uid="3"/>
+                <Separator/>
+                <MenuItem Header="Red and Black" Click="SetThemeClick" Uid="4"/>
+                <MenuItem Header="Light Theme (PLEASE DONT USE FOR YOUR OWN GOOD D:)"   Click="SetThemeClick" Uid="5"/>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="0,19,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <viewport:OGLViewPortControl x:Name="OGLViewPort" Paint="OnPaintViewPort">
+                    <controls:BitmapRenderTarget.LayoutTransform>
+                        <ScaleTransform ScaleY="-1"/>
+                    </controls:BitmapRenderTarget.LayoutTransform>
+                </viewport:OGLViewPortControl>
+                <StackPanel Orientation="Vertical">
+                    <Label x:Name="POS_LABEL"/>
+                    <Label x:Name="ROT_LABEL"/>
+                </StackPanel>
+            </Grid>
+            <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                <!-- https://dlaa.me/blog/post/9898803 -->
+                <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0">
+                    <!-- Content -->
+                    <Grid Grid.IsSharedSizeScope="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Column headers -->
+                        <TreeViewItem Grid.Row="0" BorderThickness="1">
+                            <TreeViewItem.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                        <!-- Placeholders for two columns of ToggleButton -->
+                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                        <ColumnDefinition SharedSizeGroup="Data"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Task"/>
+                                    <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Toggle" group-->
+                                    <TreeViewItem Grid.Column="1" Padding="0"/>
+                                    <TextBlock Grid.Column="3" Text="Data"/>
+                                </Grid>
+                            </TreeViewItem.Header>
+                        </TreeViewItem>
+
+                        <!-- Data rows -->
+                        <TreeView DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObjects}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                            <TreeView.ItemTemplate>
+
+                                <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
+                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                            <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                            <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                            <ColumnDefinition SharedSizeGroup="Data"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                        <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
+                                    </Grid>
+
+                                    <!-- Level 1 template leaves space for 1 child "Toggle" level -->
+                                    <HierarchicalDataTemplate.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding SubItems}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                                    <ColumnDefinition SharedSizeGroup="Data"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
+                                            </Grid>
+
+                                            <!-- Level 2 template has no children -->
+                                            <HierarchicalDataTemplate.ItemTemplate>
+                                                <HierarchicalDataTemplate ItemsSource="{Binding SubItems}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition SharedSizeGroup="Data"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                        <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
+                                                    </Grid>
+                                                </HierarchicalDataTemplate>
+                                            </HierarchicalDataTemplate.ItemTemplate>
+                                        </HierarchicalDataTemplate>
+                                    </HierarchicalDataTemplate.ItemTemplate>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
-        <Grid Column="1">
-            <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" VerticalAlignment="Top" MassiveChange="1" LargeChange="0.1" SmallChange="0.01" TinyChange="0.001" Minimum="-10000" Maximum="100000" ValueChanged="RangeBase_OnValueChanged"/>
-        </Grid>
+        <Popup x:Name="NotificationPanelPopup" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
+            <Border Background="Transparent">
+                <ScrollViewer MaxHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
+                    <n:NotificationList ItemsSource="{Binding Notifications, Mode=OneTime}" ItemTemplateSelector="{StaticResource NotificationTemplateSelector}" MinWidth="300"/>
+                </ScrollViewer>
+            </Border>
+        </Popup>
     </Grid>
 </views:WindowEx>

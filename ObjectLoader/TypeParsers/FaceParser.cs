@@ -23,7 +23,7 @@ namespace ObjectLoader.TypeParsers {
 
             foreach (string vertexString in vertices) {
                 FaceVertex faceVertex = this.ParseFaceVertex(vertexString);
-                face.AddVertex(faceVertex);
+                face.Vertices.Add(faceVertex);
             }
 
             this._faceGroup.AddFace(face);

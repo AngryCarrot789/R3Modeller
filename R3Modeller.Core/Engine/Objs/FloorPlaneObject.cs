@@ -1,7 +1,8 @@
 using System.Numerics;
 using R3Modeller.Core.Engine.Meshes;
+using R3Modeller.Core.Engine.Utils;
 
-namespace R3Modeller.Core.Engine.SceneGraph {
+namespace R3Modeller.Core.Engine.Objs {
     public class FloorPlaneObject : SceneObject {
         private readonly BasicMesh mesh;
         private readonly Shader shader;

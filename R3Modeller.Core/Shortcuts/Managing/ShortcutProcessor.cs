@@ -363,14 +363,14 @@ namespace R3Modeller.Core.Shortcuts.Managing {
                 else if (obj is IShortcutToCommand converter) {
                     ICommand command = converter.GetCommandForShortcut(shortcut.FullPath);
                     if (command is BaseAsyncRelayCommand asyncCommand) {
-                        IoC.BroadcastShortcutActivity($"Activating shortcut: {shortcut} via command...");
+                        IoC.BroadcastShortcutActivity?.Invoke($"Activating shortcut: {shortcut} via command...");
                         if (await asyncCommand.TryExecuteAsync(null)) {
-                            IoC.BroadcastShortcutActivity($"Activating shortcut: {shortcut} via command... Complete!");
+                            IoC.BroadcastShortcutActivity?.Invoke($"Activating shortcut: {shortcut} via command... Complete!");
                             return true;
                         }
                     }
                     else if (command != null && command.CanExecute(null)) {
-                        IoC.BroadcastShortcutActivity($"Activated shortcut: {shortcut} via command... Complete!");
+                        IoC.BroadcastShortcutActivity?.Invoke($"Activated shortcut: {shortcut} via command... Complete!");
                         command.Execute(null);
                         return true;
                     }
@@ -388,13 +388,13 @@ namespace R3Modeller.Core.Shortcuts.Managing {
                 context = newCtx;
             }
 
-            IoC.BroadcastShortcutActivity($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}...");
+            IoC.BroadcastShortcutActivity?.Invoke($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}...");
             if (await ActionManager.Instance.Execute(shortcut.ActionId, context)) {
-                IoC.BroadcastShortcutActivity($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}... Complete!");
+                IoC.BroadcastShortcutActivity?.Invoke($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}... Complete!");
                 return true;
             }
 
-            IoC.BroadcastShortcutActivity($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}... Incomplete!");
+            IoC.BroadcastShortcutActivity?.Invoke($"Activating shortcut action: {shortcut} -> {shortcut.ActionId}... Incomplete!");
             return false;
         }
 

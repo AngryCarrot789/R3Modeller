@@ -6,7 +6,7 @@ using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 using Vector4 = System.Numerics.Vector4;
 
-namespace R3Modeller.Core.Engine {
+namespace R3Modeller.Core.Engine.Utils {
     public class Shader : IDisposable {
         private readonly Dictionary<string, int> uniformNameToId;
         private readonly Dictionary<int, string> uniformIdToName;
