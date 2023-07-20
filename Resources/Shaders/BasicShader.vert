@@ -18,11 +18,11 @@
 #version 330
 
 // Uniforms
-uniform mat4 mat;
+uniform mat4 mvp;
 
 // Inputs
 layout(location = 0) in vec3 in_pos;
 
 void main(void) {
-    gl_Position = mat * vec4(in_pos, 1.0);
+    gl_Position = mvp * vec4(in_pos, 1.0);
 }

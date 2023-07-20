@@ -35,7 +35,7 @@ namespace R3Modeller.Core.Engine {
             Matrix4x4 matrix = modelMatrix * view * projection;
             shader.Use();
             shader.SetUniformVec3("in_color", new Vector3(0.4f, 0.4f, 0.7f));
-            shader.SetUniformMatrix4("mat", ref matrix);
+            shader.SetUniformMatrix4("mvp", ref matrix);
 
             GL.EnableVertexAttribArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
@@ -47,7 +47,8 @@ namespace R3Modeller.Core.Engine {
                 0,     // stride
                 0      // array buffer offset
             );
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
             GL.DisableVertexAttribArray(0);
         }
     }

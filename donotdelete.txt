@@ -1,0 +1,2 @@
+This file is used to identify the resource folder... because I don't know how else to safely do it. 
+The WPF project contains a "Resources" folder too so it might detect that

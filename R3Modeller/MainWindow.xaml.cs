@@ -208,14 +208,10 @@ namespace R3Modeller {
             GL.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
+            // Render scene
             {
                 this.triangle.Render(this.camera, this.shader);
                 this.floor.Render(this.camera, this.shader);
-
-                // Debug - for checking where a triangle's vertices are
-                // Vector4 vec1 = Vector4.Transform(new Vector3(-1.0f, -1.0f, 0.0f), matrix);
-                // Vector4 vec2 = Vector4.Transform(new Vector3(1.0f, -1.0f, 0.0f), matrix);
-                // Vector4 vec3 = Vector4.Transform(new Vector3(0.0f,  1.0f, 0.0f), matrix);
             }
 
             // GL.UseProgram(0); // Use your shader program
@@ -223,7 +219,7 @@ namespace R3Modeller {
             // GL.DrawArrays(PrimitiveType.Triangles, 0, this.verts.Length / 3);
             // GL.BindVertexArray(0); // Unbind VAO
 
-            // read pixels from OpenGL's back buffer, then write into draw event's back buffer (aka the WPF bitmap)
+            // Read pixels from OpenGL's back buffer, then write into draw event's back buffer (aka the WPF bitmap)
             // The resulting pixels will be flipped vertically, because OpenGL origin direction is bottom-left, where as
             // windowing apps (like WPF) use the top left.
             // However the LayoutTransform property of the control can be used to scale the layout by -1 in the Y axis to flip

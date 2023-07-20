@@ -25,15 +25,20 @@ namespace R3Modeller.Core.Engine {
         }
 
         public override void Render(Camera camera, Shader shader) {
-            // Calculate model matrix of the triangle, upload matrix to shader and draw mesh
             Matrix4x4 view = camera.view;
             Matrix4x4 projection = camera.proj;
+
+            // Calculate model matrix of the triangle
             Matrix4x4 modelMatrix = MatrixUtils.LocalToWorld(this.pos, this.euler, this.scale);
+            // Calculates model-view-projection matrix
             Matrix4x4 matrix = modelMatrix * view * projection;
+
+            // Upload the final matrix to shader
             shader.Use();
             shader.SetUniformVec3("in_color", new Vector3(0.4f, 0.7f, 0.8f));
-            shader.SetUniformMatrix4("mat", ref matrix);
+            shader.SetUniformMatrix4("mvp", ref matrix);
 
+            // Draw mesh
             GL.EnableVertexAttribArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
             GL.VertexAttribPointer(
