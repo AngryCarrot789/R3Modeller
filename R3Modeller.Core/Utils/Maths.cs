@@ -12,8 +12,9 @@ namespace R3Modeller.Core.Utils {
 
         private const float R2D = 180.0f / PI;
         private const float D2R = PI / 180.0f;
-        public static float RadiansToDegrees(float radians) => radians * R2D;
-        public static float DegreesToRadians(float degrees) => degrees * D2R;
+
+        public static float Rad2Deg(float radians) => radians * R2D;
+        public static float Deg2Rad(float degrees) => degrees * D2R;
 
         /// <summary>
         /// Maps a double value from the input range to the output range

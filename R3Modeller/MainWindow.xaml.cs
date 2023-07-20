@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using R3Modeller.Controls;
 using System.Windows;
 using System.Windows.Input;
+using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using R3Modeller.Core;
 using R3Modeller.Core.Engine;
+using R3Modeller.Core.Engine.SceneGraph;
 using R3Modeller.Core.Utils;
 using R3Modeller.Views;
+using Vector3 = System.Numerics.Vector3;
 
 namespace R3Modeller {
     /// <summary>
@@ -19,9 +24,12 @@ namespace R3Modeller {
         // private readonly float[] verts;
 
         private readonly Camera camera;
-        private readonly Shader shader;
         private readonly TriangleObject triangle;
         private readonly FloorPlaneObject floor;
+
+        private readonly LineObject lineX;
+        private readonly LineObject lineY;
+        private readonly LineObject lineZ;
 
         private bool isOrbitActive;
 
@@ -39,9 +47,17 @@ namespace R3Modeller {
             GL.DepthMask(true);
 
             this.camera = new Camera();
+            this.camera.SetYawPitch(0.45f, -0.35f);
             this.triangle = new TriangleObject();
+
+            TriangleObject tri = new TriangleObject();
+            tri.SetPosition(new Vector3(3f, 2f, 3f));
+            this.triangle.AddChild(tri);
+
             this.floor = new FloorPlaneObject();
-            this.shader = new Shader(ResourceLocator.ReadFile("Shaders/BasicShader.vert"), ResourceLocator.ReadFile("Shaders/BasicShader.frag"));
+            this.lineX = new LineObject(new Vector3(), new Vector3(1f, 0f, 0f));
+            this.lineY = new LineObject(new Vector3(), new Vector3(0f, 1f, 0f));
+            this.lineZ = new LineObject(new Vector3(), new Vector3(0f, 0f, 1f));
 
             #region obj loader
 
@@ -87,10 +103,10 @@ namespace R3Modeller {
             base.OnPreviewKeyDown(e);
             Vector3 pos = this.camera.target;
             switch (e.Key) {
-                case Key.W: pos.Z += 0.1f; break;
-                case Key.A: pos.X += 0.1f; break;
-                case Key.S: pos.Z -= 0.1f; break;
-                case Key.D: pos.X -= 0.1f; break;
+                case Key.W: pos.Z -= 0.1f; break;
+                case Key.A: pos.X -= 0.1f; break;
+                case Key.S: pos.Z += 0.1f; break;
+                case Key.D: pos.X += 0.1f; break;
                 case Key.Space:     pos.Y += 0.1f; break;
                 case Key.LeftShift: pos.Y -= 0.1f; break;
                 case Key.System: {
@@ -156,36 +172,43 @@ namespace R3Modeller {
             base.OnMouseMove(e);
 
             Point currPos = e.GetPosition(this);
-            if (this.lastMouse is Point lastPos && e.LeftButton == MouseButtonState.Pressed && this.isOrbitActive) {
+            if (this.lastMouse is Point lastPos && this.isOrbitActive) {
                 float changeX = 1f + (float) Maths.Map(currPos.X - lastPos.X, 0d, this.ActualWidth, -1d, 1d);
                 float changeY = 1f - (float) Maths.Map(currPos.Y - lastPos.Y, 0d, this.ActualHeight, 1d, -1d);
 
                 const float sensitivity = 1.75f;
+                const float epsilon = 0.00001f;
+                if (e.LeftButton == MouseButtonState.Pressed) {
+                    float yaw = this.camera.yaw;
+                    float pitch = this.camera.pitch;
+                    yaw -= (changeX * sensitivity);
+                    if (yaw > Maths.PI) {
+                        yaw = Maths.PI_NEG + epsilon;
+                    }
+                    else if (yaw < Maths.PI_NEG) {
+                        yaw = Maths.PI - epsilon;
+                    }
 
-                float yaw = this.camera.yaw;
-                float pitch = this.camera.pitch;
-                yaw -= (changeX * sensitivity);
-                if (yaw > Maths.PI) {
-                    yaw = Maths.PI_NEG + 0.0001f;
-                }
-                else if (yaw < Maths.PI_NEG) {
-                    yaw = Maths.PI - 0.0001f;
-                }
+                    pitch -= (changeY * sensitivity);
+                    if (pitch > Maths.PI_HALF) {
+                        pitch = Maths.PI_HALF - epsilon;
+                    }
+                    else if (pitch < Maths.PI_NEG_HALF) {
+                        pitch = Maths.PI_NEG_HALF + epsilon;
+                    }
 
-                pitch -= (changeY * sensitivity);
-                if (pitch > Maths.PI_HALF) {
-                    pitch = Maths.PI_HALF;
+                    this.camera.SetYawPitch(yaw, pitch);
+                    this.UpdateTextInfo();
+                    this.OGLViewPort.InvalidateVisual();
                 }
-                else if (pitch < Maths.PI_NEG / 2) {
-                    pitch = Maths.PI_NEG_HALF;
+                else if (e.RightButton == MouseButtonState.Pressed) {
+                    this.camera.SetTarget(this.camera.target - new Vector3(changeX * sensitivity * (this.camera.orbitRange / 2f), 0f, changeY * sensitivity * (this.camera.orbitRange / 2f)));
+                    this.UpdateTextInfo();
+                    this.OGLViewPort.InvalidateVisual();
                 }
-
-                this.camera.SetYawPitch(yaw, pitch);
-                this.UpdateTextInfo();
             }
 
             this.lastMouse = currPos;
-            this.OGLViewPort.InvalidateVisual();
         }
 
         public void UpdateTextInfo() {
@@ -210,8 +233,25 @@ namespace R3Modeller {
 
             // Render scene
             {
-                this.triangle.Render(this.camera, this.shader);
-                this.floor.Render(this.camera, this.shader);
+                this.triangle.Render(this.camera);
+                this.floor.Render(this.camera);
+            }
+
+            // Render XYZ axis
+            {
+                // TODO: cache these matrices maybe
+                Vector3 position = Rotation.GetOrbitPosition(this.camera.yaw, this.camera.pitch, 10f);
+                Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
+
+                // Calculates the screen position of the axis preview origin
+                Vector3 pos = new Vector3(Maths.Map(60f, 0, e.Width, 1f, -1f), Maths.Map(60f, 0, e.Height, 1f, -1f), 0f);
+
+                // Calculate the model-view-matrix of the line
+                // Translation is done at the end to apply translation after projection
+                Matrix4x4 lineMvp = lineModelView * this.camera.proj * Matrix4x4.CreateTranslation(pos);
+                this.lineX.DrawAt(lineMvp, new Vector3(1f, 0f, 0f));
+                this.lineY.DrawAt(lineMvp, new Vector3(0f, 1f, 0f));
+                this.lineZ.DrawAt(lineMvp, new Vector3(0f, 0f, 1f));
             }
 
             // GL.UseProgram(0); // Use your shader program
@@ -229,6 +269,12 @@ namespace R3Modeller {
             GL.ReadBuffer(ReadBufferMode.Back);
             GL.ReadPixels(0, 0, e.Width, e.Height, PixelFormat.Bgra, PixelType.UnsignedByte, e.BackBuffer);
             this.ogl.MakeCurrent(false);
+        }
+
+        private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+            double diff = e.NewValue - e.OldValue;
+            this.triangle.SetPosition(this.triangle.Pos + new Vector3((float) diff));
+            this.OGLViewPort.InvalidateVisual();
         }
     }
 }

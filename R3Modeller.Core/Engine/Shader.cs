@@ -1,33 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 using Vector4 = System.Numerics.Vector4;
 
 namespace R3Modeller.Core.Engine {
-    public class Shader {
+    public class Shader : IDisposable {
         private readonly Dictionary<string, int> uniformNameToId;
         private readonly Dictionary<int, string> uniformIdToName;
+        private readonly Dictionary<string, int> attributeNameToId;
+        private readonly Dictionary<int, string> attributeIdToName;
 
         /// <summary>
         /// The ID of the shader program
         /// </summary>
         public int ProgramID { get; private set; }
 
+        public IReadOnlyDictionary<string, int> UniformNameToId => this.uniformNameToId;
+        public IReadOnlyDictionary<int, string> UniformIdToName => this.uniformIdToName;
+        public IReadOnlyDictionary<string, int> AttributeNameToId => this.attributeNameToId;
+        public IReadOnlyDictionary<int, string> AttributeIdToName => this.attributeIdToName;
+
         public Shader(string vertexCode, string fragmentCode) {
             this.uniformNameToId = new Dictionary<string, int>();
             this.uniformIdToName = new Dictionary<int, string>();
-
-            int vertId = this.LoadShader(vertexCode, ShaderType.VertexShader);
-            int fragId = this.LoadShader(fragmentCode, ShaderType.FragmentShader);
+            this.attributeNameToId = new Dictionary<string, int>();
+            this.attributeIdToName = new Dictionary<int, string>();
 
             this.ProgramID = GL.CreateProgram();
-            GL.AttachShader(this.ProgramID, vertId);
-            GL.AttachShader(this.ProgramID, fragId);
+
+            int vertId = LoadShader(this.ProgramID, vertexCode, ShaderType.VertexShader);
+            int fragId = LoadShader(this.ProgramID, fragmentCode, ShaderType.FragmentShader);
 
             GL.LinkProgram(this.ProgramID);
 
@@ -35,6 +40,7 @@ namespace R3Modeller.Core.Engine {
             GL.GetProgram(this.ProgramID, GetProgramParameterName.LinkStatus, out int linked);
             if (linked < 1) {
                 GL.GetProgramInfoLog(this.ProgramID, out string info);
+                GL.DeleteProgram(this.ProgramID);
                 throw new Exception($"Failed to link shader program :\n{info}");
             }
 
@@ -45,6 +51,13 @@ namespace R3Modeller.Core.Engine {
                 this.uniformIdToName[i] = name;
             }
 
+            GL.GetProgram(this.ProgramID, GetProgramParameterName.ActiveAttributes, out count);
+            for (int i = 0; i < count; i++) {
+                GL.GetActiveAttrib(this.ProgramID, i, 16, out int length, out int size, out ActiveAttribType type, out string name);
+                this.attributeNameToId[name] = i;
+                this.attributeIdToName[i] = name;
+            }
+
             GL.DetachShader(this.ProgramID, vertId);
             GL.DetachShader(this.ProgramID, fragId);
             GL.DeleteShader(vertId);
@@ -52,20 +65,22 @@ namespace R3Modeller.Core.Engine {
         }
 
         // Loads the shaders into the main program
-        public int LoadShader(string code, ShaderType type) {
-            int shaderID = GL.CreateShader(type);
-            GL.ShaderSource(shaderID, code);
-            GL.CompileShader(shaderID);
+        public static int LoadShader(int programId, string code, ShaderType type) {
+            int id = GL.CreateShader(type);
+            GL.ShaderSource(id, code);
+            GL.CompileShader(id);
 
             // Check if it compiled
-            GL.GetShader(shaderID, ShaderParameter.CompileStatus, out int isCompiled);
+            GL.GetShader(id, ShaderParameter.CompileStatus, out int isCompiled);
             if (isCompiled < 1) {
                 string shaderType = type == ShaderType.VertexShader ? "Vertex" : (type == ShaderType.FragmentShader ? "Fragment" : "<Unknown>");
-                GL.GetShaderInfoLog(shaderID, out string info);
+                GL.GetShaderInfoLog(id, out string info);
+                GL.DeleteProgram(programId);
                 throw new Exception($"Failed to compile {shaderType} shader: {info}");
             }
 
-            return shaderID;
+            GL.AttachShader(programId, id);
+            return id;
         }
 
         public bool GetUniformLocation(string name, out int index) => this.uniformNameToId.TryGetValue(name, out index);
@@ -110,14 +125,18 @@ namespace R3Modeller.Core.Engine {
 
         public void SetUniformMatrix4(string name, ref Matrix4x4 value) {
             if (this.GetUniformLocation(name, out int index)) {
-                Matrix4 mat = Unsafe.As<Matrix4x4, Matrix4>(ref value);
-                GL.UniformMatrix4(index, false, ref mat);
+                GL.UniformMatrix4(index, 1, false, ref value.M11);
+            }
+        }
+
+        public unsafe void SetUniformMatrix4(string name, float* ptr) {
+            if (this.GetUniformLocation(name, out int index)) {
+                GL.UniformMatrix4(index, 1, false, ptr);
             }
         }
 
         public static void SetUniformMatrix4(int location, ref Matrix4x4 value) {
-            Matrix4 mat = Unsafe.As<Matrix4x4, Matrix4>(ref value);
-            GL.UniformMatrix4(location, false, ref mat);
+            GL.UniformMatrix4(location, 1, false, ref value.M11);
         }
 
         public void Use() {

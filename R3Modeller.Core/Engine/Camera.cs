@@ -23,7 +23,7 @@ namespace R3Modeller.Core.Engine {
         // projection matrix
         public Matrix4x4 proj;
 
-        public Camera(float fov = 60f, float near = 0.01f, float far = 100f) {
+        public Camera(float fov = 50f, float near = 0.01f, float far = 100f) {
             this.near = near;
             this.far = far;
             this.fov = fov;
@@ -93,18 +93,12 @@ namespace R3Modeller.Core.Engine {
          */
 
         private void UpdateViewMatrix() {
-            Vector3 direction = new Vector3(
-                (float) (Math.Cos(-this.pitch) * Math.Sin(this.yaw)),
-                (float) Math.Sin(-this.pitch),
-                (float) (Math.Cos(-this.pitch) * Math.Cos(this.yaw))
-            );
-
-            Vector3 position = this.target + direction * this.orbitRange;
+            Vector3 position = this.target + Rotation.GetOrbitPosition(this.yaw, this.pitch, this.orbitRange);
             this.view = Matrix4x4.CreateLookAt(position, this.target, Vector3.UnitY);
         }
 
         private void UpdateProjectionMatrix() {
-            float fov = Maths.DegreesToRadians(60f);
+            float fov = Maths.Deg2Rad(60f);
             float aspect = (float) this.lastW / this.lastH;
             float tanHalfFov = (float) Math.Tan(fov / 2);
             Matrix4x4 mat = Matrix4x4.Identity;
