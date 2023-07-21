@@ -105,6 +105,7 @@ namespace R3Modeller.Core.Engine.Objs {
             GL.BindVertexArray(this.vao);
             GL.DrawArrays(PrimitiveType.Quads, 0, this.indicesCount);
             // GL.DrawElements(PrimitiveType.Quads, this.indicesCount, DrawElementsType.UnsignedInt, 0);
+            GL.BindVertexArray(0);
 
             this.RenderChildren(camera);
         }

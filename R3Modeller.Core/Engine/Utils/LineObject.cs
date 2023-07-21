@@ -1,8 +1,9 @@
+using System;
 using System.Numerics;
 using OpenTK.Graphics.OpenGL;
 
 namespace R3Modeller.Core.Engine.Utils {
-    public class LineObject {
+    public class LineObject : IDisposable {
         private readonly Shader shader;
         private readonly int vao;
         private readonly int vbo;
@@ -37,6 +38,12 @@ namespace R3Modeller.Core.Engine.Utils {
             GL.DrawArrays(PrimitiveType.Lines, 0, 2);
             GL.BindVertexArray(0);
             GL.Enable(EnableCap.DepthTest);
+        }
+
+        public void Dispose() {
+            GL.DeleteVertexArray(this.vao);
+            GL.DeleteBuffer(this.vbo);
+            this.shader?.Dispose();
         }
     }
 }

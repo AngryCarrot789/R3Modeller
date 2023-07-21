@@ -9,7 +9,8 @@
                 <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml"/>
                 <ResourceDictionary Source="Themes/ControlColours.xaml"/>
                 <ResourceDictionary Source="Themes/Controls.xaml"/>
-                
+                <ResourceDictionary Source="Themes/MultiSelectTreeStyles.xaml"/>
+
                 <ResourceDictionary Source="Controls/ControlStyles.xaml"/>
                 <ResourceDictionary Source="AdvancedContextService/ContextStyles.xaml"/>
                 <ResourceDictionary Source="Notifications/NotificationStyles.xaml"/>

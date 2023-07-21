@@ -1,24 +1,25 @@
 using System;
+using System.Linq;
 using OpenTK.Graphics.OpenGL;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Core.Engine.Meshes {
     /// <summary>
     /// A class for storing a basic mesh that only stores coordinates
     /// </summary>
-    public class BasicMesh {
+    public class BasicMesh : IDisposable {
         private readonly float[] verts;
         private readonly int vertices;
         private readonly int vao;
         private readonly int vbo;
 
         public BasicMesh(float[] verts) {
-            this.verts = verts;
             if (verts.Length % 3 != 0) {
                 throw new Exception("Vertices count must be divisible by 3");
             }
 
+            this.verts = verts.Copy();
             this.vertices = verts.Length / 3;
-
             this.vao = GL.GenVertexArray();
             GL.BindVertexArray(this.vao);
 
@@ -40,6 +41,11 @@ namespace R3Modeller.Core.Engine.Meshes {
             GL.BindVertexArray(this.vao);
             GL.DrawArrays(PrimitiveType.Triangles, offset, count);
             GL.BindVertexArray(0);
+        }
+
+        public void Dispose() {
+            GL.DeleteVertexArray(this.vao);
+            GL.DeleteBuffer(this.vbo);
         }
     }
 }

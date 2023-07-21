@@ -55,7 +55,7 @@ namespace R3Modeller.Core.Utils {
             return true;
         }
 
-        public static unsafe T[] CloneArrayUnsafe<T>(T[] array) where T : unmanaged {
+        public static unsafe T[] CopyArrayUnsafe<T>(this T[] array) where T : unmanaged {
             if (array == null)
                 return null;
             int length = array.Length;
@@ -72,7 +72,7 @@ namespace R3Modeller.Core.Utils {
             return values;
         }
 
-        public static T[] CloneArray<T>(T[] array) {
+        public static T[] Copy<T>(this T[] array) {
             if (array == null)
                 return null;
             int length = array.Length;

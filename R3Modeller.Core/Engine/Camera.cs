@@ -2,17 +2,17 @@ using System;
 using System.Numerics;
 using R3Modeller.Core.Utils;
 
-namespace R3Modeller.Core.Engine.Utils {
+namespace R3Modeller.Core.Engine {
     public class Camera {
-        public float yaw;
-        public float pitch;
-
         private int lastW;
         private int lastH;
 
-        private float near;
-        private float far;
-        private float fov;
+        public float yaw;
+        public float pitch;
+
+        public float near;
+        public float far;
+        public float fov;
         public float orbitRange;
 
         public Vector3 pos;
@@ -24,7 +24,7 @@ namespace R3Modeller.Core.Engine.Utils {
         // projection matrix
         public Matrix4x4 proj;
 
-        public Camera(float fov = 50f, float near = 0.01f, float far = 100f) {
+        public Camera(float fov = 60f, float near = 0.01f, float far = 1000f) {
             this.near = near;
             this.far = far;
             this.fov = fov;
@@ -52,7 +52,18 @@ namespace R3Modeller.Core.Engine.Utils {
             this.UpdateViewMatrix();
         }
 
-        public void SetInfo(float fov = 60f, float near = 0.01f, float far = 100f) {
+        public void SetFov(float fov = 60f) {
+            this.fov = fov;
+            this.UpdateProjectionMatrix();
+        }
+
+        public void SetDrawDistance(float near = 0.01f, float far = 1000f) {
+            this.near = near;
+            this.far = far;
+            this.UpdateProjectionMatrix();
+        }
+
+        public void SetInfo(float fov = 60f, float near = 0.01f, float far = 1000f) {
             this.fov = fov;
             this.near = near;
             this.far = far;
@@ -105,15 +116,15 @@ namespace R3Modeller.Core.Engine.Utils {
         }
 
         private void UpdateProjectionMatrix() {
-            float fov = Maths.Deg2Rad(60f);
+            float fovRad = Maths.Deg2Rad(this.fov);
             float aspect = (float) this.lastW / this.lastH;
-            float tanHalfFov = (float) Math.Tan(fov / 2);
+            float tfov = (float) Math.Tan(fovRad / 2);
             Matrix4x4 mat = Matrix4x4.Identity;
-            mat.M11 = 1 / (aspect * tanHalfFov);
-            mat.M22 = 1 / (tanHalfFov);
-            mat.M33 = - (this.far + this.near) / (this.far - this.near);
-            mat.M34 = - 1;
-            mat.M43 = - (2 * this.far * this.near) / (this.far - this.near);
+            mat.M11 = 1f / (aspect * tfov);
+            mat.M22 = 1f / tfov;
+            mat.M33 = -(this.far + this.near) / (this.far - this.near);
+            mat.M34 = -1f;
+            mat.M43 = -(2f * this.far * this.near) / (this.far - this.near);
             this.proj = mat;
         }
     }

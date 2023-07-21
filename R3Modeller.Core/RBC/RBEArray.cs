@@ -54,7 +54,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBEByteArray CloneCore() {
-            return new RBEByteArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBEByteArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -97,7 +97,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBEShortArray CloneCore() {
-            return new RBEShortArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBEShortArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -146,7 +146,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBEIntArray CloneCore() {
-            return new RBEIntArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBEIntArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -192,7 +192,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBELongArray CloneCore() {
-            return new RBELongArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBELongArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -235,7 +235,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBEFloatArray CloneCore() {
-            return new RBEFloatArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBEFloatArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -278,7 +278,7 @@ namespace R3Modeller.Core.RBC {
 
         public override RBEBase Clone() => this.CloneCore();
         public RBEDoubleArray CloneCore() {
-            return new RBEDoubleArray(Arrays.CloneArrayUnsafe(this.Array));
+            return new RBEDoubleArray(Arrays.CopyArrayUnsafe(this.Array));
         }
     }
 
@@ -316,7 +316,7 @@ namespace R3Modeller.Core.RBC {
         }
 
         public override RBEBase Clone() => this.CloneCore();
-        public RBEStringArray CloneCore() => new RBEStringArray(Arrays.CloneArray(this.Array));
+        public RBEStringArray CloneCore() => new RBEStringArray(Arrays.Copy(this.Array));
     }
 
     public class RBEStructArray : RBEBase {
@@ -409,7 +409,7 @@ namespace R3Modeller.Core.RBC {
         public override RBEBase Clone() => this.CloneCore();
 
         public RBEStructArray CloneCore() {
-            return new RBEStructArray {data = Arrays.CloneArrayUnsafe(this.data)};
+            return new RBEStructArray {data = Arrays.CopyArrayUnsafe(this.data)};
         }
     }
 }

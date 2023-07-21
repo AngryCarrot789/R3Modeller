@@ -11,6 +11,7 @@
         xmlns:shortcuts="clr-namespace:R3Modeller.Shortcuts"
         xmlns:n="clr-namespace:R3Modeller.Notifications"
         xmlns:n1="clr-namespace:R3Modeller.Core.Notifications;assembly=R3Modeller.Core"
+        xmlns:c1="clr-namespace:MultiSelectTreeViews.Controls;assembly=MultiSelectTreeViews"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
@@ -47,10 +48,15 @@
                     <Label x:Name="POS_LABEL"/>
                     <Label x:Name="ROT_LABEL"/>
                 </StackPanel>
+                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,0,0,10" Minimum="20" Maximum="120" Value="{Binding RenderViewport.Camera.Fov, Mode=TwoWay}" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
             </Grid>
             <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
                 <!-- https://dlaa.me/blog/post/9898803 -->
                 <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0">
+                    <Border.Resources>
+
+
+                    </Border.Resources>
                     <!-- Content -->
                     <Grid Grid.IsSharedSizeScope="True">
                         <Grid.RowDefinitions>
@@ -79,12 +85,12 @@
 
                         <!-- Data rows -->
                         <TreeView DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
-                            <TreeView.ItemContainerStyle>
+                            <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                                     <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
                                 </Style>
-                            </TreeView.ItemContainerStyle>
-                            <TreeView.ItemTemplate>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
 
                                 <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
                                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
@@ -131,13 +137,13 @@
                                         </HierarchicalDataTemplate>
                                     </HierarchicalDataTemplate.ItemTemplate>
                                 </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
+                            </ItemsControl.ItemTemplate>
                         </TreeView>
                     </Grid>
                 </Border>
             </Grid>
         </Grid>
-        <Popup x:Name="NotificationPanelPopup" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
+        <Popup x:Name="NotificationPanelPopup" StaysOpen="True" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
             <Border Background="Transparent">
                 <ScrollViewer MaxHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"
                               VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">

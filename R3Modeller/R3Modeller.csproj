@@ -37,6 +37,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
+    <Reference Include="MultiSelectTreeView, PublicKeyToken=null">
+      <HintPath>..\packages\MultiSelectTreeView.1.0.9\lib\net40\MultiSelectTreeView.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.3.3.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>..\packages\OpenTK.3.3.3\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -340,6 +343,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\MultiSelectTreeStyles.xaml" />
     <Page Include="Views\AppLoggerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -418,6 +422,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiSelectTreeView\MultiSelectTreeView.csproj">
+      <Project>{acde95f3-218e-4bb9-a9f4-4b27a7f35bbb}</Project>
+      <Name>MultiSelectTreeView</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ObjectLoader\ObjectLoader.csproj">
       <Project>{c9e18a89-1295-4c13-9a2a-f3f0c8dad9b4}</Project>
       <Name>ObjectLoader</Name>

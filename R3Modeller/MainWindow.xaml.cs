@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -17,7 +16,6 @@ using OpenTK.Graphics.OpenGL;
 using R3Modeller.Core;
 using R3Modeller.Core.Engine;
 using R3Modeller.Core.Engine.Objs;
-using R3Modeller.Core.Engine.Objs.ViewModels;
 using R3Modeller.Core.Engine.Utils;
 using R3Modeller.Core.Engine.ViewModels;
 using R3Modeller.Core.Notifications;
@@ -33,8 +31,6 @@ namespace R3Modeller {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : WindowEx, INotificationHandler {
-        private readonly Camera camera;
-
         private readonly LineObject axisLineX;
         private readonly LineObject axisLineY;
         private readonly LineObject axisLineZ;
@@ -47,8 +43,6 @@ namespace R3Modeller {
 
         private bool isOrbitActive;
 
-        public NotificationPanelViewModel NotificationPanel { get; }
-
         public static readonly DependencyProperty PropertyPageItemsSourceProperty = DependencyProperty.Register("PropertyPageItemsSource", typeof(IEnumerable), typeof(MainWindow), new PropertyMetadata(null));
 
         public IEnumerable PropertyPageItemsSource {
@@ -56,12 +50,23 @@ namespace R3Modeller {
             set => this.SetValue(PropertyPageItemsSourceProperty, value);
         }
 
+        public EditorViewModel Editor { get; }
+
+        private readonly NotificationPanelViewModel NotificationPanel;
+
         public MainWindow() {
             this.InitializeComponent();
+            this.DataContext = this.Editor = new EditorViewModel(new Core.Engine.RenderViewport(this.OGLViewPort), this);
+            this.NotificationPanel = this.Editor.NotificationPanel;
+            this.NotificationPanelPopup.Placement = PlacementMode.Absolute;
+            this.NotificationPanelPopup.PlacementTarget = this;
+            this.NotificationPanelPopup.PlacementRectangle = System.Windows.Rect.Empty;
+            this.NotificationPanelPopup.DataContext = this.NotificationPanel;
+            this.RefreshPopupLocation();
+
             this.project = new Project();
             this.OGLViewPort.BeginFrame();
-            this.camera = new Camera();
-            this.camera.SetYawPitch(0.45f, -0.35f);
+            this.Editor.RenderViewport.Model.Camera.SetYawPitch(0.45f, -0.35f);
             this.project.Scene.Root.AddItem(new TriangleObject());
             TriangleObject tri = new TriangleObject();
             tri.SetPosition(new Vector3(3f, 2f, 3f));
@@ -78,16 +83,6 @@ namespace R3Modeller {
 
             #region obj loader
 
-            // string vertexShader =
-            //     "#version 330\n" +
-            //     "uniform mat4 mvp;\n" +
-            //     "in vec3 in_pos;\n" +
-            //     "void main() { gl_Position = mvp * vec4(in_pos, 1.0); }";
-            // string fragmentShader =
-            //     "#version 330\n" +
-            //     "void main() { gl_FragColor = vec4(0.8, 0.2, 1.0, 1.0); }\n";
-            // this.shader = new Shader(vertexShader, fragmentShader);
-
             ObjLoaderFactory factory = new ObjLoaderFactory();
             IObjLoader loader = factory.Create(new MaterialStreamProvider(ResourceLocator.ResourceDirectory));
             using (FileStream stream = File.OpenRead(ResourceLocator.GetResourceFile("untitled.obj"))) {
@@ -96,8 +91,10 @@ namespace R3Modeller {
                     DisplayName = "untitled.obj"
                 };
 
+                int i = 0;
                 foreach (Group group in result.Groups) {
-                    objFile.AddItem(new WavefrontObject(result, group));
+                    i++;
+                    objFile.AddItem(new WavefrontObject(result, group) {DisplayName = group.Name ?? $"Group {i}"});
                 }
 
                 this.project.Scene.Root.AddItem(objFile);
@@ -105,21 +102,19 @@ namespace R3Modeller {
 
             this.OGLViewPort.EndFrame();
 
-            this.DataContext = new EditorViewModel() {
-                Project = new ProjectViewModel(this.OGLViewPort, this.project) {
-                    Editor = (EditorViewModel) this.DataContext
-                }
-            };
-
-            this.NotificationPanel = new NotificationPanelViewModel(this);
-            this.NotificationPanelPopup.StaysOpen = true;
-            this.NotificationPanelPopup.Placement = PlacementMode.Absolute;
-            this.NotificationPanelPopup.PlacementTarget = this;
-            this.NotificationPanelPopup.PlacementRectangle = System.Windows.Rect.Empty;
-            this.NotificationPanelPopup.DataContext = this.NotificationPanel;
-            this.RefreshPopupLocation();
-
             #endregion
+
+            this.Editor.SetProject(new ProjectViewModel(this.project));
+        }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            this.axisLineX.Dispose();
+            this.axisLineY.Dispose();
+            this.axisLineZ.Dispose();
+            this.targetPointLineX.Dispose();
+            this.targetPointLineY.Dispose();
+            this.targetPointLineZ.Dispose();
         }
 
         #region Notification panel
@@ -278,11 +273,12 @@ namespace R3Modeller {
                 return;
             }
 
-            float oldRange = this.camera.orbitRange;
+            Camera camera = this.Editor.RenderViewport.Model.Camera;
+            float oldRange = camera.orbitRange;
             float multiplier = e.Delta > 0 ? (1f - 0.25f) : (1f + 0.25f);
             float newRange = Maths.Clamp(oldRange * multiplier, 2f, 750f);
             if (Math.Abs(newRange - oldRange) > 0.001f) {
-                this.camera.SetOrbitRange(newRange);
+                camera.SetOrbitRange(newRange);
                 this.OGLViewPort.InvalidateRender();
             }
         }
@@ -323,11 +319,12 @@ namespace R3Modeller {
                 float changeX = 1f + (float) Maths.Map(currPos.X - lastPos.X, 0d, this.ActualWidth, -1d, 1d);
                 float changeY = 1f - (float) Maths.Map(currPos.Y - lastPos.Y, 0d, this.ActualHeight, 1d, -1d);
 
+                Camera camera = this.Editor.RenderViewport.Model.Camera;
                 const float sensitivity = 1.75f;
                 const float epsilon = 0.00001f;
                 if (e.LeftButton == MouseButtonState.Pressed) {
-                    float yaw = this.camera.yaw;
-                    float pitch = this.camera.pitch;
+                    float yaw = camera.yaw;
+                    float pitch = camera.pitch;
                     yaw -= (changeX * sensitivity);
                     if (yaw > Maths.PI) {
                         yaw = Maths.PI_NEG + epsilon;
@@ -344,24 +341,24 @@ namespace R3Modeller {
                         pitch = Maths.PI_NEG_HALF + epsilon;
                     }
 
-                    this.camera.SetYawPitch(yaw, pitch);
+                    camera.SetYawPitch(yaw, pitch);
                     this.UpdateTextInfo();
                     this.OGLViewPort.InvalidateRender();
                 }
                 else if (e.RightButton == MouseButtonState.Pressed) {
                     Vector3 direction = new Vector3(
-                        (float) (Math.Cos(-this.camera.pitch) * Math.Sin(this.camera.yaw)),
-                        (float) Math.Sin(-this.camera.pitch),
-                        (float) (Math.Cos(-this.camera.pitch) * Math.Cos(this.camera.yaw))
+                        (float) (Math.Cos(-camera.pitch) * Math.Sin(camera.yaw)),
+                        (float) Math.Sin(-camera.pitch),
+                        (float) (Math.Cos(-camera.pitch) * Math.Cos(camera.yaw))
                     );
 
                     Vector3 rightward = Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitY));
                     Vector3 upward = Vector3.Cross(rightward, direction);
 
-                    float speed = this.camera.orbitRange / 1.5f;
+                    float speed = camera.orbitRange / 1.5f;
 
                     Vector3 translationOffset = rightward * (changeX * speed) + upward * (changeY * speed);
-                    this.camera.SetTarget(this.camera.target + translationOffset);
+                    camera.SetTarget(camera.target + translationOffset);
 
                     // Vector3 change = new Vector3(changeX * sensitivity * (this.camera.orbitRange / 2f), 0f, changeY * sensitivity * (this.camera.orbitRange / 2f));
                     // this.camera.SetTarget(this.camera.target - change);
@@ -374,9 +371,10 @@ namespace R3Modeller {
         }
 
         public void UpdateTextInfo() {
-            Vector3 tgt = this.camera.target;
+            Camera camera = this.Editor.RenderViewport.Model.Camera;
+            Vector3 tgt = camera.target;
             this.POS_LABEL.Content = $"Target Pos: \t{Math.Round(tgt.X, 2):F2} \t{Math.Round(tgt.Y, 2):F2} \t{Math.Round(tgt.Z, 2):F2}";
-            this.ROT_LABEL.Content = $"Yaw:        \t{Math.Round(this.camera.yaw, 2):F2} \tPitch: \t{Math.Round(this.camera.pitch, 2):F2}";
+            this.ROT_LABEL.Content = $"Yaw:        \t{Math.Round(camera.yaw, 2):F2} \tPitch: \t{Math.Round(camera.pitch, 2):F2}";
         }
 
         // TODO: Could have ViewPortViewModel, which stores a reference to an interface (implemented by an
@@ -385,28 +383,33 @@ namespace R3Modeller {
 
         private void OnPaintViewPort(object sender, DrawEventArgs e) {
             // Update hidden window, if the size has changed
-            this.camera.UpdateSize(e.Width, e.Height);
+            Camera camera = this.Editor.RenderViewport.Model.Camera;
+            camera.UpdateSize(e.Width, e.Height);
 
             GL.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
             // Render scene
             foreach (SceneObject obj in this.project.Scene.Root.Items) {
-                obj.Render(this.camera);
+                obj.Render(camera);
             }
+
+            Matrix4x4 ortho = Matrix4x4.CreateOrthographic(e.Width, e.Height, 0.001f, 500f);
 
             // Render XYZ axis
             {
                 // TODO: cache these matrices maybe
-                Vector3 position = Rotation.GetOrbitPosition(this.camera.yaw, this.camera.pitch, 10f);
+                Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch, 10f);
                 Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
 
+                const float size = 40f;
+                const float gap = 10f;
                 // Calculates the screen position of the axis preview origin
-                Vector3 pos = new Vector3(Maths.Map(60f, 0, e.Width, 1f, -1f), Maths.Map(60f, 0, e.Height, 1f, -1f), 0f);
+                Vector3 pos = new Vector3(Maths.Map(size + gap, 0, e.Width, 1f, -1f), Maths.Map(size + gap, 0, e.Height, 1f, -1f), 0f);
 
                 // Calculate the model-view-matrix of the line
                 // Translation is done at the end to apply translation after projection
-                Matrix4x4 lineMvp = lineModelView * this.camera.proj * Matrix4x4.CreateTranslation(pos);
+                Matrix4x4 lineMvp = lineModelView * ortho * Matrix4x4.CreateScale(size) * Matrix4x4.CreateTranslation(pos);
                 this.axisLineX.DrawAt(lineMvp, new Vector3(1f, 0f, 0f));
                 this.axisLineY.DrawAt(lineMvp, new Vector3(0f, 1f, 0f));
                 this.axisLineZ.DrawAt(lineMvp, new Vector3(0f, 0f, 1f));
@@ -415,20 +418,14 @@ namespace R3Modeller {
             // Draw target point
             {
                 if (this.isOrbitActive) {
-                    Vector3 position = Rotation.GetOrbitPosition(this.camera.yaw, this.camera.pitch, 10f);
+                    Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch, 10f);
                     Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
-                    Matrix4x4 mvp = lineModelView * this.camera.proj * Matrix4x4.CreateScale(0.25f);
+                    Matrix4x4 mvp = lineModelView * ortho * Matrix4x4.CreateScale(10f);
                     this.targetPointLineX.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
                     this.targetPointLineY.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
                     this.targetPointLineZ.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
                 }
             }
-        }
-
-        private void RangeBase_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-            double diff = e.NewValue - e.OldValue;
-            this.project.Scene.Root.Items[0].SetPosition(this.project.Scene.Root.Items[0].pos + new Vector3((float) diff));
-            this.OGLViewPort.InvalidateRender();
         }
     }
 }

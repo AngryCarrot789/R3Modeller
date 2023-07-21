@@ -91,7 +91,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             this.Model = model ?? throw new ArgumentNullException(nameof(model));
             this.children = new ObservableCollection<SceneObjectViewModel>();
             this.Children = new ReadOnlyObservableCollection<SceneObjectViewModel>(this.children);
-            for (int i = 0; i < model.Items.Count; i++) {
+            for (int i = 0, c = model.Items.Count; i < c; i++) {
                 this.InsertInternal(i, SORegistry.Instance.CreateViewModelFromModel(model.Items[i]));
             }
         }
