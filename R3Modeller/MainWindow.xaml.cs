@@ -25,6 +25,7 @@ using R3Modeller.Themes;
 using R3Modeller.Utils;
 using R3Modeller.Views;
 using Vector3 = System.Numerics.Vector3;
+using WindowState = System.Windows.WindowState;
 
 namespace R3Modeller {
     /// <summary>
@@ -42,6 +43,9 @@ namespace R3Modeller {
         private readonly Project project;
 
         private bool isOrbitActive;
+        private bool ignoreMouseMoveEvent;
+        private Point? lastMouse;
+        private Point? mousePosBeforeOrbitEnabled;
 
         public static readonly DependencyProperty PropertyPageItemsSourceProperty = DependencyProperty.Register("PropertyPageItemsSource", typeof(IEnumerable), typeof(MainWindow), new PropertyMetadata(null));
 
@@ -105,6 +109,20 @@ namespace R3Modeller {
             #endregion
 
             this.Editor.SetProject(new ProjectViewModel(this.project));
+        }
+
+        public void OnOrbitModeEnabled() {
+            if (this.isOrbitActive)
+                return;
+            this.isOrbitActive = true;
+            this.UpdateCursor();
+        }
+
+        public void OnOrbitModeDisabled() {
+            if (!this.isOrbitActive)
+                return;
+            this.isOrbitActive = false;
+            this.UpdateCursor();
         }
 
         protected override void OnClosed(EventArgs e) {
@@ -257,7 +275,9 @@ namespace R3Modeller {
             switch (e.Key) {
                 case Key.System: {
                     if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
+                        this.mousePosBeforeOrbitEnabled = Mouse.GetPosition(this);
                         this.isOrbitActive = true;
+                        this.UpdateCursor();
                         this.OGLViewPort.InvalidateRender();
                     }
 
@@ -265,6 +285,24 @@ namespace R3Modeller {
                 }
                 default: return;
             }
+        }
+
+        protected override void OnPreviewKeyUp(KeyEventArgs e) {
+            base.OnPreviewKeyUp(e);
+            switch (e.Key) {
+                case Key.System: {
+                    if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
+                        this.isOrbitActive = false;
+                        this.UpdateCursor();
+                        this.OGLViewPort.InvalidateRender();
+                    }
+
+                    break;
+                }
+                default: return;
+            }
+
+            e.Handled = true;
         }
 
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e) {
@@ -273,51 +311,116 @@ namespace R3Modeller {
                 return;
             }
 
-            Camera camera = this.Editor.RenderViewport.Model.Camera;
-            float oldRange = camera.orbitRange;
-            float multiplier = e.Delta > 0 ? (1f - 0.25f) : (1f + 0.25f);
-            float newRange = Maths.Clamp(oldRange * multiplier, 2f, 750f);
-            if (Math.Abs(newRange - oldRange) > 0.001f) {
-                camera.SetOrbitRange(newRange);
+            CameraViewModel camera = this.Editor.RenderViewport.Camera;
+            float oldRange = camera.OrbitRange;
+            float newRange;
+            if (oldRange < 0.01f) {
+                newRange = Maths.Clamp(e.Delta > 0 ? (oldRange / 20f) : (oldRange * 20f), 0.0001f, 750f);
+            }
+            else {
+                float multiplier = e.Delta > 0 ? (1f - 0.25f) : (1f + 0.25f);
+                newRange = Maths.Clamp(oldRange * multiplier, 0.0001f, 750f);
+            }
+
+            if (Math.Abs(newRange - oldRange) > 0.00001f) {
+                camera.OrbitRange = newRange;
                 this.OGLViewPort.InvalidateRender();
             }
         }
 
-        protected override void OnKeyUp(KeyEventArgs e) {
-            base.OnKeyUp(e);
-            switch (e.Key) {
-                case Key.System: {
-                    if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
-                        this.isOrbitActive = false;
-                        this.OGLViewPort.InvalidateRender();
-                    }
+        protected override void OnActivated(EventArgs e) {
+            base.OnActivated(e);
+            this.OGLViewPort.InvalidateRender();
+        }
 
-                    break;
-                }
-                default: return;
+        protected override void OnDeactivated(EventArgs e) {
+            base.OnDeactivated(e);
+            this.OGLViewPort.InvalidateRender();
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e) {
+            base.OnMouseDown(e);
+            if (e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right) {
+                this.Focus();
+                this.CaptureMouse();
             }
         }
 
-        private Point? lastMouse;
+        protected override void OnMouseUp(MouseButtonEventArgs e) {
+            base.OnMouseUp(e);
+            if (e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right) {
+                if (this.mousePosBeforeOrbitEnabled is Point point) {
+                    this.ignoreMouseMoveEvent = true;
+                    Point p = this.PointToScreen(point);
+                    CursorUtils.SetCursorPos((int) p.X, (int) p.Y);
+                    this.ignoreMouseMoveEvent = false;
+                    this.mousePosBeforeOrbitEnabled = null;
+                }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {
-            base.OnMouseLeftButtonDown(e);
-            this.Focus();
-            this.CaptureMouse();
+                this.ReleaseMouseCapture();
+            }
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e) {
-            base.OnMouseLeftButtonUp(e);
-            this.ReleaseMouseCapture();
+        public void UpdateCursor() {
+            if (this.isOrbitActive) {
+                this.Cursor = Cursors.None;
+            }
+            else {
+                this.ClearValue(CursorProperty);
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
+            if (this.ignoreMouseMoveEvent) {
+                return;
+            }
 
-            Point currPos = e.GetPosition(this);
+            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt)) {
+                this.isOrbitActive = false;
+                this.UpdateCursor();
+            }
+
+            Point mpos = e.GetPosition(this); // use "this" instead of OGLViewPort as it's easier due to the scale being -1
             if (this.lastMouse is Point lastPos && this.isOrbitActive) {
-                float changeX = 1f + (float) Maths.Map(currPos.X - lastPos.X, 0d, this.ActualWidth, -1d, 1d);
-                float changeY = 1f - (float) Maths.Map(currPos.Y - lastPos.Y, 0d, this.ActualHeight, 1d, -1d);
+                bool wrap = false;
+                double wrapX = mpos.X;
+                double wrapY = mpos.Y;
+                if (mpos.X < 0) {
+                    wrapX = this.ActualWidth;
+                    wrap = true;
+                }
+                else if (mpos.X > this.ActualWidth) {
+                    wrapX = 0;
+                    wrap = true;
+                }
+
+                if (mpos.Y < 0) {
+                    wrapY = this.ActualHeight;
+                    wrap = true;
+                }
+                else if (mpos.Y > this.ActualHeight) {
+                    wrapY = 0;
+                    wrap = true;
+                }
+
+                if (wrap) {
+                    this.ignoreMouseMoveEvent = true;
+                    Point wp = new Point(wrapX, wrapY);
+                    Point sp = this.PointToScreen(wp);
+                    this.lastMouse = wp;
+                    try {
+                        CursorUtils.SetCursorPos((int) sp.X, (int) sp.Y);
+                    }
+                    finally {
+                        this.ignoreMouseMoveEvent = false;
+                    }
+
+                    return;
+                }
+
+                float changeX = 1f + (float) Maths.Map(mpos.X - lastPos.X, 0d, this.ActualWidth, -1d, 1d);
+                float changeY = 1f - (float) Maths.Map(mpos.Y - lastPos.Y, 0d, this.ActualHeight, 1d, -1d);
 
                 Camera camera = this.Editor.RenderViewport.Model.Camera;
                 const float sensitivity = 1.75f;
@@ -346,12 +449,7 @@ namespace R3Modeller {
                     this.OGLViewPort.InvalidateRender();
                 }
                 else if (e.RightButton == MouseButtonState.Pressed) {
-                    Vector3 direction = new Vector3(
-                        (float) (Math.Cos(-camera.pitch) * Math.Sin(camera.yaw)),
-                        (float) Math.Sin(-camera.pitch),
-                        (float) (Math.Cos(-camera.pitch) * Math.Cos(camera.yaw))
-                    );
-
+                    Vector3 direction = camera.direction;
                     Vector3 rightward = Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitY));
                     Vector3 upward = Vector3.Cross(rightward, direction);
 
@@ -367,7 +465,7 @@ namespace R3Modeller {
                 }
             }
 
-            this.lastMouse = currPos;
+            this.lastMouse = mpos;
         }
 
         public void UpdateTextInfo() {
@@ -394,22 +492,36 @@ namespace R3Modeller {
                 obj.Render(camera);
             }
 
+            // Cached ortho projection matrix for the VP size
             Matrix4x4 ortho = Matrix4x4.CreateOrthographic(e.Width, e.Height, 0.001f, 500f);
 
             // Render XYZ axis
             {
-                // TODO: cache these matrices maybe
-                Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch, 10f);
+                const float size = 35f;
+                const float gap = 10f;
+
+                // This uses OpenTK's libraries but it doesn't render for some reason
+                // Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch, 10f);
+                // Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
+                // Vector3 pos = new Vector3(Maths.Map(size + gap, 0, e.Width, 1f, -1f), Maths.Map(size + gap, 0, e.Height, 1f, -1f), 0f);
+                // Matrix4 o = Matrix4.CreateOrthographic(e.Width, e.Height, 0.001f, 500f);
+                // Matrix4 mv = Matrix4.LookAt(position.X, position.Y, position.Z, 0f, 0f, 0f, 0f, 1f, 0f);
+                // Matrix4 mvp = mv * o * Matrix4.CreateScale(size) * Matrix4.CreateTranslation(pos.X, pos.Y, pos.Z);
+                // Matrix4x4 lineMvp = Unsafe.As<Matrix4, Matrix4x4>(ref mvp);
+                // this.axisLineX.DrawAt(lineMvp, new Vector3(1f, 0f, 0f));
+                // this.axisLineY.DrawAt(lineMvp, new Vector3(0f, 1f, 0f));
+                // this.axisLineZ.DrawAt(lineMvp, new Vector3(0f, 0f, 1f));
+
+                Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch);
                 Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
 
-                const float size = 40f;
-                const float gap = 10f;
                 // Calculates the screen position of the axis preview origin
                 Vector3 pos = new Vector3(Maths.Map(size + gap, 0, e.Width, 1f, -1f), Maths.Map(size + gap, 0, e.Height, 1f, -1f), 0f);
 
                 // Calculate the model-view-matrix of the line
-                // Translation is done at the end to apply translation after projection
+                // Transformation is done at the end to apply translation after projection
                 Matrix4x4 lineMvp = lineModelView * ortho * Matrix4x4.CreateScale(size) * Matrix4x4.CreateTranslation(pos);
+
                 this.axisLineX.DrawAt(lineMvp, new Vector3(1f, 0f, 0f));
                 this.axisLineY.DrawAt(lineMvp, new Vector3(0f, 1f, 0f));
                 this.axisLineZ.DrawAt(lineMvp, new Vector3(0f, 0f, 1f));
@@ -418,12 +530,12 @@ namespace R3Modeller {
             // Draw target point
             {
                 if (this.isOrbitActive) {
-                    Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch, 10f);
+                    Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch);
                     Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
                     Matrix4x4 mvp = lineModelView * ortho * Matrix4x4.CreateScale(10f);
-                    this.targetPointLineX.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
-                    this.targetPointLineY.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
-                    this.targetPointLineZ.DrawAt(mvp, new Vector3(0.3f, 0.4f, 0.3f), 2f);
+                    this.targetPointLineX.DrawAt(mvp, new Vector3(0.9f, 0.2f, 0.2f), 1f);
+                    this.targetPointLineY.DrawAt(mvp, new Vector3(0.2f, 0.9f, 0.2f), 1f);
+                    this.targetPointLineZ.DrawAt(mvp, new Vector3(0.2f, 0.2f, 0.9f), 1f);
                 }
             }
         }

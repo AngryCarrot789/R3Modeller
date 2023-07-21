@@ -15,8 +15,14 @@ namespace R3Modeller.Core.Engine {
         public float fov;
         public float orbitRange;
 
+        // actual position of the camera
         public Vector3 pos;
+
+        // the target orbit position. this affects pos
         public Vector3 target;
+
+        // the camera direction based on yaw and pitch
+        public Vector3 direction;
 
         // view matrix
         public Matrix4x4 view;
@@ -105,13 +111,13 @@ namespace R3Modeller.Core.Engine {
          */
 
         private void UpdateViewMatrix() {
-            Vector3 direction = new Vector3(
+            this.direction = new Vector3(
                 (float) (Math.Cos(-this.pitch) * Math.Sin(this.yaw)),
                 (float) Math.Sin(-this.pitch),
                 (float) (Math.Cos(-this.pitch) * Math.Cos(this.yaw))
             );
 
-            this.pos = this.target + direction * this.orbitRange;
+            this.pos = this.target + this.direction * this.orbitRange;
             this.view = Matrix4x4.CreateLookAt(this.pos, this.target, Vector3.UnitY);
         }
 

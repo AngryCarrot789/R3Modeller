@@ -15,6 +15,15 @@ namespace R3Modeller.Core.Engine.ViewModels {
             }
         }
 
+        public float OrbitRange {
+            get => this.Model.orbitRange;
+            set {
+                this.Model.SetOrbitRange(Maths.Clamp(value, 0.0001f, 1000f));
+                this.RaisePropertyChanged(nameof(this.OrbitRange));
+                this.Viewport.InvalidateRender();
+            }
+        }
+
         public RenderViewportViewModel Viewport { get; }
 
         public CameraViewModel(Camera model, RenderViewportViewModel viewport) {

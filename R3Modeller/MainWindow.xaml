@@ -48,7 +48,8 @@
                     <Label x:Name="POS_LABEL"/>
                     <Label x:Name="ROT_LABEL"/>
                 </StackPanel>
-                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,0,0,10" Minimum="20" Maximum="120" Value="{Binding RenderViewport.Camera.Fov, Mode=TwoWay}" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="750" Value="{Binding RenderViewport.Camera.OrbitRange, Mode=TwoWay}" TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120" Value="{Binding RenderViewport.Camera.Fov, Mode=TwoWay}" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
             </Grid>
             <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
                 <!-- https://dlaa.me/blog/post/9898803 -->

@@ -26,8 +26,21 @@ namespace R3Modeller.Core.Utils {
         /// <param name="outA">Output range lower bound</param>
         /// <param name="outB">Output range upper bound</param>
         /// <returns>The output value, between outA and outB</returns>
-        public static double Map(double dIn, double inA, double inB, double outA, double outB) => outA + ((outB - outA) / (inB - inA) * (dIn - inA));
-        public static float Map(float dIn, float inA, float inB, float outA, float outB) => outA + ((outB - outA) / (inB - inA) * (dIn - inA));
+        public static double Map(double dIn, double inA, double inB, double outA, double outB) => outA + (outB - outA) / (inB - inA) * (dIn - inA);
+
+        // Delegate to double in order to get a bit more precision during the full calculation. Might
+        // be slower, but this function probably won't be needed for intensive operations
+        /// <summary>
+        /// Maps a float value from the input range to the output range
+        /// <code>17.5f = Map(75f, 0, 100, 10f, 20f)</code>
+        /// </summary>
+        /// <param name="dIn">Input value</param>
+        /// <param name="inA">Input range lower bound</param>
+        /// <param name="inB">Input range upper bound</param>
+        /// <param name="outA">Output range lower bound</param>
+        /// <param name="outB">Output range upper bound</param>
+        /// <returns>The output value, between outA and outB</returns>
+        public static float Map(float dIn, float inA, float inB, float outA, float outB) => (float) Map((double) dIn, inA, inB, outA, outB);
 
         public static float Clamp(float value, float min, float max) => Math.Max(Math.Min(value, max), min);
 
