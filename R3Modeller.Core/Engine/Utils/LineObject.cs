@@ -34,10 +34,12 @@ namespace R3Modeller.Core.Engine.Utils {
 
             GL.Disable(EnableCap.DepthTest);
             GL.BindVertexArray(this.vao);
+            float oldWidth = GL.GetFloat(GetPName.LineWidth);
             GL.LineWidth(thickness);
             GL.DrawArrays(PrimitiveType.Lines, 0, 2);
             GL.BindVertexArray(0);
             GL.Enable(EnableCap.DepthTest);
+            GL.LineWidth(oldWidth);
         }
 
         public void Dispose() {

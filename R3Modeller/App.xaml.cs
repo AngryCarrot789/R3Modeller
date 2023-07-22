@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -140,6 +141,20 @@ namespace R3Modeller {
         }
 
         public async Task OnVideoEditorLoaded(MainWindow editor) {
+            // await Task.Delay(2500);
+            // editor.Width = 3500;
+            // editor.Height = 1000;
+            // editor.Top = 20;
+            // editor.Left = -1900;
+            // for (int i = 0; i < 200; i++) {
+            //     editor.Width--;
+            //     await Task.Delay(35);
+            //     long time = editor.OGLViewPort.PART_RenderTarget.lastLockTime;
+            //     if (time > 0) {
+            //         editor.OGLViewPort.PART_RenderTarget.lastLockTime = 0;
+            //         Debug.WriteLine($"Win width = {Math.Round(editor.ActualWidth, 1).ToString("F1").FitLength(8)} | Bitmap width = {Math.Round(editor.OGLViewPort.PART_RenderTarget.ActualWidth, 1).ToString("F1").FitLength(8)} | Render Time = {Time.TicksToMillis(time).ToString("F2")}");
+            //     }
+            // }
         }
 
         protected override void OnExit(ExitEventArgs e) {

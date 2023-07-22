@@ -118,7 +118,31 @@ namespace R3Modeller.Core.Engine {
             );
 
             this.pos = this.target + this.direction * this.orbitRange;
-            this.view = Matrix4x4.CreateLookAt(this.pos, this.target, Vector3.UnitY);
+            // this.view = Matrix4x4.CreateLookAt(this.pos, this.target, Vector3.UnitY);
+
+            // inlined LookAt function with a few slight optimisations
+            Vector3 zaxis = Vector3.Normalize(this.pos - this.target);
+            Vector3 xaxis = Vector3.Normalize(new Vector3(zaxis.Z, 0f, -zaxis.X));
+            Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
+
+            Matrix4x4 result;
+            result.M11 = xaxis.X;
+            result.M12 = yaxis.X;
+            result.M13 = zaxis.X;
+            result.M14 = 0.0f;
+            result.M21 = xaxis.Y;
+            result.M22 = yaxis.Y;
+            result.M23 = zaxis.Y;
+            result.M24 = 0.0f;
+            result.M31 = xaxis.Z;
+            result.M32 = yaxis.Z;
+            result.M33 = zaxis.Z;
+            result.M34 = 0.0f;
+            result.M41 = -Vector3.Dot(xaxis, this.pos);
+            result.M42 = -Vector3.Dot(yaxis, this.pos);
+            result.M43 = -Vector3.Dot(zaxis, this.pos);
+            result.M44 = 1.0f;
+            this.view = result;
         }
 
         private void UpdateProjectionMatrix() {

@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xaml;
+using R3Modeller.Core.Utils;
+using Rect = System.Windows.Rect;
 
 namespace R3Modeller.Controls {
     /// <summary>
@@ -16,6 +18,7 @@ namespace R3Modeller.Controls {
     public class BitmapRenderTarget : FrameworkElement {
         private readonly bool designMode;
         private WriteableBitmap bitmap; // stuff draws into this, then it is rendered
+        public long lastLockTime;
 
         [Category("Appearance")]
         public event EventHandler<DrawEventArgs> Paint;
@@ -49,6 +52,9 @@ namespace R3Modeller.Controls {
                 return;
             }
 
+            // Resolution safe = Maths.FindNearestResolution(width, height);
+            // width = safe.Width;
+            // height = safe.Height;
             if (this.bitmap == null || width != this.bitmap.PixelWidth || height != this.bitmap.PixelHeight) {
                 this.bitmap = new WriteableBitmap(width, height, 96.0 * scaleX, 96.0 * scaleY, PixelFormats.Pbgra32, null);
             }
@@ -59,7 +65,14 @@ namespace R3Modeller.Controls {
 
             // But what's even weirder... When the bitmap's size is 3353x960, 3329x960 or 3302x960, Lock() performs fine.
             // I imagine there are more resolutions like this that have zero overhead... but this is super weird
+
+            // fast = 1617*932 -> 1577.0954935*909
+            //      = 3353*909
+            //      = 3302*909
+
+            long a = Time.GetSystemTicks();
             this.bitmap.Lock();
+            this.lastLockTime = Time.GetSystemTicks() - a;
             // long b = R3Modeller.Core.Utils.Time.GetSystemTicks() - a;
             // System.Diagnostics.Debug.WriteLine($"Paint time: {Math.Round(R3Modeller.Core.Utils.Time.TicksToMillis(b), 2):F2}");
 

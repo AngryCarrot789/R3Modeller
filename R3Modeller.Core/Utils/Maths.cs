@@ -1,13 +1,14 @@
 using System;
+using System.Numerics;
 
 namespace R3Modeller.Core.Utils {
     public static class Maths {
         // these floats have more decimals that can possibly fit but meh
-        public const float PI_HALF       =  1.57079632679489f;
-        public const float PI            =  3.14159265358979f;
-        public const float PI_DOUBLE     =  6.28318530717958f;
-        public const float PI_NEG_HALF   = -1.57079632679489f;
-        public const float PI_NEG        = -3.14159265358979f;
+        public const float PI_HALF = 1.57079632679489f;
+        public const float PI = 3.14159265358979f;
+        public const float PI_DOUBLE = 6.28318530717958f;
+        public const float PI_NEG_HALF = -1.57079632679489f;
+        public const float PI_NEG = -3.14159265358979f;
         public const float PI_NEG_DOUBLE = -6.28318530717958f;
 
         private const float R2D = 180.0f / PI;
@@ -110,25 +111,105 @@ namespace R3Modeller.Core.Utils {
 
         // https://stackoverflow.com/a/51099524/11034928
         public static int GetDigitCount(ulong v) {
-            if (v < 10L) return 1;
-            if (v < 100L) return 2;
-            if (v < 1000L) return 3;
-            if (v < 10000L) return 4;
-            if (v < 100000L) return 5;
-            if (v < 1000000L) return 6;
-            if (v < 10000000L) return 7;
-            if (v < 100000000L) return 8;
-            if (v < 1000000000L) return 9;
-            if (v < 10000000000L) return 10;
-            if (v < 100000000000L) return 11;
-            if (v < 1000000000000L) return 12;
-            if (v < 10000000000000L) return 13;
-            if (v < 100000000000000L) return 14;
-            if (v < 1000000000000000L) return 15;
-            if (v < 10000000000000000L) return 16;
-            if (v < 100000000000000000L) return 17;
-            if (v < 1000000000000000000L) return 18;
+            if (v < 10L)
+                return 1;
+            if (v < 100L)
+                return 2;
+            if (v < 1000L)
+                return 3;
+            if (v < 10000L)
+                return 4;
+            if (v < 100000L)
+                return 5;
+            if (v < 1000000L)
+                return 6;
+            if (v < 10000000L)
+                return 7;
+            if (v < 100000000L)
+                return 8;
+            if (v < 1000000000L)
+                return 9;
+            if (v < 10000000000L)
+                return 10;
+            if (v < 100000000000L)
+                return 11;
+            if (v < 1000000000000L)
+                return 12;
+            if (v < 10000000000000L)
+                return 13;
+            if (v < 100000000000000L)
+                return 14;
+            if (v < 1000000000000000L)
+                return 15;
+            if (v < 10000000000000000L)
+                return 16;
+            if (v < 100000000000000000L)
+                return 17;
+            if (v < 1000000000000000000L)
+                return 18;
             return v < 10000000000000000000L ? 19 : 20;
+        }
+
+        // 3001518
+        // 1507044
+
+        /// <summary>
+        /// Finds the greatest common divisor for a value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static long FindGCD(long[] inputs) {
+            if (inputs == null || inputs.Length == 0) {
+                throw new ArgumentException("At least one number must be provided.");
+            }
+
+            long result = inputs[0];
+            for (int i = 1, c = inputs.Length; i < c; i++) {
+                result = FindGCD(result, inputs[i]);
+            }
+
+            return result;
+        }
+
+        public static long FindGCD(long a, long b) {
+            while (b != 0) {
+                long temp = b;
+                b = a % b;
+                a = temp;
+            }
+
+            return Math.Abs(a);
+        }
+
+        private static int GCD(int a, int b) {
+            do {
+                if (b == 0)
+                    return a;
+                int tmp = a;
+                a = b;
+                b = tmp % b;
+            } while (true);
+        }
+
+        public static Resolution FindNearestResolution(int width, int height) {
+            int product = width * height;
+
+            if (product % 3 == 0) {
+                return new Resolution(width, height);
+            }
+
+            int increment = 0;
+            int decrement = 0;
+            while (GCD((width + increment) * (height + decrement), 3) != 3) {
+                if (increment == decrement) {
+                    increment++;
+                }
+                else {
+                    decrement++;
+                }
+            }
+
+            return new Resolution(width + increment, height + decrement);
         }
     }
 }

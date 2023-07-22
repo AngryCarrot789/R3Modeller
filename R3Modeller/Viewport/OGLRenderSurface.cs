@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using R3Modeller.Controls;
 using R3Modeller.Core.Engine;
@@ -14,6 +17,7 @@ using R3Modeller.Core.Engine.ViewModels;
 using R3Modeller.Core.Rendering;
 using R3Modeller.Core.Utils;
 using R3Modeller.Utils;
+using Vector3 = System.Numerics.Vector3;
 
 namespace R3Modeller.Viewport {
     public class OGLRenderSurface : Control, IRenderTarget {
@@ -40,12 +44,19 @@ namespace R3Modeller.Viewport {
         private Point? mousePosBeforeOrbitEnabled;
         private int contextUsageCounter;
 
+        private readonly bool isDesignerMode;
+
         // This will be the same size as the BRT, but without the -1 scale on the Y axis
         private Border PART_RenderTarget_LayoutProxy;
-        private BitmapRenderTarget PART_RenderTarget;
+        public BitmapRenderTarget PART_RenderTarget;
 
         public OGLRenderSurface() {
+            this.isDesignerMode = DesignerProperties.GetIsInDesignMode(this);
             this.invalidateVisualAction = () => this.PART_RenderTarget?.InvalidateVisual();
+            if (this.isDesignerMode) {
+                return;
+            }
+
             this.ogl = new OGLContextWrapper();
             this.ogl.MakeCurrent(true);
             GL.ClearColor(0.2f, 0.4f, 0.8f, 1.0f);
@@ -60,9 +71,9 @@ namespace R3Modeller.Viewport {
             this.axisLineX = new LineObject(new Vector3(), new Vector3(1f, 0f, 0f));
             this.axisLineY = new LineObject(new Vector3(), new Vector3(0f, 1f, 0f));
             this.axisLineZ = new LineObject(new Vector3(), new Vector3(0f, 0f, 1f));
-            this.targetPointLineX = new LineObject(new Vector3(-1f, 0f, 0f), new Vector3(1f,  0f,  0f));
-            this.targetPointLineY = new LineObject(new Vector3( 0f, 1f, 0f), new Vector3(0f, -1f,  0f));
-            this.targetPointLineZ = new LineObject(new Vector3( 0f, 0f, 1f), new Vector3(0f,  0f, -1f));
+            this.targetPointLineX = new LineObject(new Vector3(-1f, 0f, 0f), new Vector3(1f, 0f, 0f));
+            this.targetPointLineY = new LineObject(new Vector3(0f, 1f, 0f), new Vector3(0f, -1f, 0f));
+            this.targetPointLineZ = new LineObject(new Vector3(0f, 0f, 1f), new Vector3(0f, 0f, -1f));
             this.ogl.MakeCurrent(false);
         }
 
@@ -70,14 +81,14 @@ namespace R3Modeller.Viewport {
             base.OnApplyTemplate();
             this.PART_RenderTarget = (BitmapRenderTarget) this.GetTemplateChild("PART_RenderTarget");
             this.PART_RenderTarget_LayoutProxy = (Border) this.GetTemplateChild("PART_RenderTarget_LayoutProxy");
-            if (this.PART_RenderTarget != null) {
+            if (!this.isDesignerMode && this.PART_RenderTarget != null) {
                 this.PART_RenderTarget.Paint += this.OnPaint;
             }
         }
 
         protected override void OnTemplateChanged(ControlTemplate oldTemplate, ControlTemplate newTemplate) {
             base.OnTemplateChanged(oldTemplate, newTemplate);
-            if (this.PART_RenderTarget != null) {
+            if (!this.isDesignerMode && this.PART_RenderTarget != null) {
                 this.PART_RenderTarget.Paint -= this.OnPaint;
             }
         }
@@ -225,16 +236,25 @@ namespace R3Modeller.Viewport {
                     return;
                 }
 
-                float changeX = 1f + (float) Maths.Map(mpos.X - lastPos.X, 0d, this.ActualWidth, -1d, 1d);
-                float changeY = 1f - (float) Maths.Map(mpos.Y - lastPos.Y, 0d, this.ActualHeight, 1d, -1d);
+                double width = this.ActualWidth;
+                double height = this.ActualHeight;
+
+                double changeX = 1d + Maths.Map(mpos.X - lastPos.X, 0d, width, -1d, 1d);
+                double changeY = 1d - Maths.Map(mpos.Y - lastPos.Y, 0d, height, 1d, -1d);
 
                 Camera camera = this.Viewport.Camera.Model;
-                const float sensitivity = 1.75f;
+                const double sensitivity = 0.8d;
+                // double aspW = width / height;
+                // double aspH = height / width;
+                // double sX = (float) sensitivity * Math.Max(aspW, aspH);
+                // double sY = (float) sensitivity * Math.Max(aspW, aspH);
+                const double sX = sensitivity;
+                const double sY = sensitivity;
                 const float epsilon = 0.00001f;
                 if (e.LeftButton == MouseButtonState.Pressed) {
                     float yaw = camera.yaw;
                     float pitch = camera.pitch;
-                    yaw -= (changeX * sensitivity);
+                    yaw -= (float) (changeX * sX);
                     if (yaw > Maths.PI) {
                         yaw = Maths.PI_NEG + epsilon;
                     }
@@ -242,7 +262,7 @@ namespace R3Modeller.Viewport {
                         yaw = Maths.PI - epsilon;
                     }
 
-                    pitch -= (changeY * sensitivity);
+                    pitch -= (float) (changeY * sY);
                     if (pitch > Maths.PI_HALF) {
                         pitch = Maths.PI_HALF - epsilon;
                     }
@@ -257,8 +277,8 @@ namespace R3Modeller.Viewport {
                     Vector3 direction = camera.direction;
                     Vector3 rightward = Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitY));
                     Vector3 upward = Vector3.Cross(rightward, direction);
-                    float speed = camera.orbitRange / 1.5f;
-                    Vector3 translationOffset = rightward * (changeX * speed) + upward * (changeY * speed);
+                    double speed = camera.orbitRange / 1.5d;
+                    Vector3 translationOffset = rightward * (float) (changeX * speed) + upward * (float) (changeY * speed);
                     camera.SetTarget(camera.target + translationOffset);
                     this.InvalidateRender();
                 }
@@ -314,19 +334,21 @@ namespace R3Modeller.Viewport {
                 const float size = 35f;
                 const float gap = 10f;
 
-                Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch);
-                Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
+                Vector3 camPos = Rotation.GetOrbitPosition(camera.yaw, camera.pitch);
+                Matrix4x4 view = Matrix4x4.CreateLookAt(camPos, new Vector3(), Vector3.UnitY);
 
                 // Calculates the screen position of the axis preview origin
-                Vector3 pos = new Vector3(Maths.Map(size + gap, 0, e.Width, 1f, -1f), Maths.Map(size + gap, 0, e.Height, 1f, -1f), 0f);
+                Vector3 axisPos = new Vector3(Maths.Map(size + gap, 0, e.Width, 1f, -1f), Maths.Map(size + gap, 0, e.Height, 1f, -1f), 0f);
 
                 // Calculate the model-view-matrix of the line
-                // Transformation is done at the end to apply translation after projection
-                Matrix4x4 lineMvp = lineModelView * ortho * Matrix4x4.CreateScale(size) * Matrix4x4.CreateTranslation(pos);
+                // Transformation is done at the end to apply translation after projection and scale
+                Matrix4x4 lineMvp = view * ortho * Matrix4x4.CreateScale(size) * Matrix4x4.CreateTranslation(axisPos);
+                Matrix4 mat4 = Unsafe.As<Matrix4x4, Matrix4>(ref lineMvp);
+                Matrix4x4 mvp = Unsafe.As<Matrix4, Matrix4x4>(ref mat4);
 
-                this.axisLineX.DrawAt(lineMvp, new Vector3(1f, 0f, 0f));
-                this.axisLineY.DrawAt(lineMvp, new Vector3(0f, 1f, 0f));
-                this.axisLineZ.DrawAt(lineMvp, new Vector3(0f, 0f, 1f));
+                this.axisLineX.DrawAt(mvp, new Vector3(1f, 0f, 0f));
+                this.axisLineY.DrawAt(mvp, new Vector3(0f, 1f, 0f));
+                this.axisLineZ.DrawAt(mvp, new Vector3(0f, 0f, 1f));
             }
 
             {

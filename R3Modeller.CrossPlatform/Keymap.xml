@@ -1,0 +1,39 @@
+﻿<?xml version="1.0"?>
+<KeyMap>
+    <Group Name="Application">
+        <Group Name="Editor">
+            <Shortcut Name="SaveProject" ActionId="actions.project.Save">
+                <Keystroke Mods="CTRL" Key="S"/>
+            </Shortcut>
+            <Shortcut Name="SaveProjectAs" ActionId="actions.project.SaveAs">
+                <Keystroke Mods="CTRL+SHIFT" Key="S"/>
+            </Shortcut>
+            <Shortcut Name="OpenProject" ActionId="actions.project.Open">
+                <Keystroke Mods="CTRL" Key="O"/>
+            </Shortcut>
+            <Shortcut Name="UndoShortcut" ActionId="actions.project.history.Undo">
+                <Keystroke Mods="CTRL" Key="Z"/>
+            </Shortcut>
+            <Shortcut Name="RedoShortcut1" ActionId="actions.project.history.Redo">
+                <Keystroke Mods="CTRL+SHIFT" Key="Z"/>
+            </Shortcut>
+            <Shortcut Name="RedoShortcut2" ActionId="actions.project.history.Redo">
+                <Keystroke Mods="CTRL" Key="Y"/>
+            </Shortcut>
+            <Group Name="ObjectList">
+                <Shortcut Name="DeleteItems" ActionId="actions.objlist.DeleteItems" Description="Deletes all of the selected objects">
+                    <Keystroke Key="Delete"/>
+                </Shortcut>
+                <Shortcut Name="RenameItem" ActionId="actions.objlist.RenameItem" Description="Rename the selected object item">
+                    <Keystroke Key="F2"/>
+                </Shortcut>
+                <Shortcut Name="RenameItem2" ActionId="actions.objlist.RenameItem" Description="Rename the selected object item">
+                    <Keystroke Mods="CTRL" Key="R"/>
+                </Shortcut>
+                <Shortcut Name="GroupSelection" ActionId="actions.objlist.GroupSelection" Description="Puts the selected objects into their own group object">
+                    <Keystroke Mods="CTRL" Key="G"/>
+                </Shortcut>
+            </Group>
+        </Group>
+    </Group>
+</KeyMap>

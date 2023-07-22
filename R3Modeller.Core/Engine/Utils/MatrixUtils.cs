@@ -1,5 +1,7 @@
 using System;
 using System.Numerics;
+using OpenTK;
+using Vector3 = System.Numerics.Vector3;
 
 namespace R3Modeller.Core.Engine.Utils {
     public class MatrixUtils {
@@ -77,5 +79,23 @@ namespace R3Modeller.Core.Engine.Utils {
         }
 
         public static Matrix4x4 CreateRotationYPR(Vector3 rotation) => CreateHeading(rotation.Y) * CreatePitch(rotation.X) * CreateBearing(rotation.Z);
+
+        public static Matrix4d LookAt(Vector3d src, Vector3d dst) {
+            Vector3d zaxis = Vector3d.Normalize(src - dst);
+            Vector3d xaxis = Vector3d.Normalize(new Vector3d(zaxis.Z, 0f, -zaxis.X));
+            Vector3d yaxis = Vector3d.Cross(zaxis, xaxis);
+            double dX = -Vector3d.Dot(xaxis, src);
+            double dY = -Vector3d.Dot(yaxis, src);
+            double dZ = -Vector3d.Dot(zaxis, src);
+
+            Matrix4d result = new Matrix4d(
+                new Vector4d(xaxis.X, yaxis.X, zaxis.X, 0f),
+                new Vector4d(xaxis.Y, yaxis.Y, zaxis.Y, 0f),
+                new Vector4d(xaxis.Z, yaxis.Z, zaxis.Z, 0f),
+                new Vector4d(dX, dY, dZ, 1f)
+            );
+
+            return result;
+        }
     }
 }
