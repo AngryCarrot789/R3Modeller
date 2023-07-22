@@ -1,23 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>x64;x86</Platforms>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <PlatformTarget>x64</PlatformTarget>
+        <DefineConstants>TRACE;X64</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Attribution" />
-    <Folder Include="Utils\Collections\" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+        <PlatformTarget>x86</PlatformTarget>
+        <DefineConstants>TRACE;X86</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenTK" Version="3.3.3" />
-    <PackageReference Include="SkiaSharp" Version="2.88.4-preview.84" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="7.0.0-preview.2.22152.2" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <PlatformTarget>x64</PlatformTarget>
+        <DefineConstants>TRACE;X64</DefineConstants>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+        <PlatformTarget>x86</PlatformTarget>
+        <DefineConstants>TRACE;X86</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ObjectLoader\ObjectLoader.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Attribution" />
+        <Folder Include="Utils\Collections\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenTK" Version="3.3.3" />
+        <PackageReference Include="SkiaSharp" Version="2.88.4-preview.84" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="7.0.0-preview.2.22152.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ObjectLoader\ObjectLoader.csproj" />
+    </ItemGroup>
 
 </Project>

@@ -14,10 +14,13 @@ namespace R3Modeller.Core.Engine.ViewModels {
 
         public NotificationPanelViewModel NotificationPanel { get; }
 
-        public RenderViewportViewModel RenderViewport { get; }
+        /// <summary>
+        /// The main window's viewport. This will never be null
+        /// </summary>
+        public RenderViewportViewModel MainViewport { get; }
 
         public EditorViewModel(RenderViewport viewport, INotificationHandler handler) {
-            this.RenderViewport = new RenderViewportViewModel(viewport, this);
+            this.MainViewport = new RenderViewportViewModel(viewport, this);
             this.NotificationPanel = new NotificationPanelViewModel(handler);
         }
 
@@ -30,7 +33,7 @@ namespace R3Modeller.Core.Engine.ViewModels {
         }
 
         public void InvalidateAllViewports(bool schedule) {
-            this.RenderViewport.Model.RenderTarget.InvalidateRender(schedule);
+            this.MainViewport.Model.RenderTarget.InvalidateRender(schedule);
         }
     }
 }

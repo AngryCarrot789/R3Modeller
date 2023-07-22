@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:R3Modeller"
+             xmlns:viewport="clr-namespace:R3Modeller.Viewport"
+             xmlns:controls="clr-namespace:R3Modeller.Controls"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -15,6 +17,24 @@
                 <ResourceDictionary Source="AdvancedContextService/ContextStyles.xaml"/>
                 <ResourceDictionary Source="Notifications/NotificationStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type viewport:OGLRenderSurface}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <Border x:Name="PART_RenderTarget_LayoutProxy">
+                                    <controls:BitmapRenderTarget x:Name="PART_RenderTarget">
+                                        <FrameworkElement.LayoutTransform>
+                                            <ScaleTransform ScaleY="-1"/>
+                                        </FrameworkElement.LayoutTransform>
+                                    </controls:BitmapRenderTarget>
+                                </Border>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

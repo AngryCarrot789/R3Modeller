@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:R3Modeller" xmlns:controls="clr-namespace:R3Modeller.Controls"
         xmlns:views="clr-namespace:R3Modeller.Views"
         xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
-        xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         xmlns:viewModels="clr-namespace:R3Modeller.Core.Engine.ViewModels;assembly=R3Modeller.Core"
         xmlns:shortcuts="clr-namespace:R3Modeller.Shortcuts"
         xmlns:n="clr-namespace:R3Modeller.Notifications"
         xmlns:n1="clr-namespace:R3Modeller.Core.Notifications;assembly=R3Modeller.Core"
         xmlns:c1="clr-namespace:MultiSelectTreeViews.Controls;assembly=MultiSelectTreeViews"
+        xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
@@ -39,25 +39,13 @@
                 <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
             <Grid>
-                <viewport:OGLViewPortControl x:Name="OGLViewPort" Paint="OnPaintViewPort">
-                    <controls:BitmapRenderTarget.LayoutTransform>
-                        <ScaleTransform ScaleY="-1"/>
-                    </controls:BitmapRenderTarget.LayoutTransform>
-                </viewport:OGLViewPortControl>
-                <StackPanel Orientation="Vertical">
-                    <Label x:Name="POS_LABEL"/>
-                    <Label x:Name="ROT_LABEL"/>
-                </StackPanel>
-                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="750" Value="{Binding RenderViewport.Camera.OrbitRange, Mode=TwoWay}" TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
-                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120" Value="{Binding RenderViewport.Camera.Fov, Mode=TwoWay}" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}"/>
+                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="750" Value="{Binding MainViewport.Camera.OrbitRange, Mode=TwoWay}" TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                <dragger:NumberDragger Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120" Value="{Binding MainViewport.Camera.Fov, Mode=TwoWay}" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
             </Grid>
             <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
                 <!-- https://dlaa.me/blog/post/9898803 -->
                 <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0">
-                    <Border.Resources>
-
-
-                    </Border.Resources>
                     <!-- Content -->
                     <Grid Grid.IsSharedSizeScope="True">
                         <Grid.RowDefinitions>

@@ -16,30 +16,48 @@
     <Deterministic>true</Deterministic>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;X64</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X86</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;X86</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="MultiSelectTreeView, PublicKeyToken=null">
-      <HintPath>..\packages\MultiSelectTreeView.1.0.9\lib\net40\MultiSelectTreeView.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=3.3.3.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>..\packages\OpenTK.3.3.3\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -106,6 +124,7 @@
     <Compile Include="AttachedProperties\HistoryHelper.cs" />
     <Compile Include="AttachedProperties\HorizontalScrolling.cs" />
     <Compile Include="AttachedProperties\MultiSelectorHelper.cs" />
+    <Compile Include="AttachedProperties\ControlInteractivity.cs" />
     <Compile Include="AttachedProperties\TextBlockHelper.cs" />
     <Compile Include="AttachedProperties\TextBoxHelper.cs" />
     <Compile Include="AttachedProperties\ToggleButtonHelper.cs" />
@@ -131,6 +150,7 @@
     <Compile Include="Controls\BitmapRenderTarget.cs" />
     <Compile Include="Controls\DrawEventArgs.cs" />
     <Compile Include="Controls\OGLRenderPort.cs" />
+    <Compile Include="Controls\OGLViewPortControl.cs" />
     <Compile Include="Controls\SelectionAdorder.cs" />
     <Compile Include="Controls\VerticalIncrement.cs" />
     <Compile Include="Controls\ViewBoxClone.cs" />
@@ -159,6 +179,7 @@
     <Compile Include="Notifications\NotificationControl.cs" />
     <Compile Include="Notifications\NotificationList.cs" />
     <Compile Include="OGLContextWrapper.cs" />
+    <Compile Include="RawInputs\RAWINPUT.cs" />
     <Compile Include="Resources\IconTypeToImageSourceConverter.cs" />
     <Compile Include="Services\ClipboardService.cs" />
     <Compile Include="Services\WinExplorerService.cs" />
@@ -220,7 +241,7 @@
     <Compile Include="Utils\UsageCounter.cs" />
     <Compile Include="Utils\Validate.cs" />
     <Compile Include="Utils\VisualTreeUtils.cs" />
-    <Compile Include="Viewport\OGLViewPortControl.cs" />
+    <Compile Include="Viewport\OGLRenderSurface.cs" />
     <Compile Include="Views\AppLoggerWindow.xaml.cs">
       <DependentUpon>AppLoggerWindow.xaml</DependentUpon>
     </Compile>

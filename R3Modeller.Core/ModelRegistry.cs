@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace R3Modeller.Core {
     /// <summary>
@@ -90,6 +91,7 @@ namespace R3Modeller.Core {
                 throw new ArgumentException("ID cannot be null or empty", nameof(id));
             if (!this.IdToRegistry.TryGetValue(id, out var entry))
                 throw new Exception($"No such registration with id: {id}");
+
             return entry;
         }
 

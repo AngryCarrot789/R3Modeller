@@ -1,12 +1,9 @@
 using System;
 using OpenTK.Graphics.OpenGL;
-using R3Modeller.Controls;
-using R3Modeller.Core.Rendering;
 
-namespace R3Modeller.Viewport {
-    public class OGLViewPortControl : BitmapRenderTarget, IRenderTarget {
+namespace R3Modeller.Controls {
+    public class OGLViewPortControl : BitmapRenderTarget {
         public readonly OGLContextWrapper ogl;
-        private int counter;
         private readonly Action invalidateVisualAction;
 
         public OGLViewPortControl() {
@@ -40,22 +37,6 @@ namespace R3Modeller.Viewport {
             GL.ReadBuffer(ReadBufferMode.Back);
             GL.ReadPixels(0, 0, e.Width, e.Height, PixelFormat.Bgra, PixelType.UnsignedByte, e.BackBuffer);
             this.ogl.MakeCurrent(false);
-        }
-
-        public void BeginFrame() {
-            if (++this.counter == 1) {
-                this.ogl.MakeCurrent(true);
-            }
-        }
-
-        public void EndFrame() {
-            if (--this.counter == 0) {
-                this.ogl.MakeCurrent(false);
-            }
-
-            if (this.counter < 0) {
-                throw new Exception("Excessive calls to EndFrame");
-            }
         }
 
         public void InvalidateRender(bool schedule = false) {

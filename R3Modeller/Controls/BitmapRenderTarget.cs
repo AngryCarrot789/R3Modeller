@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xaml;
 
 namespace R3Modeller.Controls {
     /// <summary>
@@ -51,7 +53,13 @@ namespace R3Modeller.Controls {
                 this.bitmap = new WriteableBitmap(width, height, 96.0 * scaleX, 96.0 * scaleY, PixelFormats.Pbgra32, null);
             }
 
+            // For some reason, Lock() will randomly take a long time, but rarely, it performs perfectly fine
+            // The only way to repeat this afaik is to get lucky after starting the app
+            // long a = R3Modeller.Core.Utils.Time.GetSystemTicks();
             this.bitmap.Lock();
+            // long b = R3Modeller.Core.Utils.Time.GetSystemTicks() - a;
+            // System.Diagnostics.Debug.WriteLine($"Paint time: {Math.Round(R3Modeller.Core.Utils.Time.TicksToMillis(b), 2):F2}");
+
             this.OnPaint(new DrawEventArgs(this.bitmap.BackBuffer, width, height, scaleX, scaleY));
             this.bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             this.bitmap.Unlock();

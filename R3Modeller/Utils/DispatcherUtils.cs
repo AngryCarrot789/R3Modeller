@@ -5,14 +5,6 @@ using System.Windows.Threading;
 
 namespace R3Modeller.Utils {
     public static class DispatcherUtils {
-        public static void ThrowOrLog(string msg) {
-            #if DEBUG
-            throw new Exception(msg);
-            #else
-            R3Modeller.Core.AppLogger.WriteLine(msg);
-            #endif
-        }
-
         public static Task WaitUntilRenderPhase(Dispatcher dispatcher) {
             return dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render).Task;
         }

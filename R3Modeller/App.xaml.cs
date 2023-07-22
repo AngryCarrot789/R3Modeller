@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using OpenTK.Graphics;
 using R3Modeller.Core;
 using R3Modeller.Core.Actions;
 using R3Modeller.Core.Engine.Objs.Actions;
@@ -105,8 +106,11 @@ namespace R3Modeller {
             this.MainWindow = this.splash = new AppSplashScreen();
             this.splash.Show();
 
+#if !DEBUG // allow debug mode to catch the exception
             try {
+#endif
                 await this.InitApp();
+#if !DEBUG
             }
             catch (Exception ex) {
                 if (IoC.MessageDialogs != null) {
@@ -121,6 +125,7 @@ namespace R3Modeller {
                 }, DispatcherPriority.Background);
                 return;
             }
+#endif
 
             await this.SetActivity("Loading FramePFX main window...");
             MainWindow window = new MainWindow();
