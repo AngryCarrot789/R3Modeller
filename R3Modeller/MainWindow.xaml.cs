@@ -86,24 +86,24 @@ namespace R3Modeller {
             this.OGLViewPort.EndFrame();
 
             this.Editor.SetProject(new ProjectViewModel(this.project));
-            this.Loaded += this.OnLoaded;
+            // this.Loaded += this.OnLoaded;
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e) {
-            WindowInteropHelper interop = new WindowInteropHelper(this);
-            HwndSource source = HwndSource.FromHwnd(interop.Handle);
-            source.AddHook(this.WndProc);
-        }
-
-        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled) {
-            byte[] lpb = new byte[256];
-            int dwSize = 256;
-
-            if (msg == 255) {
-
-            }
-            return IntPtr.Zero;
-        }
+        // private void OnLoaded(object sender, RoutedEventArgs e) {
+        //     WindowInteropHelper interop = new WindowInteropHelper(this);
+        //     HwndSource source = HwndSource.FromHwnd(interop.Handle);
+        //     source.AddHook(this.WndProc);
+        // }
+        // 
+        // private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled) {
+        //     byte[] lpb = new byte[256];
+        //     int dwSize = 256;
+        // 
+        //     if (msg == 255) {
+        // 
+        //     }
+        //     return IntPtr.Zero;
+        // }
 
         #region Notification panel
 

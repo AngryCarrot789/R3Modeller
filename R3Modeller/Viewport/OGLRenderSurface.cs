@@ -289,6 +289,7 @@ namespace R3Modeller.Viewport {
             // windowing apps (like WPF) use the top left.
             // However the LayoutTransform property of the control can be used to scale the layout by -1 in the Y axis to flip
             // it back. It's most likely faster than doing a manual pixel copy, because the layout transformation (i'm guessing) is happening in DirectX
+            GL.Flush();
             GL.ReadBuffer(ReadBufferMode.Back);
             GL.ReadPixels(0, 0, e.Width, e.Height, PixelFormat.Bgra, PixelType.UnsignedByte, e.BackBuffer);
             this.ogl.MakeCurrent(false);

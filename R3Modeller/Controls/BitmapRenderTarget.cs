@@ -56,6 +56,9 @@ namespace R3Modeller.Controls {
             // For some reason, Lock() will randomly take a long time, but rarely, it performs perfectly fine
             // The only way to repeat this afaik is to get lucky after starting the app
             // long a = R3Modeller.Core.Utils.Time.GetSystemTicks();
+
+            // But what's even weirder... When the bitmap's size is 3353x960, 3329x960 or 3302x960, Lock() performs fine.
+            // I imagine there are more resolutions like this that have zero overhead... but this is super weird
             this.bitmap.Lock();
             // long b = R3Modeller.Core.Utils.Time.GetSystemTicks() - a;
             // System.Diagnostics.Debug.WriteLine($"Paint time: {Math.Round(R3Modeller.Core.Utils.Time.TicksToMillis(b), 2):F2}");
