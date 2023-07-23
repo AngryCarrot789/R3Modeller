@@ -27,6 +27,7 @@
 
     <ItemGroup>
         <Folder Include="Attribution" />
+        <Folder Include="PropertyEditing\Editors" />
         <Folder Include="Utils\Collections\" />
     </ItemGroup>
 

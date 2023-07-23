@@ -1,8 +1,9 @@
 using System;
 using System.Windows.Input;
+using R3Modeller.Core.PropertyEditing;
 
 namespace R3Modeller.Core.Engine.ViewModels {
-    public class CameraViewModel : BaseViewModel {
+    public class CameraViewModel : BaseViewModel, IPropertyEditReceiver {
         public Camera Model { get; }
 
         public float OrbitRange {
@@ -49,6 +50,11 @@ namespace R3Modeller.Core.Engine.ViewModels {
             }, () => this.isModifyingFov);
         }
 
+        static CameraViewModel() {
+            PropertyEditorFactory.Register(typeof(CameraViewModel), new PropertyDescription(nameof(OrbitRange), typeof(float)));
+            PropertyEditorFactory.Register(typeof(CameraViewModel), new PropertyDescription(nameof(Fov), typeof(float)));
+        }
+
         private void OnOrbitRangeUpdated() {
             if (!this.isModifyingOrbitRange) {
                 this.Viewport.RecalculateVisibleObjects();
@@ -63,6 +69,10 @@ namespace R3Modeller.Core.Engine.ViewModels {
             }
 
             this.Viewport.InvalidateRender();
+        }
+
+        public void OnExternalPropertyModified(BasePropertyViewModel handler, string property) {
+
         }
     }
 }

@@ -4,7 +4,7 @@ using R3Modeller.Core.Views.ViewModels;
 
 namespace R3Modeller.Core.Views.Dialogs {
     public class BaseConfirmableDialogViewModel : BaseDialogViewModel, IErrorInfoHandler {
-        protected bool HasErrors { get; private set; }
+        public bool HasErrors { get; private set; }
 
         public AsyncRelayCommand ConfirmCommand { get; }
         public AsyncRelayCommand CancelCommand { get; }
