@@ -51,8 +51,6 @@ namespace R3Modeller.Core.Engine.ViewModels {
         }
 
         static CameraViewModel() {
-            PropertyEditorFactory.Register(typeof(CameraViewModel), new PropertyDescription(nameof(OrbitRange), typeof(float)));
-            PropertyEditorFactory.Register(typeof(CameraViewModel), new PropertyDescription(nameof(Fov), typeof(float)));
         }
 
         private void OnOrbitRangeUpdated() {
@@ -71,7 +69,7 @@ namespace R3Modeller.Core.Engine.ViewModels {
             this.Viewport.InvalidateRender();
         }
 
-        public void OnExternalPropertyModified(BasePropertyViewModel handler, string property) {
+        public void OnExternalPropertyModified(BasePropertyEditorViewModel handler, string property) {
 
         }
     }

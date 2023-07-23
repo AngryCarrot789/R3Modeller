@@ -8,7 +8,7 @@ namespace R3Modeller.Core.Engine.ViewModels {
 
         public ProjectViewModel(Project project) {
             this.Model = project;
-            this.Scene = new SceneViewModel(project.Scene);
+            this.Scene = new SceneViewModel(project.Scene, this);
         }
 
         public void OnRenderInvalidated() {

@@ -317,7 +317,7 @@ namespace R3Modeller.Core.Engine.Objs {
             t = Matrix4x4.CreateTranslation(this.absolutePos);
             r = Matrix4x4.CreateFromQuaternion(this.absoluteRot);
             s = Matrix4x4.CreateScale(this.absoluteScale);
-            this.modelMatrix = t * r * s;
+            this.modelMatrix = s * r * t;
             foreach (SceneObject obj in this.items) {
                 obj.UpdateAbsoluteValues();
             }

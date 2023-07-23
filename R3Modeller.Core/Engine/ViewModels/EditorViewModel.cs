@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using R3Modeller.Core.Notifications;
 
 namespace R3Modeller.Core.Engine.ViewModels {
-    public class EditorViewModel : ObservableObject {
+    public class EditorViewModel : BaseViewModel {
         private ProjectViewModel project;
 
         /// <summary>
@@ -10,7 +10,7 @@ namespace R3Modeller.Core.Engine.ViewModels {
         /// </summary>
         public ProjectViewModel Project {
             get => this.project;
-            private set => this.SetProperty(ref this.project, value);
+            private set => this.RaisePropertyChanged(ref this.project, value);
         }
 
         public NotificationPanelViewModel NotificationPanel { get; }
@@ -30,6 +30,7 @@ namespace R3Modeller.Core.Engine.ViewModels {
                 // prompt save
             }
 
+            project.Editor = this;
             this.Project = project;
         }
 

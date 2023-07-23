@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:R3Modeller"
              xmlns:viewport="clr-namespace:R3Modeller.Viewport"
              xmlns:controls="clr-namespace:R3Modeller.Controls"
+             xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
+             xmlns:pec="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core"
+             xmlns:editors="clr-namespace:R3Modeller.Core.PropertyEditing.Editors;assembly=R3Modeller.Core"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -31,6 +36,32 @@
                                     </controls:BitmapRenderTarget>
                                 </Border>
                             </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <s:Double x:Key="FloatMinValue">-3.402823E+38</s:Double>
+            <s:Double x:Key="FloatMaxValue">3.402823E+38</s:Double>
+
+            <Style TargetType="{x:Type pe:PropertyEditor}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type pe:PropertyEditor}">
+                            <TreeView ItemsSource="{TemplateBinding ApplicableGroups}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+                                <FrameworkElement.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type pec:PropertyGroupViewModel}" ItemsSource="{Binding Values}">
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </HierarchicalDataTemplate>
+                                    <DataTemplate DataType="{x:Type editors:PositionEditorViewModel}">
+                                        <StackPanel>
+                                            <dragger:NumberDragger Height="20" Width="75" Style="{StaticResource AbletonNumberDraggerStyle}" Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" Value="{Binding PosX, Mode=TwoWay}"/>
+                                            <dragger:NumberDragger Height="20" Width="75" Style="{StaticResource AbletonNumberDraggerStyle}" Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" Value="{Binding PosY, Mode=TwoWay}"/>
+                                            <dragger:NumberDragger Height="20" Width="75" Style="{StaticResource AbletonNumberDraggerStyle}" Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" Value="{Binding PosZ, Mode=TwoWay}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </FrameworkElement.Resources>
+                            </TreeView>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

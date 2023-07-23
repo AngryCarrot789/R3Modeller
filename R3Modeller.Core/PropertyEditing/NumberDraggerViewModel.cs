@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Collections;
 using OpenTK.Graphics.OpenGL;
 
 namespace R3Modeller.Core.PropertyEditing {
-    public class NumberDraggerViewModel : BasePropertyViewModel {
+    public class NumberDraggerViewModel : BasePropertyEditorViewModel {
         private double value;
         public double Value {
             get => this.value;

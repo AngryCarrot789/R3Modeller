@@ -9,9 +9,13 @@ namespace R3Modeller.Core.Engine.ViewModels {
 
         public SceneGraph Model { get; set; }
 
-        public SceneViewModel(SceneGraph model) {
+        public ProjectViewModel Project { get; }
+
+        public SceneViewModel(SceneGraph model, ProjectViewModel project) {
             this.Model = model;
+            this.Project = project;
             this.RootObject = new SceneObjectViewModel(model.Root);
+            this.RootObject.SetProject(project);
         }
     }
 }

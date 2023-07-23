@@ -185,5 +185,12 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                 throw new Exception("Expected object's parent to be null");
             }
         }
+
+        public void SetProject(ProjectViewModel project) {
+            this.Project = project;
+            foreach (SceneObjectViewModel obj in this.children) {
+                obj.SetProject(project);
+            }
+        }
     }
 }

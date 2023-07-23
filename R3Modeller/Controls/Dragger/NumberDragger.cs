@@ -521,6 +521,13 @@ namespace R3Modeller.Controls.Dragger {
             }
         }
 
+        protected override void OnMouseLeave(MouseEventArgs e) {
+            base.OnMouseLeave(e);
+            if (e.LeftButton != MouseButtonState.Pressed && this.IsDragging) {
+                this.CompleteDrag();
+            }
+        }
+
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {
             if (!this.IsDragging && !this.IsValueReadOnly) {
                 e.Handled = true;

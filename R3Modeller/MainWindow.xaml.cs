@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -250,6 +251,10 @@ namespace R3Modeller {
         protected override void OnDeactivated(EventArgs e) {
             base.OnDeactivated(e);
             this.OGLViewPort.InvalidateRender();
+        }
+
+        private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
+            // this.VPPropertyEditor.DataSources = new List<Object>() {e.NewValue};
         }
     }
 }

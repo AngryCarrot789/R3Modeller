@@ -13,6 +13,7 @@
         xmlns:c1="clr-namespace:MultiSelectTreeViews.Controls;assembly=MultiSelectTreeViews"
         xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         xmlns:ap="clr-namespace:R3Modeller.AttachedProperties"
+        xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
@@ -37,7 +38,7 @@
         <Grid Margin="0,19,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="300"/>
             </Grid.ColumnDefinitions>
             <Grid>
                 <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}"/>
@@ -55,6 +56,10 @@
                                        TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
             </Grid>
             <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
                 <!-- https://dlaa.me/blog/post/9898803 -->
                 <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0">
                     <!-- Content -->
@@ -84,7 +89,7 @@
                         </TreeViewItem>
 
                         <!-- Data rows -->
-                        <TreeView DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                        <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                                     <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
@@ -140,6 +145,9 @@
                             </ItemsControl.ItemTemplate>
                         </TreeView>
                     </Grid>
+                </Border>
+                <Border Grid.Row="1">
+                    <pe:PropertyEditor x:Name="VPPropertyEditor" DataSources="{Binding Project.Scene.RootObject.Children}"/>
                 </Border>
             </Grid>
         </Grid>
