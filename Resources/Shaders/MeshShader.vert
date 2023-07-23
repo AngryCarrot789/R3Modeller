@@ -1,13 +1,15 @@
 #version 330
 
+precision mediump float;
+
 // Uniforms
 uniform mat4 mvp;
 uniform mat4 mv;
 
 // Inputs
-layout(location = 0) in vec3 in_pos;
-layout(location = 1) in vec2 in_uv;
-layout(location = 1) in vec3 in_normal;
+in vec3 in_pos;
+in vec2 in_uv;
+in vec3 in_normal;
 
 // Outputs
 out vec2 ex_uv;

@@ -211,5 +211,17 @@ namespace R3Modeller.Core.Utils {
 
             return new Resolution(width + increment, height + decrement);
         }
+
+        public static float NormalizeAngle(float angle) {
+            while (angle < -180.0f) {
+                angle += 360.0f;
+            }
+
+            while (angle > 180.0f) {
+                angle -= 360.0f;
+            }
+
+            return angle;
+        }
     }
 }

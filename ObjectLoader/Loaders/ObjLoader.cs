@@ -49,7 +49,6 @@ namespace ObjectLoader.Loaders {
 
         public LoadResult Load(Stream lineStream) {
             this.StartLoad(lineStream);
-
             return this.CreateResult();
         }
 

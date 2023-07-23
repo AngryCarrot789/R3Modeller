@@ -26,7 +26,6 @@ namespace R3Modeller.Core.Engine.Meshes {
             this.vbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
             GL.BufferData(BufferTarget.ArrayBuffer, verts.Length * sizeof(float), verts, BufferUsageHint.StaticDraw);
-
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
 

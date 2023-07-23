@@ -54,12 +54,12 @@ namespace R3Modeller.Core.Engine {
         }
 
         public void SetOrbitRange(float range) {
-            this.orbitRange = range;
+            this.orbitRange = Maths.Clamp(range, 0.0001f, 1000f);
             this.UpdateViewMatrix();
         }
 
         public void SetFov(float fov = 60f) {
-            this.fov = fov;
+            this.fov = Maths.Clamp(fov, 5f, 175f);
             this.UpdateProjectionMatrix();
         }
 

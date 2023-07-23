@@ -8,7 +8,7 @@ namespace R3Modeller.Core.Engine.Objs {
         private readonly Shader shader;
 
         public FloorPlaneObject() {
-            this.SetScale(new Vector3(5f));
+            this.RelativeScale = new Vector3(5f);
             this.shader = new Shader(ResourceLocator.ReadFile("Shaders/BasicShader.vert"), ResourceLocator.ReadFile("Shaders/BasicShader.frag"));
             this.mesh = new BasicMesh(new[] {
                 -1.0f, 0.0f,  1.0f,

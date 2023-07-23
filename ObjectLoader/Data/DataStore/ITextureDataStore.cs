@@ -1,7 +1,8 @@
+using System.Numerics;
 using ObjectLoader.Data.VertexData;
 
 namespace ObjectLoader.Data.DataStore {
     public interface ITextureDataStore {
-        void AddTexture(Texture texture);
+        void AddTexture(Vector3 texture);
     }
 }

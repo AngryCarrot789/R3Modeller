@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLoader", "ObjectLoade
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiSelectTreeView", "MultiSelectTreeView\MultiSelectTreeView.csproj", "{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "R3Modeller.CrossPlatform", "R3Modeller.CrossPlatform\R3Modeller.CrossPlatform.csproj", "{F5C38020-0525-4410-AF6F-0E3C7363F9F0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,18 +71,6 @@ Global
 		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x64.Build.0 = Release|x64
 		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x86.ActiveCfg = Release|x86
 		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x86.Build.0 = Release|x86
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|x64.Build.0 = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Debug|x86.Build.0 = Debug|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|x64.ActiveCfg = Release|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|x64.Build.0 = Release|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|x86.ActiveCfg = Release|Any CPU
-		{F5C38020-0525-4410-AF6F-0E3C7363F9F0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

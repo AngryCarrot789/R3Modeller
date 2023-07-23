@@ -15,15 +15,15 @@ namespace R3Modeller.Core.Engine {
         public static Project CreateDefault() {
             Project project = new Project();
             FloorPlaneObject floor = new FloorPlaneObject();
-            floor.SetScale(new Vector3(5f));
+            floor.RelativeScale = new Vector3(5f);
 
             project.Scene.Root.AddItem(floor);
 
             TriangleObject tri1 = new TriangleObject();
-            tri1.SetTransformation(new Vector3(1f, 0f, 0f), new Vector3(1.5f), Vector3.Zero);
+            tri1.SetTransformation(new Vector3(1f, 0f, 0f), new Vector3(1.5f), Quaternion.Identity);
 
             TriangleObject tri2 = new TriangleObject();
-            tri2.SetPosition(new Vector3(4, 2, 4));
+            tri2.RelativePosition = new Vector3(4, 2, 4);
             tri1.AddItem(tri2);
 
             project.Scene.Root.AddItem(tri1);

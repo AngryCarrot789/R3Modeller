@@ -8,27 +8,12 @@ using Vector4 = System.Numerics.Vector4;
 
 namespace R3Modeller.Core.Engine.Utils {
     public class Shader : IDisposable {
-        private readonly Dictionary<string, int> uniformNameToId;
-        private readonly Dictionary<int, string> uniformIdToName;
-        private readonly Dictionary<string, int> attributeNameToId;
-        private readonly Dictionary<int, string> attributeIdToName;
-
         /// <summary>
         /// The ID of the shader program
         /// </summary>
         public int ProgramID { get; private set; }
 
-        public IReadOnlyDictionary<string, int> UniformNameToId => this.uniformNameToId;
-        public IReadOnlyDictionary<int, string> UniformIdToName => this.uniformIdToName;
-        public IReadOnlyDictionary<string, int> AttributeNameToId => this.attributeNameToId;
-        public IReadOnlyDictionary<int, string> AttributeIdToName => this.attributeIdToName;
-
         public Shader(string vertexCode, string fragmentCode) {
-            this.uniformNameToId = new Dictionary<string, int>();
-            this.uniformIdToName = new Dictionary<int, string>();
-            this.attributeNameToId = new Dictionary<string, int>();
-            this.attributeIdToName = new Dictionary<int, string>();
-
             this.ProgramID = GL.CreateProgram();
 
             int vertId = LoadShader(this.ProgramID, vertexCode, ShaderType.VertexShader);
@@ -44,19 +29,18 @@ namespace R3Modeller.Core.Engine.Utils {
                 throw new Exception($"Failed to link shader program :\n{info}");
             }
 
-            GL.GetProgram(this.ProgramID, GetProgramParameterName.ActiveUniforms, out int count);
-            for (int i = 0; i < count; i++) {
-                GL.GetActiveUniform(this.ProgramID, i, 16, out int length, out int size, out ActiveUniformType uniformType, out string name);
-                this.uniformNameToId[name] = i;
-                this.uniformIdToName[i] = name;
-            }
-
-            GL.GetProgram(this.ProgramID, GetProgramParameterName.ActiveAttributes, out count);
-            for (int i = 0; i < count; i++) {
-                GL.GetActiveAttrib(this.ProgramID, i, 16, out int length, out int size, out ActiveAttribType type, out string name);
-                this.attributeNameToId[name] = i;
-                this.attributeIdToName[i] = name;
-            }
+            // GL.GetProgram(this.ProgramID, GetProgramParameterName.ActiveUniforms, out int count);
+            // for (int i = 0; i < count; i++) {
+            //     GL.GetActiveUniform(this.ProgramID, i, 16, out int length, out int size, out ActiveUniformType uniformType, out string name);
+            //     this.uniformNameToId[name] = i;
+            //     this.uniformIdToName[i] = name;
+            // }
+            // GL.GetProgram(this.ProgramID, GetProgramParameterName.ActiveAttributes, out count);
+            // for (int i = 0; i < count; i++) {
+            //     GL.GetActiveAttrib(this.ProgramID, i, 16, out int length, out int size, out ActiveAttribType type, out string name);
+            //     this.attributeNameToId[name] = i;
+            //     this.attributeIdToName[i] = name;
+            // }
 
             GL.DetachShader(this.ProgramID, vertId);
             GL.DetachShader(this.ProgramID, fragId);
@@ -83,11 +67,13 @@ namespace R3Modeller.Core.Engine.Utils {
             return id;
         }
 
-        public bool GetUniformLocation(string name, out int index) => this.uniformNameToId.TryGetValue(name, out index);
+        public bool GetUniformLocation(string name, out int index) {
+            return (index = GL.GetUniformLocation(this.ProgramID, name)) >= 0;
+        }
 
         public void SetUniformBool(string name, bool value) {
             if (this.GetUniformLocation(name, out int index))
-                GL.Uniform1(index, value ? 1 : 0);
+                GL.Uniform1(index, value ? 1f : 0f);
         }
 
         public void SetUniformInt(string name, int value) {

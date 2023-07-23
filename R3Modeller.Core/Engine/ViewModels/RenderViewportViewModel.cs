@@ -17,5 +17,12 @@ namespace R3Modeller.Core.Engine.ViewModels {
         public void InvalidateRender(bool schedule = true) {
             this.Model.RenderTarget.InvalidateRender(schedule);
         }
+
+        /// <summary>
+        /// Calculate a list of objects whose bounding boxes are visible on screen based on the current state of the camera
+        /// </summary>
+        public void RecalculateVisibleObjects() {
+
+        }
     }
 }

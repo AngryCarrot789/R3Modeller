@@ -130,6 +130,8 @@ namespace R3Modeller.Controls.Dragger {
                 new PropertyMetadata(null));
 
         public static readonly DependencyProperty ValueFormatterProperty = DependencyProperty.Register("ValueFormatter", typeof(IValueFormatter), typeof(NumberDragger), new PropertyMetadata(null));
+        public static readonly DependencyProperty EditStartedCommandProperty = DependencyProperty.Register("EditStartedCommand", typeof(ICommand), typeof(NumberDragger), new PropertyMetadata(null));
+        public static readonly DependencyProperty EditCompletedCommandProperty = DependencyProperty.Register("EditCompletedCommand", typeof(ICommand), typeof(NumberDragger), new PropertyMetadata(null));
 
         #endregion
 
@@ -235,6 +237,22 @@ namespace R3Modeller.Controls.Dragger {
         public IValueFormatter ValueFormatter {
             get => (IValueFormatter) this.GetValue(ValueFormatterProperty);
             set => this.SetValue(ValueFormatterProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a command executed when an edit begins
+        /// </summary>
+        public ICommand EditStartedCommand {
+            get => (ICommand) this.GetValue(EditStartedCommandProperty);
+            set => this.SetValue(EditStartedCommandProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a command executed when an edit is completed, passing the cancelled state as a parameter
+        /// </summary>
+        public ICommand EditCompletedCommand {
+            get => (ICommand) this.GetValue(EditCompletedCommandProperty);
+            set => this.SetValue(EditCompletedCommandProperty, value);
         }
 
         public bool IsValueReadOnly {
@@ -757,6 +775,10 @@ namespace R3Modeller.Controls.Dragger {
                     this.CancelDrag();
                 }
             }
+
+            if (this.EditStartedCommand is ICommand command && command.CanExecute(null)) {
+                command.Execute(null);
+            }
         }
 
         public void CompleteDrag() {
@@ -801,6 +823,9 @@ namespace R3Modeller.Controls.Dragger {
             this.UpdateCursor();
 
             this.RaiseEvent(new EditCompletedEventArgs(cancelled));
+            if (this.EditCompletedCommand is ICommand command && command.CanExecute(cancelled.Box())) {
+                command.Execute(cancelled.Box());
+            }
         }
 
         private Cursor GetCursorForOrientation() {

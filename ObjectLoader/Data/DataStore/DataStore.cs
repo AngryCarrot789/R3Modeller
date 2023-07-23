@@ -14,14 +14,14 @@ namespace ObjectLoader.Data.DataStore {
         private readonly List<Material> _materials = new List<Material>();
 
         private readonly List<Vector3> _vertices = new List<Vector3>();
-        private readonly List<Texture> _textures = new List<Texture>();
+        private readonly List<Vector3> _textures = new List<Vector3>();
         private readonly List<Normal> _normals = new List<Normal>();
 
         public IList<Vector3> Vertices {
             get { return this._vertices; }
         }
 
-        public IList<Texture> Textures {
+        public IList<Vector3> Textures {
             get { return this._textures; }
         }
 
@@ -58,7 +58,7 @@ namespace ObjectLoader.Data.DataStore {
             this._vertices.Add(vertex);
         }
 
-        public void AddTexture(Texture texture) {
+        public void AddTexture(Vector3 texture) {
             this._textures.Add(texture);
         }
 

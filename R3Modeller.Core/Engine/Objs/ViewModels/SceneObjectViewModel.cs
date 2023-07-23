@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Numerics;
 using R3Modeller.Core.Engine.Factories;
 using R3Modeller.Core.Engine.ViewModels;
@@ -10,6 +9,11 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
     public class SceneObjectViewModel : BaseViewModel {
         private SceneObjectViewModel parent;
         private readonly ObservableCollection<SceneObjectViewModel> children;
+
+        // storage for the rotation properties
+        private float yaw;
+        private float pitch;
+        private float roll;
 
         /// <summary>
         /// This scene object's underlying model object
@@ -22,9 +26,9 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         public ReadOnlyObservableCollection<SceneObjectViewModel> Children { get; }
 
         public Vector3 Pos {
-            get => this.Model.pos;
+            get => this.Model.RelativePosition;
             set {
-                this.Model.SetPosition(value);
+                this.Model.RelativePosition = value;
                 this.RaisePropertyChanged(nameof(this.Pos));
                 this.RaisePropertyChanged(nameof(this.PosX));
                 this.RaisePropertyChanged(nameof(this.PosY));
@@ -33,22 +37,23 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             }
         }
 
-        public Vector3 Rotation {
-            get => this.Model.rotation;
+        public Quaternion Rotation {
+            get => this.Model.RelativeRotation;
             set {
                 this.Model.SetRotation(value);
                 this.RaisePropertyChanged(nameof(this.Rotation));
-                this.RaisePropertyChanged(nameof(this.RotationX));
-                this.RaisePropertyChanged(nameof(this.RotationY));
-                this.RaisePropertyChanged(nameof(this.RotationZ));
+                this.RaisePropertyChanged(nameof(this.Yaw));
+                this.RaisePropertyChanged(nameof(this.Pitch));
+                this.RaisePropertyChanged(nameof(this.Roll));
+                this.UpdateYawPitchRollForQuaternion();
                 this.Project.OnRenderInvalidated();
             }
         }
 
         public Vector3 Scale {
-            get => this.Model.scale;
+            get => this.Model.RelativeScale;
             set {
-                this.Model.SetScale(value);
+                this.Model.RelativeScale = value;
                 this.RaisePropertyChanged(nameof(this.Scale));
                 this.RaisePropertyChanged(nameof(this.ScaleX));
                 this.RaisePropertyChanged(nameof(this.ScaleY));
@@ -61,9 +66,32 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         public float PosY { get => this.Pos.Y; set => this.Pos = this.Pos.SetY(value); }
         public float PosZ { get => this.Pos.Z; set => this.Pos = this.Pos.SetZ(value); }
 
-        public float RotationX { get => this.Rotation.X; set => this.Rotation = this.Rotation.SetX(value); }
-        public float RotationY { get => this.Rotation.Y; set => this.Rotation = this.Rotation.SetY(value); }
-        public float RotationZ { get => this.Rotation.Z; set => this.Rotation = this.Rotation.SetZ(value); }
+        public float Yaw {
+            get { return this.yaw; }
+            set {
+                this.yaw = value;
+                this.UpdateQuaternionForYawPitchRoll();
+                this.RaisePropertyChanged(nameof(this.Yaw));
+            }
+        }
+
+        public float Pitch {
+            get { return this.pitch; }
+            set {
+                this.pitch = value;
+                this.UpdateQuaternionForYawPitchRoll();
+                this.RaisePropertyChanged(nameof(this.Pitch));
+            }
+        }
+
+        public float Roll {
+            get { return this.roll; }
+            set {
+                this.roll = value;
+                this.UpdateQuaternionForYawPitchRoll();
+                this.RaisePropertyChanged(nameof(this.Roll));
+            }
+        }
 
         public float ScaleX { get => this.Scale.X; set => this.Scale = this.Scale.SetX(value); }
         public float ScaleY { get => this.Scale.Y; set => this.Scale = this.Scale.SetY(value); }
@@ -74,12 +102,23 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         /// </summary>
         public ProjectViewModel Project { get; set; }
 
+        public bool IsRoot => this.parent == null;
+
         /// <summary>
         /// This object's parent object. Null if this object is a root object
         /// </summary>
         public SceneObjectViewModel Parent {
             get => this.parent;
             set => this.RaisePropertyChanged(ref this.parent, value);
+        }
+
+        public SceneObjectViewModel TopLevelParent {
+            get {
+                SceneObjectViewModel top = null, p = this.parent;
+                for (; p != null && !p.IsRoot; p = p.parent) // "p != null" should be false unless this is called on the root container
+                    top = p;
+                return top;
+            }
         }
 
         public string DisplayName {
@@ -109,6 +148,30 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             obj.parent = this;
             this.children.Insert(index, obj);
             obj.RaisePropertyChanged(nameof(obj.Parent));
+        }
+
+        private void UpdateQuaternionForYawPitchRoll() {
+            double radYaw = this.yaw * (Math.PI / 180.0);
+            double radPitch = this.pitch * (Math.PI / 180.0);
+            double radRoll = this.roll * (Math.PI / 180.0);
+            this.Rotation = Quaternion.CreateFromYawPitchRoll((float) radYaw, (float) radPitch, (float) radRoll);
+        }
+
+        private void UpdateYawPitchRollForQuaternion() {
+            Quaternion q = this.Rotation;
+            double sqw = q.W * q.W;
+            double sqx = q.X * q.X;
+            double sqy = q.Y * q.Y;
+            double sqz = q.Z * q.Z;
+
+            double rollRad = Math.Atan2(2.0 * (q.Y * q.Z + q.W * q.X), (sqw - sqx - sqy + sqz));
+            this.roll = (float)(rollRad * (180.0 / Math.PI));
+
+            double pitchRad = Math.Asin(-2.0 * (q.X * q.Z - q.W * q.Y));
+            this.pitch = (float)(pitchRad * (180.0 / Math.PI));
+
+            double yawRad = Math.Atan2(2.0 * (q.X * q.Y + q.W * q.Z), (sqw + sqx - sqy - sqz));
+            this.yaw = (float)(yawRad * (180.0 / Math.PI));
         }
 
         public static void ValidateOwnsObject(SceneObjectViewModel @this, SceneObjectViewModel obj) {
