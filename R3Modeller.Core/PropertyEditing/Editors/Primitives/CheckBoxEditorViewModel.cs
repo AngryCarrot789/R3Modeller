@@ -52,20 +52,38 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
                         bool value = ((CBHandlerData) data).OriginalValue;
                         this.setter(data.Target, value);
                     }
-
-                    this.isChecked = null;
                 }
                 else if (!this.IsEmpty) {
                     bool value = ((CBHandlerData) this.GetHandlerData(0)).OriginalValue;
                     this.setter(this.Handlers[0], value);
-                    this.isChecked = value;
                 }
                 else {
                     return;
                 }
 
+                this.isChecked = this.CalculateDefaultValue();
                 this.RaisePropertyChanged(nameof(this.IsChecked));
             });
+        }
+
+        public bool? CalculateDefaultValue() {
+            if (this.IsMultiSelection)
+            {
+                bool lastValue = this.getter(this.Handlers[0]);
+                for (int i = 1; i < this.Handlers.Count; i++)
+                {
+                    if (this.getter(base.Handlers[i]) != lastValue)
+                    {
+                        return null;
+                    }
+                }
+
+                return lastValue;
+            }
+            else
+            {
+                return this.IsEmpty ? (bool?)null : this.getter(this.Handlers[0]);
+            }
         }
 
         public static CheckBoxEditorViewModel ForGeneric<T>(string label, Func<T, bool> getter, Action<T, bool> setter) {
@@ -75,17 +93,11 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
         protected override void OnHandlersLoaded() {
             base.OnHandlersLoaded();
             this.PreallocateHandlerData();
-            if (this.IsMultiSelection) {
-                this.isChecked = null;
+            if (!this.IsEmpty)
+            {
+                this.isChecked = this.CalculateDefaultValue();
+                this.RaisePropertyChanged(nameof(this.IsChecked));
             }
-            else if (!this.IsEmpty) {
-                this.isChecked = this.getter(this.Handlers[0]);
-            }
-            else {
-                return;
-            }
-
-            this.RaisePropertyChanged(nameof(this.IsChecked));
         }
 
         protected override PropertyHandler NewHandler(object target) => new CBHandlerData(target, this.getter(target));

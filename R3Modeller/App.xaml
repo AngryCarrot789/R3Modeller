@@ -288,7 +288,13 @@
                                                                       Header="{Binding Id, Mode=OneTime}"
                                                                       Style="{StaticResource HierarchicalExpanderStyle}">
                                                                 <!-- This ItemsControl should inherit the templates from the one above -->
-                                                                <pe:PropertyEditorItemsControl Margin="8,0,0,0" ItemsSource="{Binding Values, Mode=OneTime}"/>
+                                                                <pe:PropertyEditorItemsControl Margin="8,0,0,0" ItemsSource="{Binding Values, Mode=OneTime}">
+                                                                    <ItemsControl.ItemContainerStyle>
+                                                                        <Style TargetType="{x:Type pe:PropertyEditorItemContainer}" BasedOn="{StaticResource {x:Type pe:PropertyEditorItemContainer}}">
+                                                                            <Setter Property="Margin" Value="0,3,0,0"/>
+                                                                        </Style>
+                                                                    </ItemsControl.ItemContainerStyle>
+                                                                </pe:PropertyEditorItemsControl>
                                                             </Expander>
                                                         </HierarchicalDataTemplate>
                                                     </FrameworkElement.Resources>

@@ -17,6 +17,8 @@ namespace R3Modeller.Core.PropertyEditing {
             // basicData.AddPropertyEditor("Visibility", new CheckBoxEditorViewModel("Is Visible", typeof(SceneObjectViewModel), x => ((SceneObjectViewModel) x).IsVisible, (x, v) => ((SceneObjectViewModel) x).IsVisible = v));
 
             PropertyGroupViewModel transformation = typeGroup.CreateSubGroup(typeof(SceneObjectViewModel), "Transformation");
+            // probably shouldn't really use stuff like this, as a huge amount of UI control is stripped.
+            // A specific view model and data template for controlling stuff
             transformation.AddPropertyEditor("Absolute Coords Grid", new CheckBoxGridEditorViewModel(typeof(SceneObjectViewModel)) {
                 CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Pos", (x) => x.IsPositionAbsolute, (x, v) => x.IsPositionAbsolute = v),
                 CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Scale", (x) => x.IsScaleAbsolute, (x, v) => x.IsScaleAbsolute = v),

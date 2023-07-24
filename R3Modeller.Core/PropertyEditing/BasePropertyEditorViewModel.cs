@@ -41,6 +41,11 @@ namespace R3Modeller.Core.PropertyEditing {
         }
 
         public void ClearHandlers() {
+            if (this.handlerList.Count < 1)
+            {
+                return;
+            }
+
             this.OnClearHandlers();
             this.handlerList.Clear();
             this.handlerToDataMap.Clear();
@@ -51,8 +56,6 @@ namespace R3Modeller.Core.PropertyEditing {
 
         public void LoadHandlers(IEnumerable<object> targets) {
             this.OnClearHandlers();
-            this.handlerList.Clear();
-            this.handlerToDataMap.Clear();
             foreach (object entry in targets) {
                 this.handlerToDataMap[entry] = null;
                 this.handlerList.Add(entry);

@@ -57,118 +57,121 @@
                                        EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
                                        TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
             </Grid>
-            <Grid Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
-                <!-- https://dlaa.me/blog/post/9898803 -->
-                <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0">
-                    <!-- Content -->
-                    <Grid Grid.IsSharedSizeScope="True">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
+            <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0" 
+                    Grid.Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    <!-- https://dlaa.me/blog/post/9898803 -->
+                    <Border BorderThickness="0">
+                        <!-- Content -->
+                        <Grid Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
 
-                        <!-- Column headers -->
-                        <TreeViewItem Grid.Row="0" BorderThickness="1">
-                            <TreeViewItem.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                        <!-- Placeholders for two columns of ToggleButton -->
-                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                        <ColumnDefinition SharedSizeGroup="Data"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="Task"/>
-                                    <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Toggle" group-->
-                                    <TreeViewItem Grid.Column="1" Padding="0"/>
-                                    <TextBlock Grid.Column="3" Text="Data"/>
-                                </Grid>
-                            </TreeViewItem.Header>
-                        </TreeViewItem>
-
-                        <!-- Data rows -->
-                        <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                    <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.ItemTemplate>
-
-                                <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
-                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <!-- Column headers -->
+                            <TreeViewItem Grid.Row="0" BorderThickness="1">
+                                <TreeViewItem.Header>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                            <!-- Placeholders for two columns of ToggleButton -->
                                             <ColumnDefinition SharedSizeGroup="Toggle"/>
                                             <ColumnDefinition SharedSizeGroup="Toggle"/>
                                             <ColumnDefinition SharedSizeGroup="Data"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                        <CheckBox IsChecked="{Binding IsVisible}" Grid.Column="3" Content="Is Visible"/>
+                                        <TextBlock Grid.Column="0" Text="Task"/>
+                                        <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Toggle" group-->
+                                        <TreeViewItem Grid.Column="1" Padding="0"/>
+                                        <TextBlock Grid.Column="3" Text="Data"/>
                                     </Grid>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
 
-                                    <!-- Level 1 template leaves space for 1 child "Toggle" level -->
-                                    <HierarchicalDataTemplate.ItemTemplate>
-                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                                    <ColumnDefinition SharedSizeGroup="Data"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
-                                            </Grid>
+                            <!-- Data rows -->
+                            <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                        <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
 
-                                            <!-- Level 2 template has no children -->
-                                            <HierarchicalDataTemplate.ItemTemplate>
-                                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition SharedSizeGroup="Data"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                        <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
-                                                    </Grid>
-                                                </HierarchicalDataTemplate>
-                                            </HierarchicalDataTemplate.ItemTemplate>
-                                        </HierarchicalDataTemplate>
-                                    </HierarchicalDataTemplate.ItemTemplate>
-                                </HierarchicalDataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </TreeView>
-                    </Grid>
-                </Border>
-                <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
-                         Grid.Row="1" SelectionMode="Extended"
-                         BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,1,0,0"
-                         ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
-                         ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding DisplayName}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Border Grid.Row="2" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1 1 0 0">
-                    <Grid>
-                        <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
-                        <ScrollViewer>
-                            <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
-            </Grid>
+                                    <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
+                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                                <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                                <ColumnDefinition SharedSizeGroup="Data"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                            <CheckBox IsChecked="{Binding IsVisible}" Grid.Column="3" Content="Is Visible"/>
+                                        </Grid>
+
+                                        <!-- Level 1 template leaves space for 1 child "Toggle" level -->
+                                        <HierarchicalDataTemplate.ItemTemplate>
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
+                                                        <ColumnDefinition SharedSizeGroup="Data"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                    <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
+                                                </Grid>
+
+                                                <!-- Level 2 template has no children -->
+                                                <HierarchicalDataTemplate.ItemTemplate>
+                                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                                <ColumnDefinition/>
+                                                                <ColumnDefinition/>
+                                                                <ColumnDefinition SharedSizeGroup="Data"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                            <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
+                                                        </Grid>
+                                                    </HierarchicalDataTemplate>
+                                                </HierarchicalDataTemplate.ItemTemplate>
+                                            </HierarchicalDataTemplate>
+                                        </HierarchicalDataTemplate.ItemTemplate>
+                                    </HierarchicalDataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </TreeView>
+                        </Grid>
+                    </Border>
+                    <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
+                             Grid.Row="1" SelectionMode="Extended"
+                             BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,1"
+                             ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
+                             ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Border Grid.Row="2" BorderThickness="0">
+                        <Grid>
+                            <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
+                                <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
         <Popup x:Name="NotificationPanelPopup" StaysOpen="True" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
             <Border Background="Transparent">
