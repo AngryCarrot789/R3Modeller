@@ -96,6 +96,33 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         public float ScaleY { get => this.Scale.Y; set => this.Scale = this.Scale.WithY(value); }
         public float ScaleZ { get => this.Scale.Z; set => this.Scale = this.Scale.WithZ(value); }
 
+        public bool IsPositionAbsolute {
+            get => this.Model.IsPositionAbsolute;
+            set {
+                if (value != this.IsPositionAbsolute)
+                    this.Model.IsPositionAbsolute = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public bool IsScaleAbsolute {
+            get => this.Model.IsScaleAbsolute;
+            set {
+                if (value != this.IsScaleAbsolute)
+                    this.Model.IsScaleAbsolute = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public bool IsRotationAbsolute {
+            get => this.Model.IsRotationAbsolute;
+            set {
+                if (value != this.IsRotationAbsolute)
+                    this.Model.IsRotationAbsolute = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
         /// <summary>
         /// The project associated with this scene object. Should only really be set once
         /// </summary>

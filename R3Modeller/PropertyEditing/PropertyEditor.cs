@@ -9,38 +9,53 @@ using R3Modeller.Core.PropertyEditing;
 
 namespace R3Modeller.PropertyEditing {
     public class PropertyEditor : Control {
-        public static readonly DependencyProperty DataSourcesProperty =
+        public static readonly DependencyProperty EditorRegistryProperty =
             DependencyProperty.Register(
-                "DataSources",
+                "EditorRegistry",
+                typeof(PropertyEditorRegistry),
+                typeof(PropertyEditor),
+                new PropertyMetadata(null, (d, e) => {
+                    if (e.NewValue is PropertyEditorRegistry editor) {
+                        ((PropertyEditor) d).ApplicableItems = editor.Root.Values;
+                    }
+                }));
+
+        public static readonly DependencyProperty InputItemsProperty =
+            DependencyProperty.Register(
+                "InputItems",
                 typeof(IEnumerable),
                 typeof(PropertyEditor),
                 new PropertyMetadata(null, (d, e) => ((PropertyEditor) d).OnDataSourceChanged((IEnumerable) e.OldValue, (IEnumerable) e.NewValue)));
 
-        public static readonly DependencyProperty ApplicableDataSourcesProperty =
+        public static readonly DependencyProperty ApplicableItemsProperty =
             DependencyProperty.Register(
-                "ApplicableDataSources",
+                "ApplicableItems",
                 typeof(IEnumerable),
                 typeof(PropertyEditor),
                 new PropertyMetadata(null));
 
+        public PropertyEditorRegistry EditorRegistry {
+            get => (PropertyEditorRegistry) this.GetValue(EditorRegistryProperty);
+            set => this.SetValue(EditorRegistryProperty, value);
+        }
+
         // INPUT
-        public IEnumerable DataSources {
-            get => (IEnumerable) this.GetValue(DataSourcesProperty);
-            set => this.SetValue(DataSourcesProperty, value);
+        public IEnumerable InputItems {
+            get => (IEnumerable) this.GetValue(InputItemsProperty);
+            set => this.SetValue(InputItemsProperty, value);
         }
 
         // OUTPUT
 
-        public IEnumerable ApplicableDataSources {
-            get => (IEnumerable) this.GetValue(ApplicableDataSourcesProperty);
-            set => this.SetValue(ApplicableDataSourcesProperty, value);
+        public IEnumerable ApplicableItems {
+            get => (IEnumerable) this.GetValue(ApplicableItemsProperty);
+            set => this.SetValue(ApplicableItemsProperty, value);
         }
 
         private readonly bool isInDesigner;
 
         public PropertyEditor() {
             this.isInDesigner = DesignerProperties.GetIsInDesignMode(this);
-            this.Loaded += this.OnLoaded;
         }
 
         private void OnDataSourceChanged(IEnumerable oldItems, IEnumerable newItems) {
@@ -48,25 +63,19 @@ namespace R3Modeller.PropertyEditing {
                 ((INotifyCollectionChanged) oldItems).CollectionChanged -= this.OnDataSourceCollectionChanged;
             if (newItems is INotifyCollectionChanged)
                 ((INotifyCollectionChanged) newItems).CollectionChanged += this.OnDataSourceCollectionChanged;
-            this.ClearInternal();
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e) {
-
+            this.SetupObjects();
         }
 
         private void OnDataSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            this.ClearInternal();
+            this.SetupObjects();
         }
 
-        private void ClearInternal() {
-            IEnumerable items = this.DataSources;
-            List<object> list = items != null ? items.Cast<object>().ToList() : new List<object>();
-
-            // Release bindings from the editor, then setup objects, then re-assign to the original value
-            // this.ClearValue(ApplicableDataSourcesProperty);
-            R3PropertyEditorRegistry.Instance.SetupObjects(list);
-            // this.ApplicableDataSources = new List<object>(R3PropertyEditorRegistry.Instance.Root.Values);
+        private void SetupObjects() {
+            if (this.EditorRegistry is PropertyEditorRegistry registry) {
+                IEnumerable items = this.InputItems;
+                List<object> list = items != null ? items.Cast<object>().ToList() : new List<object>();
+                registry.SetupObjects(list);
+            }
         }
     }
 }

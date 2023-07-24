@@ -14,6 +14,7 @@
         xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         xmlns:ap="clr-namespace:R3Modeller.AttachedProperties"
         xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
+        xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
@@ -163,7 +164,7 @@
                     <Grid>
                         <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
                         <ScrollViewer>
-                            <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" DataSources="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
+                            <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
                         </ScrollViewer>
                     </Grid>
                 </Border>

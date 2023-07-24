@@ -37,13 +37,6 @@ namespace R3Modeller {
     public partial class MainWindow : WindowEx, INotificationHandler {
         private readonly Project project;
 
-        public static readonly DependencyProperty PropertyPageItemsSourceProperty = DependencyProperty.Register("PropertyPageItemsSource", typeof(IEnumerable), typeof(MainWindow), new PropertyMetadata(null));
-
-        public IEnumerable PropertyPageItemsSource {
-            get => (IEnumerable) this.GetValue(PropertyPageItemsSourceProperty);
-            set => this.SetValue(PropertyPageItemsSourceProperty, value);
-        }
-
         public EditorViewModel Editor { get; }
 
         private readonly NotificationPanelViewModel NotificationPanel;
@@ -95,7 +88,6 @@ namespace R3Modeller {
             // WindowInteropHelper interop = new WindowInteropHelper(this);
             // HwndSource source = HwndSource.FromHwnd(interop.Handle);
             // source.AddHook(this.WndProc);
-            this.VPPropertyEditor.ApplicableDataSources = R3PropertyEditorRegistry.Instance.Root.Values;
         }
         // 
         // private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled) {

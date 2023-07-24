@@ -10,22 +10,30 @@ namespace R3Modeller.Core.PropertyEditing {
         private readonly Dictionary<object, PropertyHandler> handlerToDataMap;
         private readonly List<object> handlerList;
 
+        /// <summary>
+        /// The list of active handlers
+        /// </summary>
         public IReadOnlyList<object> Handlers => this.handlerList;
+
+        /// <summary>
+        /// The unordered backing collection of property handler data. This collection may be incomplete as handler data is created on-demand
+        /// </summary>
+        public IReadOnlyCollection<PropertyHandler> HandlerData => this.handlerToDataMap.Values;
 
         /// <summary>
         /// Whether or not there are handlers currently using this property editor. Inverse of <see cref="IsEmpty"/>
         /// </summary>
-        public bool HasHandlers =>  this.handlerList != null && this.handlerList.Count > 0;
+        public bool HasHandlers => this.handlerList.Count > 0;
 
         /// <summary>
         /// Whether or not there are no handlers currently using this property editor. Inverse of <see cref="HasHandlers"/>
         /// </summary>
-        public bool IsEmpty =>  this.handlerList == null || this.handlerList.Count < 1;
+        public bool IsEmpty => this.handlerList.Count < 1;
 
         /// <summary>
         /// Whether or not this editor has more than 1 handler
         /// </summary>
-        public bool IsMultiSelection => this.handlerList != null && this.handlerList.Count > 1;
+        public bool IsMultiSelection => this.handlerList.Count > 1;
 
         protected BasePropertyEditorViewModel(Type applicableType) : base(applicableType) {
             this.handlerToDataMap = new Dictionary<object, PropertyHandler>();
@@ -62,7 +70,19 @@ namespace R3Modeller.Core.PropertyEditing {
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        protected abstract PropertyHandler NewHandler(object target);
+        protected virtual PropertyHandler NewHandler(object target) => new PropertyHandler(target);
+
+        /// <summary>
+        /// Creates an instance of the <see cref="PropertyHandler"/> for each object currently loaded, to save dynamic creation
+        /// <para>
+        /// There are very few reason to use this
+        /// </para>
+        /// </summary>
+        protected void PreallocateHandlerData() {
+            foreach (object obj in this.handlerList) {
+                this.handlerToDataMap[obj] = this.NewHandler(obj);
+            }
+        }
 
         /// <summary>
         /// Called just before the handlers are cleared
@@ -85,6 +105,14 @@ namespace R3Modeller.Core.PropertyEditing {
             return data;
         }
 
+        protected virtual PropertyHandler GetHandlerData(int index) {
+            object target = this.Handlers[index];
+            PropertyHandler data = this.handlerToDataMap[target];
+            if (data == null)
+                this.handlerToDataMap[target] = data = this.NewHandler(target);
+            return data;
+        }
+
         protected IEnumerable<T> GetHandlersData<T>() where T : PropertyHandler {
             return this.handlerList.Select(this.GetHandlerData).Cast<T>();
         }
@@ -92,17 +120,5 @@ namespace R3Modeller.Core.PropertyEditing {
         protected IEnumerable<T> GetHandlers<T>() where T : BaseViewModel {
             return this.handlerList.Cast<T>();
         }
-
-        public BasePropertyEditorViewModel Clone() {
-            BasePropertyEditorViewModel editor = this.NewInstance();
-            editor.handlerList.AddRange(this.handlerList);
-            foreach (KeyValuePair<object,PropertyHandler> entry in this.handlerToDataMap) {
-                editor.handlerToDataMap[entry.Key] = entry.Value;
-            }
-
-            return editor;
-        }
-
-        protected abstract BasePropertyEditorViewModel NewInstance();
     }
 }

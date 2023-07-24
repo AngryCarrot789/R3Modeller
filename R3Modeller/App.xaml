@@ -11,6 +11,7 @@
              xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
              xmlns:scenes="clr-namespace:R3Modeller.Core.PropertyEditing.Editors.Scenes;assembly=R3Modeller.Core"
              xmlns:c="clr-namespace:R3Modeller.Converters"
+             xmlns:primitives="clr-namespace:R3Modeller.Core.PropertyEditing.Editors.Primitives;assembly=R3Modeller.Core"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -150,120 +151,152 @@
 
             </Style>
 
+            <ResourceDictionary x:Key="PropertyEditorDataTemplates">
+                <DataTemplate DataType="{x:Type scenes:TransformationEditorViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="56"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Pos" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="Scale" Grid.Row="1" Grid.Column="0"/>
+                        <TextBlock Text="Rotation" Grid.Row="2" Grid.Column="0"/>
+                        <TextBlock Text="X" Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="X" Grid.Row="1" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="P" Grid.Row="2" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Row="0" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Row="1" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Row="2" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="Z" Grid.Row="0" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="Z" Grid.Row="1" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <TextBlock Text="R" Grid.Row="2" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                        <dragger:NumberDragger Grid.Row="0" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding PosX, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditPosXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosXCommand, Mode=OneTime}"
+                                               ToolTip="The X position of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="0" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding PosY, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditPosYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosYCommand, Mode=OneTime}"
+                                               ToolTip="The Y position of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="0" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding PosZ, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditPosZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosZCommand, Mode=OneTime}"
+                                               ToolTip="The Z position of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="1" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding ScaleX, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditScaleXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleXCommand, Mode=OneTime}"
+                                               ToolTip="The X scale of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="1" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding ScaleY, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditScaleYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleYCommand, Mode=OneTime}"
+                                               ToolTip="The Y scale of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="1" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding ScaleZ, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditScaleZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleZCommand, Mode=OneTime}"
+                                               ToolTip="The Z scale of the selected object(s)"/>
+                        <dragger:NumberDragger Grid.Row="2" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding Pitch, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditPitchCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPitchCommand, Mode=OneTime}"
+                                               ToolTip="The pitch (aka rotation around the X axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                        <dragger:NumberDragger Grid.Row="2" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding Yaw, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditYawCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditYawCommand, Mode=OneTime}"
+                                               ToolTip="The yaw (aka rotation around the Y axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                        <dragger:NumberDragger Grid.Row="2" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                               RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                               Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                               Value="{Binding Roll, Mode=TwoWay}"
+                                               EditStartedCommand="{Binding BeginEditRollCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditRollCommand, Mode=OneTime}"
+                                               ToolTip="The roll (aka rotation around the Z axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type primitives:CheckBoxEditorViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="{Binding Label, Mode=OneWay}" IsChecked="{Binding IsChecked}"/>
+                    </StackPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type primitives:CheckBoxGridEditorViewModel}">
+                    <ItemsControl ItemsSource="{Binding Editors, Mode=OneTime}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid IsItemsHost="True" Rows="1" Columns="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Items.Count}"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <StaticResource>
+                                <StaticResource.ResourceKey>
+                                    <DataTemplateKey DataType="{x:Type primitives:CheckBoxEditorViewModel}"/>
+                                </StaticResource.ResourceKey>
+                            </StaticResource>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="{x:Type ContentPresenter}">
+                                <Setter Property="Margin" Value="0,0,2,0"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </DataTemplate>
+            </ResourceDictionary>
+
             <Style TargetType="{x:Type pe:PropertyEditor}">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type pe:PropertyEditor}">
-                            <pe:PropertyEditorItemsControl ItemsSource="{TemplateBinding ApplicableDataSources}"
+                            <pe:PropertyEditorItemsControl ItemsSource="{TemplateBinding ApplicableItems}"
                                                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
                                                            BorderBrush="{TemplateBinding BorderBrush}"
                                                            BorderThickness="{TemplateBinding BorderThickness}">
                                 <ItemsControl.Resources>
-                                    <DataTemplate DataType="{x:Type scenes:TransformationEditorViewModel}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="56"/>
-                                                <ColumnDefinition Width="15"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="15"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="15"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="*"/>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Pos" Grid.Row="0" Grid.Column="0"/>
-                                            <TextBlock Text="Scale" Grid.Row="1" Grid.Column="0"/>
-                                            <TextBlock Text="Rotation" Grid.Row="2" Grid.Column="0"/>
-                                            <TextBlock Text="X" Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="X" Grid.Row="1" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="P" Grid.Row="2" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Y" Grid.Row="0" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Y" Grid.Row="1" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Y" Grid.Row="2" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Z" Grid.Row="0" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Z" Grid.Row="1" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <TextBlock Text="R" Grid.Row="2" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
-                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
-                                                                   Value="{Binding PosX, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditPosXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosXCommand, Mode=OneTime}"
-                                                                   ToolTip="The X position of the selected object(s)"/>
-                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
-                                                                   Value="{Binding PosY, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditPosYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosYCommand, Mode=OneTime}"
-                                                                   ToolTip="The Y position of the selected object(s)"/>
-                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
-                                                                   Value="{Binding PosZ, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditPosZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosZCommand, Mode=OneTime}"
-                                                                   ToolTip="The Z position of the selected object(s)"/>
-
-                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding ScaleX, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditScaleXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleXCommand, Mode=OneTime}"
-                                                                   ToolTip="The X scale of the selected object(s)"/>
-                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding ScaleY, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditScaleYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleYCommand, Mode=OneTime}"
-                                                                   ToolTip="The Y scale of the selected object(s)"/>
-                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding ScaleZ, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditScaleZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleZCommand, Mode=OneTime}"
-                                                                   ToolTip="The Z scale of the selected object(s)"/>
-
-                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding Pitch, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditPitchCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPitchCommand, Mode=OneTime}"
-                                                                   ToolTip="The pitch (aka rotation around the X axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
-                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding Yaw, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditYawCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditYawCommand, Mode=OneTime}"
-                                                                   ToolTip="The yaw (aka rotation around the Y axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
-                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
-                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
-                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
-                                                                   Value="{Binding Roll, Mode=TwoWay}"
-                                                                   EditStartedCommand="{Binding BeginEditRollCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditRollCommand, Mode=OneTime}"
-                                                                   ToolTip="The roll (aka rotation around the Z axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                    <DataTemplate DataType="{x:Type pec:PropertyGroupViewModel}">
-                                        <StackPanel Visibility="{Binding IsCurrentlyApplicable, Converter={x:Static c:BoolToVisibilityConverter.BoolToVisibleOrCollapsed}}">
-                                            <!-- totally ripping off C4d at this point with this LOL -->
-                                            <TextBlock Margin="4,0" Padding="0,3" FontWeight="Bold" Text="{Binding Name, Mode=OneTime}"/>
-                                            <pe:PropertyEditorItemsControl Margin="4,0" ItemsSource="{Binding Values, Mode=OneTime}">
-                                                <ItemsControl.Resources>
-                                                    <HierarchicalDataTemplate DataType="{x:Type pec:PropertyGroupViewModel}" ItemsSource="{Binding Values, Mode=OneTime}">
-                                                        <Expander Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" 
-                                                                  Header="{Binding Name, Mode=OneTime}" 
-                                                                  Style="{StaticResource HierarchicalExpanderStyle}">
-                                                            <!-- This ItemsControl should inherit the templates from the one above -->
-                                                            <pe:PropertyEditorItemsControl Margin="8,0,0,0" ItemsSource="{Binding Values, Mode=OneTime}"/>
-                                                        </Expander>
-                                                    </HierarchicalDataTemplate>
-                                                </ItemsControl.Resources>
-                                            </pe:PropertyEditorItemsControl>
-                                            <Separator Margin="4,2"/>
-                                        </StackPanel>
-                                    </DataTemplate>
+                                    <ResourceDictionary>
+                                        <ResourceDictionary.MergedDictionaries>
+                                            <StaticResource ResourceKey="PropertyEditorDataTemplates"/>
+                                        </ResourceDictionary.MergedDictionaries>
+                                        <DataTemplate DataType="{x:Type pec:PropertyGroupViewModel}">
+                                            <StackPanel Visibility="{Binding IsCurrentlyApplicable, Converter={x:Static c:BoolToVisibilityConverter.BoolToVisibleOrCollapsed}}">
+                                                <!-- totally ripping off C4d at this point with this LOL -->
+                                                <TextBlock Margin="4,0" Padding="0,3" FontWeight="Bold" Text="{Binding Id, Mode=OneTime}"/>
+                                                <pe:PropertyEditorItemsControl Margin="4,0" ItemsSource="{Binding Values, Mode=OneTime}">
+                                                    <FrameworkElement.Resources>
+                                                        <HierarchicalDataTemplate DataType="{x:Type pec:PropertyGroupViewModel}" ItemsSource="{Binding Values, Mode=OneTime}">
+                                                            <Expander Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+                                                                      Header="{Binding Id, Mode=OneTime}"
+                                                                      Style="{StaticResource HierarchicalExpanderStyle}">
+                                                                <!-- This ItemsControl should inherit the templates from the one above -->
+                                                                <pe:PropertyEditorItemsControl Margin="8,0,0,0" ItemsSource="{Binding Values, Mode=OneTime}"/>
+                                                            </Expander>
+                                                        </HierarchicalDataTemplate>
+                                                    </FrameworkElement.Resources>
+                                                </pe:PropertyEditorItemsControl>
+                                                <Separator Margin="4,5"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ResourceDictionary>
                                 </ItemsControl.Resources>
                             </pe:PropertyEditorItemsControl>
                             <!--

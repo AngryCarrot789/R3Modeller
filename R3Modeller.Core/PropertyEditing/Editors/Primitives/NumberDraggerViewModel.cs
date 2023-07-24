@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace R3Modeller.Core.PropertyEditing.Editors {
+namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
     public class NumberDraggerViewModel : BasePropertyEditorViewModel {
         private double value;
         public double Value {
@@ -62,18 +62,15 @@ namespace R3Modeller.Core.PropertyEditing.Editors {
             }
         }
 
-        protected override PropertyHandler NewHandler(object target) {
-            return new ObjectData(target);
-        }
+        protected override PropertyHandler NewHandler(object target) => new NumberDragData(target);
 
-        protected override BasePropertyEditorViewModel NewInstance() {
-            return new NumberDraggerViewModel(this.ApplicableType, this.getter, this.setter);
-        }
-
-        private class ObjectData : PropertyHandler {
+        private class NumberDragData : PropertyHandler {
+            // use accumulator in the event that there's a lower/upper bound to the value
+            // this can be used to store the "excess" value. It can be added to the final
+            // value and then clamped between the min/max to determine the absolute value
             public double accumulator;
 
-            public ObjectData(object handler) : base(handler) {
+            public NumberDragData(object target) : base(target) {
             }
         }
     }

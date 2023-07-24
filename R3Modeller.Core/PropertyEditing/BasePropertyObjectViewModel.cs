@@ -1,6 +1,9 @@
 using System;
 
 namespace R3Modeller.Core.PropertyEditing {
+    /// <summary>
+    /// The base class for property groups and editors
+    /// </summary>
     public class BasePropertyObjectViewModel : BaseViewModel {
         private bool isCurrentlyApplicable;
 
@@ -20,6 +23,15 @@ namespace R3Modeller.Core.PropertyEditing {
 
         public BasePropertyObjectViewModel(Type applicableType) {
             this.ApplicableType = applicableType;
+        }
+
+        /// <summary>
+        /// Whether or not this object is applicable to the given object
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool IsApplicable(object value) {
+            return this.ApplicableType.IsInstanceOfType(value);
         }
     }
 }

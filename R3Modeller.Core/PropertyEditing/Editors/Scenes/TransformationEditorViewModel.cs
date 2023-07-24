@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Numerics;
 using System.Windows.Input;
 using R3Modeller.Core.Engine.Objs.ViewModels;
@@ -93,11 +92,8 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         public ICommand FinishEditPitchCommand { get; }
         public ICommand FinishEditRollCommand { get; }
 
-        // private readonly PropertyChangedEventHandler handlerPropertyChangedEventHandler;
-
         public TransformationEditorViewModel(Type applicableType) : base(applicableType) {
-            // this.handlerPropertyChangedEventHandler = this.OnHandlerPropertyChanged;
-            // This is why the property editors are mostly singletons for each view port LOL
+            // This is why the property editors are gonna be singletons for each view port LOL
             this.BeginEditPosXCommand = new RelayCommand(() => this.isEditingPosX = true, () => !this.isEditingPosX);
             this.BeginEditPosYCommand = new RelayCommand(() => this.isEditingPosY = true, () => !this.isEditingPosY);
             this.BeginEditPosZCommand = new RelayCommand(() => this.isEditingPosZ = true, () => !this.isEditingPosZ);
@@ -118,6 +114,12 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             this.FinishEditRollCommand = new RelayCommand(() => this.isEditingRoll = false, () => this.isEditingRoll);
         }
 
+#if RELEASE
+        public override bool IsApplicable(object value) {
+            return value is SceneObjectViewModel;
+        }
+#endif
+
         private void OnModifiedPos(Vector3 oldVal, Vector3 newVal) {
             // more convenient and cleaner to update the pos here than in the property setter block
             this.pos = newVal;
@@ -133,7 +135,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
             else {
                 Vector3 change = newVal - oldVal;
-                foreach (TransformationHandlerData obj in this.GetHandlersData<TransformationHandlerData>()) {
+                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
                     Vector3 p = obj.Handler.Pos;
                     if (this.isEditingPosX || this.isEditingPosY || this.isEditingPosZ) {
                         p += change;
@@ -162,7 +164,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
             else {
                 Quaternion change = Quaternion.Inverse(oldVal) * newVal;
-                foreach (TransformationHandlerData obj in this.GetHandlersData<TransformationHandlerData>()) {
+                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
                     Quaternion rotation;
                     if (this.isEditingYaw || this.isEditingPitch || this.isEditingRoll) {
                         rotation = obj.Handler.Rotation * change;
@@ -190,29 +192,8 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
                 ((SceneObjectViewModel) this.Handlers[0]).Scale = newVal;
             }
             else {
-                // Vector3 change;
-                // if (this.isEditingScaleX || this.isEditingScaleY || this.isEditingScaleZ) {
-                //     change = newVal / oldVal;
-                // }
-                // else {
-                //     // If not editing any individual component, set the entire scale directly
-                //     change = newVal;
-                // }
-                // foreach (TransformationHandlerData obj in this.GetHandlersData<TransformationHandlerData>()) {
-                //     Vector3 s = obj.Handler.Scale;
-                //     if (this.isEditingScaleX) {
-                //         s.X *= change.X;
-                //     }
-                //     if (this.isEditingScaleY) {
-                //         s.Y *= change.Y;
-                //     }
-                //     if (this.isEditingScaleZ) {
-                //         s.Z *= change.Z;
-                //     }
-                //     obj.Handler.Scale = s;
-                // }
                 Vector3 change = newVal - oldVal;
-                foreach (TransformationHandlerData obj in this.GetHandlersData<TransformationHandlerData>()) {
+                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
                     Vector3 s = obj.Handler.Scale;
                     if (this.isEditingScaleX || this.isEditingScaleY || this.isEditingScaleZ) {
                         s += change;
@@ -311,16 +292,12 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         //     }
         // }
 
-        protected override BasePropertyEditorViewModel NewInstance() {
-            return new TransformationEditorViewModel(this.ApplicableType);
-        }
+        protected override PropertyHandler NewHandler(object target) => new HandlerData((SceneObjectViewModel) target);
 
-        protected override PropertyHandler NewHandler(object target) => new TransformationHandlerData((SceneObjectViewModel) target);
+        private class HandlerData : PropertyHandler {
+            public new SceneObjectViewModel Handler => (SceneObjectViewModel) base.Target;
 
-        private class TransformationHandlerData : PropertyHandler {
-            public new SceneObjectViewModel Handler => (SceneObjectViewModel) base.Handler;
-
-            public TransformationHandlerData(object handler) : base(handler) {
+            public HandlerData(object target) : base(target) {
             }
         }
     }
