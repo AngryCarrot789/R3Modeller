@@ -110,6 +110,10 @@ namespace R3Modeller.Core.PropertyEditing.Editors {
             this.pos = this.Handlers.Count == 1 ? ((SceneObjectViewModel) this.Handlers[0]).Pos : new Vector3();
         }
 
+        protected override BasePropertyEditorViewModel NewInstance() {
+            return new PositionEditorViewModel();
+        }
+
         protected override PropertyHandler NewHandler(object target) => new PositionEditorHandlerData((SceneObjectViewModel) target);
 
         private class PositionEditorHandlerData : PropertyHandler {

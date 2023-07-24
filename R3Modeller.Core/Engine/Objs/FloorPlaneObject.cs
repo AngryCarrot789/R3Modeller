@@ -1,6 +1,7 @@
 using System.Numerics;
 using R3Modeller.Core.Engine.Meshes;
 using R3Modeller.Core.Engine.Utils;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Core.Engine.Objs {
     public class FloorPlaneObject : SceneObject {
@@ -27,6 +28,12 @@ namespace R3Modeller.Core.Engine.Objs {
             this.shader.SetUniformMatrix4("mvp", ref matrix);
 
             this.mesh.DrawTriangles();
+        }
+
+        protected override void DisposeCore(ExceptionStack stack) {
+            base.DisposeCore(stack);
+            this.shader.Dispose();
+            this.mesh.Dispose();
         }
     }
 }

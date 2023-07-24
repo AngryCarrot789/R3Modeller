@@ -4,12 +4,14 @@ using OpenTK.Graphics.OpenGL;
 
 namespace R3Modeller.Core.Engine.Utils {
     public class LineObject : IDisposable {
+        public static Shader SharedShader;
+
         private readonly Shader shader;
         private readonly int vao;
         private readonly int vbo;
 
         public LineObject(Vector3 a, Vector3 b) {
-            this.shader = new Shader(ResourceLocator.ReadFile("Shaders/LineShader.vert"), ResourceLocator.ReadFile("Shaders/LineShader.frag"));
+            this.shader = SharedShader ?? (SharedShader = new Shader(ResourceLocator.ReadFile("Shaders/LineShader.vert"), ResourceLocator.ReadFile("Shaders/LineShader.frag")));
             this.vao = GL.GenVertexArray();
             this.vbo = GL.GenBuffer();
             GL.BindVertexArray(this.vao);

@@ -130,7 +130,13 @@ namespace R3Modeller.Core.Engine.Utils {
         }
 
         public void Dispose() {
+            // TODO: this is probably bad. CreateShader could return a negative maybe?
+            if (this.ProgramID == -1) {
+                return;
+            }
+
             GL.DeleteProgram(this.ProgramID);
+            this.ProgramID = -1;
         }
     }
 }

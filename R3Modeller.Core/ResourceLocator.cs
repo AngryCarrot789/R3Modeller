@@ -1,3 +1,5 @@
+// comment out this line when doing a final build, where
+// the Resources folder is in the same folder as the .exe
 #define IS_BUILD_IN_SOLUTION
 
 using System;

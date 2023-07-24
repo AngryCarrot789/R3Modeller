@@ -1,6 +1,7 @@
 using System.Numerics;
 using R3Modeller.Core.Engine.Meshes;
 using R3Modeller.Core.Engine.Utils;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Core.Engine.Objs {
     public class TriangleObject : SceneObject {
@@ -31,6 +32,12 @@ namespace R3Modeller.Core.Engine.Objs {
             // Draw mesh
             this.mesh.DrawTriangles();
             this.RenderChildren(camera);
+        }
+
+        protected override void DisposeCore(ExceptionStack stack) {
+            base.DisposeCore(stack);
+            this.shader.Dispose();
+            this.mesh.Dispose();
         }
     }
 }

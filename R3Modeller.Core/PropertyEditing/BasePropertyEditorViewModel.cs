@@ -84,5 +84,17 @@ namespace R3Modeller.Core.PropertyEditing {
         protected IEnumerable<T> GetHandlers<T>() where T : BaseViewModel {
             return this.handlerList.Cast<T>();
         }
+
+        public BasePropertyEditorViewModel Clone() {
+            BasePropertyEditorViewModel editor = this.NewInstance();
+            editor.handlerList.AddRange(this.handlerList);
+            foreach (KeyValuePair<object,PropertyHandler> entry in this.handlerToDataMap) {
+                editor.handlerToDataMap[entry.Key] = entry.Value;
+            }
+
+            return editor;
+        }
+
+        protected abstract BasePropertyEditorViewModel NewInstance();
     }
 }

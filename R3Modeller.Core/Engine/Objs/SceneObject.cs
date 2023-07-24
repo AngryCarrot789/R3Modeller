@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using R3Modeller.Core.Engine.Utils;
+using R3Modeller.Core.Utils;
 using Vector3 = System.Numerics.Vector3;
 
 namespace R3Modeller.Core.Engine.Objs {
@@ -321,6 +322,23 @@ namespace R3Modeller.Core.Engine.Objs {
             foreach (SceneObject obj in this.items) {
                 obj.UpdateAbsoluteValues();
             }
+        }
+
+        public void DisposeRecursive() {
+            using (ExceptionStack stack = new ExceptionStack("Exception disposing scene object")) {
+                this.DisposeRecursive(stack);
+            }
+        }
+
+        protected void DisposeRecursive(ExceptionStack stack) {
+            this.DisposeCore(stack);
+            foreach (SceneObject item in this.items) {
+                item.DisposeRecursive(stack);
+            }
+        }
+
+        protected virtual void DisposeCore(ExceptionStack stack) {
+
         }
     }
 }

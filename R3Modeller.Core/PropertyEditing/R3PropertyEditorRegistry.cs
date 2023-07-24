@@ -96,17 +96,20 @@ namespace R3Modeller.Core.PropertyEditing {
             return commonGroups ?? new List<PropertyGroupViewModel>();
         }
 
-        public void SetupObjects(List<object> dataSources) {
-            this.ApplicableGroups.Clear();
-            foreach (PropertyGroupViewModel group in this.entries.Values) {
+        public List<PropertyGroupViewModel> SetupObjects(List<object> dataSources) {
+            foreach (PropertyGroupViewModel group in this.ApplicableGroups) {
                 group.ClearRecursive();
             }
+
+            this.ApplicableGroups.Clear();
 
             List<PropertyGroupViewModel> groups = this.FindCommonGroups(dataSources);
             foreach (PropertyGroupViewModel group in groups) {
                 group.LoadDataSourcesRecursive(dataSources);
                 this.ApplicableGroups.Add(group);
             }
+
+            return groups;
         }
     }
 }

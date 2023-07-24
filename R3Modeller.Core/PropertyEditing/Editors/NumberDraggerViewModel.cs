@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Collections;
-using OpenTK.Graphics.OpenGL;
 
-namespace R3Modeller.Core.PropertyEditing {
+namespace R3Modeller.Core.PropertyEditing.Editors {
     public class NumberDraggerViewModel : BasePropertyEditorViewModel {
         private double value;
         public double Value {
@@ -66,6 +63,10 @@ namespace R3Modeller.Core.PropertyEditing {
 
         protected override PropertyHandler NewHandler(object target) {
             return new ObjectData(target, null, null);
+        }
+
+        protected override BasePropertyEditorViewModel NewInstance() {
+            return new NumberDraggerViewModel();
         }
 
         private class ObjectData : PropertyHandler {

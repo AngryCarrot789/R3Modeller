@@ -25,6 +25,10 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         /// </summary>
         public ReadOnlyObservableCollection<SceneObjectViewModel> Children { get; }
 
+        // TODO: figure out another way to store the text "n objects selected" as
+        // converters don't really work well with observable collections
+        public string PropertyEditorText { get; set; }
+
         public Vector3 Pos {
             get => this.Model.RelativePosition;
             set {
@@ -130,6 +134,10 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             this.Model = model ?? throw new ArgumentNullException(nameof(model));
             this.children = new ObservableCollection<SceneObjectViewModel>();
             this.Children = new ReadOnlyObservableCollection<SceneObjectViewModel>(this.children);
+            this.children.CollectionChanged += (sender, args) => {
+                this.PropertyEditorText = $"{this.children.Count} item{Lang.S(this.children.Count)} selected";
+                this.RaisePropertyChanged(nameof(this.PropertyEditorText));
+            };
             for (int i = 0, c = model.Items.Count; i < c; i++) {
                 this.InsertInternal(i, SORegistry.Instance.CreateViewModelFromModel(model.Items[i]));
             }

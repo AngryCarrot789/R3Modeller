@@ -256,5 +256,11 @@ namespace R3Modeller {
         private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
             // this.VPPropertyEditor.DataSources = new List<Object>() {e.NewValue};
         }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            this.project.Scene.Root.DisposeRecursive();
+            LineObject.SharedShader?.Dispose();
+        }
     }
 }

@@ -6,6 +6,7 @@ using ObjectLoader.Data.VertexData;
 using ObjectLoader.Loaders;
 using OpenTK.Graphics.OpenGL;
 using R3Modeller.Core.Engine.Utils;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Core.Engine.Objs {
     public class WavefrontObject : SceneObject {
@@ -119,6 +120,16 @@ namespace R3Modeller.Core.Engine.Objs {
             // GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0); // Unbind the index buffer
 
             this.RenderChildren(camera);
+        }
+
+        protected override void DisposeCore(ExceptionStack stack) {
+            base.DisposeCore(stack);
+            this.shader.Dispose();
+            GL.DeleteVertexArray(this.vao);
+            GL.DeleteBuffer(this.vbo);
+            GL.DeleteBuffer(this.nbo);
+            GL.DeleteBuffer(this.tbo);
+            GL.DeleteBuffer(this.ibo);
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 namespace R3Modeller.Core.PropertyEditing {
-    public class PropertyGroupViewModel {
+    public class PropertyGroupViewModel : BaseViewModel {
         public readonly string name;
 
         private readonly Dictionary<string, PropertyGroupViewModel> groupMap;
@@ -12,11 +12,25 @@ namespace R3Modeller.Core.PropertyEditing {
 
         public string Name => this.name;
 
+        private bool isExpanded;
+        public bool IsExpanded {
+            get => this.isExpanded;
+            set => this.RaisePropertyChanged(ref this.isExpanded, value);
+        }
+
         public PropertyGroupViewModel(string name) {
             this.name = name;
             this.valueList = new List<object>();
             this.groupMap = new Dictionary<string, PropertyGroupViewModel>();
             this.valueMap = new Dictionary<string, BasePropertyEditorViewModel>();
+        }
+
+        private PropertyGroupViewModel(string name, Dictionary<string, PropertyGroupViewModel> groupMap, Dictionary<string, BasePropertyEditorViewModel> valueMap, List<object> valueList, bool isExpanded) {
+            this.name = name;
+            this.groupMap = groupMap;
+            this.valueMap = valueMap;
+            this.valueList = valueList;
+            this.isExpanded = isExpanded;
         }
 
         [NotNull]

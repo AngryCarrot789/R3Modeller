@@ -146,8 +146,11 @@
                         </TreeView>
                     </Grid>
                 </Border>
-                <Border Grid.Row="1">
-                    <pe:PropertyEditor x:Name="VPPropertyEditor" DataSources="{Binding Project.Scene.RootObject.Children}"/>
+                <Border Grid.Row="1" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1 1 0 0">
+                    <Grid>
+                    <TextBlock Text="{Binding Project.Scene.RootObject.PropertyEditorText}" Margin="2,0" Padding="2"/>
+                    <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" DataSources="{Binding Project.Scene.RootObject.Children}"/>
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

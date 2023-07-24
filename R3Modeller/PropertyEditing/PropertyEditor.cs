@@ -18,14 +18,16 @@ namespace R3Modeller.PropertyEditing {
 
         public static readonly DependencyPropertyKey ApplicableGroupsProperty = DependencyProperty.RegisterReadOnly("ApplicableGroups", typeof(IEnumerable<PropertyGroupViewModel>), typeof(PropertyEditor), new PropertyMetadata(default(IEnumerable<PropertyGroupViewModel>)));
 
-        public IEnumerable<PropertyGroupViewModel> ApplicableGroups {
-            get => (IEnumerable<PropertyGroupViewModel>) this.GetValue(ApplicableGroupsProperty.DependencyProperty);
-            private set => this.SetValue(ApplicableGroupsProperty, value);
-        }
-
+        // INPUT
         public IEnumerable DataSources {
             get => (IEnumerable) this.GetValue(DataSourcesProperty);
             set => this.SetValue(DataSourcesProperty, value);
+        }
+
+        // OUTPUT
+        public IEnumerable<PropertyGroupViewModel> ApplicableGroups {
+            get => (IEnumerable<PropertyGroupViewModel>) this.GetValue(ApplicableGroupsProperty.DependencyProperty);
+            private set => this.SetValue(ApplicableGroupsProperty, value);
         }
 
         private readonly bool isInDesigner;
@@ -55,9 +57,7 @@ namespace R3Modeller.PropertyEditing {
         private void ClearInternal() {
             IEnumerable items = this.DataSources;
             List<object> list = items != null ? items.Cast<object>().ToList() : new List<object>();
-            R3PropertyEditorRegistry.Instance.SetupObjects(list);
-
-            this.ApplicableGroups = R3PropertyEditorRegistry.Instance.ApplicableGroups.ToList();
+            this.ApplicableGroups = R3PropertyEditorRegistry.Instance.SetupObjects(list);
         }
     }
 }
