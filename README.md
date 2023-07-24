@@ -8,7 +8,7 @@ I copied a bunch of boilerplate code from my other project, FramePFX, but I'm no
 
 ## Preview
 This is what i've done so far. You can orbit by holding ALT and the left mouse button and moving your mouse
-![](R3Modeller_2023-07-20_03.30.57.png)
+![](R3Modeller_2023-07-24_15.05.07.png)
 
 ## OpenGL -> WPF
 `glReadBuffer` and `glReadPixels` are used to write the backbuffer's pixels into a WriteableBitmap's BackBuffer.
