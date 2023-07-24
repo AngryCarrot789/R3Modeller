@@ -9,6 +9,8 @@
              xmlns:editors="clr-namespace:R3Modeller.Core.PropertyEditing.Editors;assembly=R3Modeller.Core"
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
+             xmlns:scenes="clr-namespace:R3Modeller.Core.PropertyEditing.Editors.Scenes;assembly=R3Modeller.Core"
+             xmlns:c="clr-namespace:R3Modeller.Converters"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -44,11 +46,228 @@
             <s:Double x:Key="FloatMinValue">-3.402823E+38</s:Double>
             <s:Double x:Key="FloatMaxValue">3.402823E+38</s:Double>
 
+            <Style x:Key="HierarchicalExpanderToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Padding="{TemplateBinding Padding}">
+                                <DockPanel Background="Transparent" SnapsToDevicePixels="False">
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          SnapsToDevicePixels="false"
+                                          Stroke="{DynamicResource Expander.Static.Arrow.Stroke}"
+                                          StrokeThickness="2" VerticalAlignment="Center" />
+                                    <ContentPresenter Margin="5,0,0,0" x:Name="contentPresenter" Focusable="False" RecognizesAccessKey="True"
+                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                    <Border Margin="6,0,0,0" Background="{DynamicResource ABrush.Tone6.Background.Static}" Height="1" IsHitTestVisible="True"/>
+                                </DockPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="true">
+                                    <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Stroke" TargetName="arrow" Value="{DynamicResource Expander.MouseOver.Arrow.Stroke}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="Stroke" TargetName="arrow" Value="{DynamicResource Expander.Pressed.Arrow.Stroke}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Stroke" TargetName="arrow" Value="{DynamicResource Expander.Disabled.Arrow.Stroke}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="HierarchicalExpanderStyle" TargetType="{x:Type Expander}">
+                <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Expander}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}" CornerRadius="3"
+                                    SnapsToDevicePixels="true"
+                                    HorizontalAlignment="Stretch">
+                                <DockPanel>
+                                    <ToggleButton x:Name="HeaderSite" ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                                  Content="{TemplateBinding Header}" DockPanel.Dock="Top"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  FontWeight="{TemplateBinding FontWeight}"
+                                                  FocusVisualStyle="{StaticResource ExpanderHeaderFocusVisual}"
+                                                  FontStyle="{TemplateBinding FontStyle}"
+                                                  FontStretch="{TemplateBinding FontStretch}"
+                                                  FontSize="{TemplateBinding FontSize}"
+                                                  FontFamily="{TemplateBinding FontFamily}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  Margin="1,1,0,1" MinWidth="0" MinHeight="0" 
+                                                  Padding="{TemplateBinding Padding}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Style="{StaticResource HierarchicalExpanderToggleButtonStyle}">
+                                    </ToggleButton>
+                                    <ContentPresenter x:Name="ExpandSite" DockPanel.Dock="Bottom" Focusable="false" 
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                      Margin="{TemplateBinding Padding}" Visibility="Collapsed" 
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                </DockPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsExpanded" Value="true">
+                                    <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type pe:PropertyEditorItemContainer}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsCurrentlyApplicable}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsCurrentlyApplicable}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="{x:Type pe:PropertyEditorItemsControl}" BasedOn="{StaticResource {x:Type ItemsControl}}">
+
+            </Style>
+
             <Style TargetType="{x:Type pe:PropertyEditor}">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type pe:PropertyEditor}">
-                            <TreeView ItemsSource="{TemplateBinding ApplicableGroups}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <pe:PropertyEditorItemsControl ItemsSource="{TemplateBinding ApplicableDataSources}"
+                                                           HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+                                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                                           BorderThickness="{TemplateBinding BorderThickness}">
+                                <ItemsControl.Resources>
+                                    <DataTemplate DataType="{x:Type scenes:TransformationEditorViewModel}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56"/>
+                                                <ColumnDefinition Width="15"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="15"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="15"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Text="Pos" Grid.Row="0" Grid.Column="0"/>
+                                            <TextBlock Text="Scale" Grid.Row="1" Grid.Column="0"/>
+                                            <TextBlock Text="Rotation" Grid.Row="2" Grid.Column="0"/>
+                                            <TextBlock Text="X" Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="X" Grid.Row="1" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="P" Grid.Row="2" Grid.Column="1" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Y" Grid.Row="0" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Y" Grid.Row="1" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Y" Grid.Row="2" Grid.Column="3" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Z" Grid.Row="0" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Z" Grid.Row="1" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <TextBlock Text="R" Grid.Row="2" Grid.Column="5" Margin="4,0,0,0" TextTrimming="None" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
+                                                                   Value="{Binding PosX, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditPosXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosXCommand, Mode=OneTime}"
+                                                                   ToolTip="The X position of the selected object(s)"/>
+                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
+                                                                   Value="{Binding PosY, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditPosYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosYCommand, Mode=OneTime}"
+                                                                   ToolTip="The Y position of the selected object(s)"/>
+                                            <dragger:NumberDragger Grid.Row="0" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10" 
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}" 
+                                                                   Value="{Binding PosZ, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditPosZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPosZCommand, Mode=OneTime}"
+                                                                   ToolTip="The Z position of the selected object(s)"/>
+
+                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding ScaleX, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditScaleXCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleXCommand, Mode=OneTime}"
+                                                                   ToolTip="The X scale of the selected object(s)"/>
+                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding ScaleY, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditScaleYCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleYCommand, Mode=OneTime}"
+                                                                   ToolTip="The Y scale of the selected object(s)"/>
+                                            <dragger:NumberDragger Grid.Row="1" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="2" TinyChange="0.01" SmallChange="0.1" LargeChange="1" MassiveChange="10"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding ScaleZ, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditScaleZCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditScaleZCommand, Mode=OneTime}"
+                                                                   ToolTip="The Z scale of the selected object(s)"/>
+
+                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="2" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding Pitch, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditPitchCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditPitchCommand, Mode=OneTime}"
+                                                                   ToolTip="The pitch (aka rotation around the X axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="4" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding Yaw, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditYawCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditYawCommand, Mode=OneTime}"
+                                                                   ToolTip="The yaw (aka rotation around the Y axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                                            <dragger:NumberDragger Grid.Row="2" Grid.Column="6" Height="20" Style="{StaticResource AbletonNumberDraggerStyle}"
+                                                                   RoundedPlaces="4" TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"
+                                                                   Minimum="{StaticResource FloatMinValue}" Maximum="{StaticResource FloatMaxValue}"
+                                                                   Value="{Binding Roll, Mode=TwoWay}"
+                                                                   EditStartedCommand="{Binding BeginEditRollCommand, Mode=OneTime}" EditCompletedCommand="{Binding FinishEditRollCommand, Mode=OneTime}"
+                                                                   ToolTip="The roll (aka rotation around the Z axis) of the selected object(s). This uses the Tait–Bryan rotation method"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type pec:PropertyGroupViewModel}">
+                                        <StackPanel Visibility="{Binding IsCurrentlyApplicable, Converter={x:Static c:BoolToVisibilityConverter.BoolToVisibleOrCollapsed}}">
+                                            <!-- totally ripping off C4d at this point with this LOL -->
+                                            <TextBlock Margin="4,0" Padding="0,3" FontWeight="Bold" Text="{Binding Name, Mode=OneTime}"/>
+                                            <pe:PropertyEditorItemsControl Margin="4,0" ItemsSource="{Binding Values, Mode=OneTime}">
+                                                <ItemsControl.Resources>
+                                                    <HierarchicalDataTemplate DataType="{x:Type pec:PropertyGroupViewModel}" ItemsSource="{Binding Values, Mode=OneTime}">
+                                                        <Expander Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" 
+                                                                  Header="{Binding Name, Mode=OneTime}" 
+                                                                  Style="{StaticResource HierarchicalExpanderStyle}">
+                                                            <!-- This ItemsControl should inherit the templates from the one above -->
+                                                            <pe:PropertyEditorItemsControl Margin="8,0,0,0" ItemsSource="{Binding Values, Mode=OneTime}"/>
+                                                        </Expander>
+                                                    </HierarchicalDataTemplate>
+                                                </ItemsControl.Resources>
+                                            </pe:PropertyEditorItemsControl>
+                                            <Separator Margin="4,2"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.Resources>
+                            </pe:PropertyEditorItemsControl>
+                            <!--
+                            <TreeView ItemsSource="{TemplateBinding ApplicableGroups}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                                 <FrameworkElement.Resources>
                                     <HierarchicalDataTemplate DataType="{x:Type pec:PropertyGroupViewModel}" ItemsSource="{Binding Values}">
                                         <TextBlock Text="{Binding Name}"/>
@@ -62,6 +281,7 @@
                                     </DataTemplate>
                                 </FrameworkElement.Resources>
                             </TreeView>
+                            -->
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

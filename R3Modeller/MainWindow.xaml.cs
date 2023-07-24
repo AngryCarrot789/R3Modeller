@@ -21,6 +21,7 @@ using R3Modeller.Core.Engine.Objs;
 using R3Modeller.Core.Engine.Utils;
 using R3Modeller.Core.Engine.ViewModels;
 using R3Modeller.Core.Notifications;
+using R3Modeller.Core.PropertyEditing;
 using R3Modeller.Core.Utils;
 using R3Modeller.Notifications;
 using R3Modeller.Themes;
@@ -87,14 +88,15 @@ namespace R3Modeller {
             this.OGLViewPort.EndFrame();
 
             this.Editor.SetProject(new ProjectViewModel(this.project));
-            // this.Loaded += this.OnLoaded;
+            this.Loaded += this.OnLoaded;
         }
 
-        // private void OnLoaded(object sender, RoutedEventArgs e) {
-        //     WindowInteropHelper interop = new WindowInteropHelper(this);
-        //     HwndSource source = HwndSource.FromHwnd(interop.Handle);
-        //     source.AddHook(this.WndProc);
-        // }
+        private void OnLoaded(object sender, RoutedEventArgs e) {
+            // WindowInteropHelper interop = new WindowInteropHelper(this);
+            // HwndSource source = HwndSource.FromHwnd(interop.Handle);
+            // source.AddHook(this.WndProc);
+            this.VPPropertyEditor.ApplicableDataSources = R3PropertyEditorRegistry.Instance.Root.Values;
+        }
         // 
         // private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled) {
         //     byte[] lpb = new byte[256];

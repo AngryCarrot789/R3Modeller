@@ -30,54 +30,50 @@ namespace R3Modeller.Core.PropertyEditing.Editors {
         public ICommand BeginValueModificationCommand { get; }
         public ICommand EndValueModificationCommand { get; }
 
-        public NumberDraggerViewModel() {
+        private readonly Func<object, double> getter;
+        private readonly Action<object, double> setter;
+
+        public NumberDraggerViewModel(Type type, Func<object, double> getter, Action<object, double> setter) : base(type) {
             this.BeginValueModificationCommand = new RelayCommand(() => this.isEditingValue = true, () => !this.isEditingValue);
             this.EndValueModificationCommand = new RelayCommand(() => this.isEditingValue = false, () => this.isEditingValue);
-        }
-
-        static NumberDraggerViewModel() {
-
+            this.getter = getter;
+            this.setter = setter;
         }
 
         private void OnValueChanged(double oldValue, double newValue) {
-            // if (!this.HasHandlers) {
-            //     return;
-            // }
-//
-            // if (this.Handlers.Count == 1) {
-            //     this.Handlers[0].setter(newValue);
-            // }
-            // else if (this.isEditingValue) {
-            //     double change = newValue - oldValue;
-            //     foreach ((Func<double> getter, Action<double> setter) handler in this.Handlers) {
-            //         double val = handler.getter();
-            //         handler.setter(val + change);
-            //     }
-            // }
-            // else {
-            //     foreach ((Func<double> getter, Action<double> setter) handler in this.Handlers) {
-            //         handler.setter(newValue);
-            //     }
-            // }
+            if (this.IsEmpty) {
+                return;
+            }
+
+            if (this.Handlers.Count == 1) {
+                this.setter(this.Handlers[0], newValue);
+            }
+            else if (this.isEditingValue) {
+                double change = newValue - oldValue;
+                foreach (object handler in this.Handlers) {
+                    double val = this.getter(handler);
+                    this.setter(handler, val + change);
+                }
+            }
+            else {
+                foreach (object handler in this.Handlers) {
+                    this.setter(handler, newValue);
+                }
+            }
         }
 
         protected override PropertyHandler NewHandler(object target) {
-            return new ObjectData(target, null, null);
+            return new ObjectData(target);
         }
 
         protected override BasePropertyEditorViewModel NewInstance() {
-            return new NumberDraggerViewModel();
+            return new NumberDraggerViewModel(this.ApplicableType, this.getter, this.setter);
         }
 
         private class ObjectData : PropertyHandler {
-            public readonly Func<object, double> getter;
-            public readonly Action<object, double> setter;
-
             public double accumulator;
 
-            public ObjectData(object handler, Func<object, double> getter, Action<object, double> setter) : base(handler) {
-                this.getter = getter;
-                this.setter = setter;
+            public ObjectData(object handler) : base(handler) {
             }
         }
     }

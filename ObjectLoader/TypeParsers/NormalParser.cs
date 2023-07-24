@@ -1,6 +1,6 @@
+using System.Numerics;
 using ObjectLoader.Common;
 using ObjectLoader.Data.DataStore;
-using ObjectLoader.Data.VertexData;
 using ObjectLoader.TypeParsers.Interfaces;
 
 namespace ObjectLoader.TypeParsers {
@@ -21,9 +21,7 @@ namespace ObjectLoader.TypeParsers {
             float x = parts[0].ParseInvariantFloat();
             float y = parts[1].ParseInvariantFloat();
             float z = parts[2].ParseInvariantFloat();
-
-            Normal normal = new Normal(x, y, z);
-            this._normalDataStore.AddNormal(normal);
+            this._normalDataStore.AddNormal(new Vector3(x, y, z));
         }
     }
 }

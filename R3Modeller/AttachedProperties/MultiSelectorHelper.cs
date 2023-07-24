@@ -37,29 +37,16 @@ namespace R3Modeller.AttachedProperties {
                 typeof(MultiSelectorHelper),
                 new PropertyMetadata(BoolBox.False));
 
-        public static IList GetSelectedItems(DependencyObject obj) {
-            return (IList) obj.GetValue(SelectedItemsProperty);
-        }
+        #region getters and setters
 
-        public static void SetSelectedItems(DependencyObject obj, IList value) {
-            obj.SetValue(SelectedItemsProperty, value);
-        }
+        public static IList GetSelectedItems(DependencyObject obj) => (IList) obj.GetValue(SelectedItemsProperty);
+        public static void SetSelectedItems(DependencyObject obj, IList value) => obj.SetValue(SelectedItemsProperty, value);
+        public static bool GetUpdateSelectedItemsOnChange(DependencyObject obj) => (bool) obj.GetValue(UpdateSelectedItemsOnChangeProperty);
+        public static void SetUpdateSelectedItemsOnChange(DependencyObject obj, bool value) => obj.SetValue(UpdateSelectedItemsOnChangeProperty, value.Box());
+        private static void SetIsUpdatingSelection(DependencyObject element, bool value) => element.SetValue(IsUpdatingSelectionProperty, value.Box());
+        private static bool GetIsUpdatingSelection(DependencyObject element) => (bool) element.GetValue(IsUpdatingSelectionProperty.DependencyProperty);
 
-        public static bool GetUpdateSelectedItemsOnChange(DependencyObject obj) {
-            return (bool) obj.GetValue(UpdateSelectedItemsOnChangeProperty);
-        }
-
-        public static void SetUpdateSelectedItemsOnChange(DependencyObject obj, bool value) {
-            obj.SetValue(UpdateSelectedItemsOnChangeProperty, value.Box());
-        }
-
-        private static void SetIsUpdatingSelection(DependencyObject element, bool value) {
-            element.SetValue(IsUpdatingSelectionProperty, value.Box());
-        }
-
-        private static bool GetIsUpdatingSelection(DependencyObject element) {
-            return (bool) element.GetValue(IsUpdatingSelectionProperty.DependencyProperty);
-        }
+        #endregion
 
         private static void OnSelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if (GetIsUpdatingSelection(d)) {

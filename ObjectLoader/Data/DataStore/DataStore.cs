@@ -3,7 +3,6 @@ using System.Linq;
 using System.Numerics;
 using ObjectLoader.Common;
 using ObjectLoader.Data.Elements;
-using ObjectLoader.Data.VertexData;
 
 namespace ObjectLoader.Data.DataStore {
     public class DataStore : IDataStore, IGroupDataStore, IVertexDataStore, ITextureDataStore, INormalDataStore,
@@ -15,7 +14,7 @@ namespace ObjectLoader.Data.DataStore {
 
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector3> _textures = new List<Vector3>();
-        private readonly List<Normal> _normals = new List<Normal>();
+        private readonly List<Vector3> _normals = new List<Vector3>();
 
         public IList<Vector3> Vertices {
             get { return this._vertices; }
@@ -25,7 +24,7 @@ namespace ObjectLoader.Data.DataStore {
             get { return this._textures; }
         }
 
-        public IList<Normal> Normals {
+        public IList<Vector3> Normals {
             get { return this._normals; }
         }
 
@@ -62,7 +61,7 @@ namespace ObjectLoader.Data.DataStore {
             this._textures.Add(texture);
         }
 
-        public void AddNormal(Normal normal) {
+        public void AddNormal(Vector3 normal) {
             this._normals.Add(normal);
         }
 

@@ -1,7 +1,7 @@
-using ObjectLoader.Data.VertexData;
+using System.Numerics;
 
 namespace ObjectLoader.Data.DataStore {
     public interface INormalDataStore {
-        void AddNormal(Normal normal);
+        void AddNormal(Vector3 normal);
     }
 }

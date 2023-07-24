@@ -2,114 +2,50 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Numerics;
-using System.Windows.Input;
 using R3Modeller.Core.Engine.Objs.ViewModels;
-using R3Modeller.Core.PropertyEditing.Editors;
+using R3Modeller.Core.PropertyEditing.Editors.Scenes;
 
 namespace R3Modeller.Core.PropertyEditing {
     public class R3PropertyEditorRegistry : PropertyEditorRegistry {
         public static R3PropertyEditorRegistry Instance { get; } = new R3PropertyEditorRegistry();
 
-        private readonly Dictionary<Type, PropertyGroupViewModel> entries;
-
-        public ObservableCollection<PropertyGroupViewModel> ApplicableGroups { get; } = new ObservableCollection<PropertyGroupViewModel>();
+        /// <summary>
+        /// The root group container for this registry. This group by itself is invalid
+        /// and should never be used apart from storing child objects
+        /// </summary>
+        public PropertyGroupViewModel Root { get; }
 
         private R3PropertyEditorRegistry() {
-            this.entries = new Dictionary<Type, PropertyGroupViewModel>();
+            this.Root = new PropertyGroupViewModel(null, "<root>");
 
-            PropertyGroupViewModel typeGroup = this.RegisterType(typeof(SceneObjectViewModel), "Scene Object");
-            PropertyGroupViewModel transformation = typeGroup.GetSubGroup("Transformation");
-            transformation.AddPropertyEditor("Position", new PositionEditorViewModel());
+            // scene object
+            {
+                PropertyGroupViewModel typeGroup = this.RegisterRoot(typeof(SceneObjectViewModel), "Scene Object");
+                typeGroup.AddPropertyEditor("Transformation", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
+
+                // only for testing the UI and also the applicability calculators.
+                // passing typeof(SceneObjectViewModel) to the transformation editor is not nessesary but it
+                // makes debugging the code easier as I can fake a higher applicable type
+                // PropertyGroupViewModel group1 = typeGroup.CreateSubGroup(typeof(SceneObjectViewModel), "Group 1");
+                // group1.AddPropertyEditor("Position 1", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
+                // group1.AddPropertyEditor("Floor Position 1", new TransformationEditorViewModel(typeof(FloorPlaneObjectViewModel)));
+                // PropertyGroupViewModel group2 = group1.CreateSubGroup(typeof(SceneObjectViewModel), "Group 2");
+                // group2.AddPropertyEditor("Position 2", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
+                // group2.AddPropertyEditor("Floor Position 2", new TransformationEditorViewModel(typeof(FloorPlaneObjectViewModel)));
+                // PropertyGroupViewModel group3 = group2.CreateSubGroup(typeof(SceneObjectViewModel), "Group 3");
+                // group3.AddPropertyEditor("Sexy Position", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
+            }
         }
 
-        private PropertyGroupViewModel RegisterType(Type type, string name) {
-            if (!this.entries.TryGetValue(type, out PropertyGroupViewModel group))
-                this.entries[type] = @group = new PropertyGroupViewModel(name);
-            return @group;
+        private PropertyGroupViewModel RegisterRoot(Type type, string name, bool isExpandedByDefault = true) {
+            return this.Root.CreateSubGroup(type, name, isExpandedByDefault);
         }
 
-        static Type FindCommonBaseType(IEnumerable<object> objects) {
-            Type commonType = null;
-            foreach (object obj in objects) {
-                Type type = obj.GetType();
-                if (commonType == null) {
-                    commonType = type;
-                }
-                else {
-                    if (!type.IsAssignableFrom(commonType)) {
-                        while (commonType != null && !commonType.IsAssignableFrom(type)) {
-                            commonType = commonType.BaseType;
-                        }
-                    }
-                }
+        public void SetupObjects(List<object> dataSources) {
+            this.Root.ClearHandlersRecursive();
+            if (dataSources.Count > 0) {
+                this.Root.SetupHierarchyState(dataSources);
             }
-
-            return commonType;
-        }
-
-        private static IEnumerable<PropertyGroupViewModel> GetApplicableGroups(IEnumerable<object> objects, Dictionary<Type, PropertyGroupViewModel> typeToGroupEntry) {
-            HashSet<PropertyGroupViewModel> applicableGroups = new HashSet<PropertyGroupViewModel>();
-            foreach (object obj in objects) {
-                // Include the group entry associated with the current type and all its ancestors
-                Type type = obj.GetType();
-                while (type != null) {
-                    if (typeToGroupEntry.TryGetValue(type, out PropertyGroupViewModel groupEntry)) {
-                        applicableGroups.Add(groupEntry);
-                    }
-
-                    type = type.BaseType;
-                }
-            }
-
-            return applicableGroups;
-        }
-
-        // Function to find all the applicable group entries for a given type
-        private List<PropertyGroupViewModel> GetApplicableGroups(Type type) {
-            List<PropertyGroupViewModel> applicableGroups = new List<PropertyGroupViewModel>();
-            while (type != null) {
-                if (this.entries.TryGetValue(type, out PropertyGroupViewModel groupEntry)) {
-                    applicableGroups.Add(groupEntry);
-                }
-
-                type = type.BaseType;
-            }
-
-            return applicableGroups;
-        }
-
-        // Function to find common group entries for a collection of objects
-        private List<PropertyGroupViewModel> FindCommonGroups(IEnumerable<object> objects) {
-            List<PropertyGroupViewModel> commonGroups = null;
-            foreach (object obj in objects) {
-                Type objectType = obj.GetType();
-                List<PropertyGroupViewModel> applicableGroups = this.GetApplicableGroups(objectType);
-                if (commonGroups == null) {
-                    commonGroups = applicableGroups;
-                }
-                else {
-                    commonGroups = commonGroups.Intersect(applicableGroups).ToList();
-                }
-            }
-
-            return commonGroups ?? new List<PropertyGroupViewModel>();
-        }
-
-        public List<PropertyGroupViewModel> SetupObjects(List<object> dataSources) {
-            foreach (PropertyGroupViewModel group in this.ApplicableGroups) {
-                group.ClearRecursive();
-            }
-
-            this.ApplicableGroups.Clear();
-
-            List<PropertyGroupViewModel> groups = this.FindCommonGroups(dataSources);
-            foreach (PropertyGroupViewModel group in groups) {
-                group.LoadDataSourcesRecursive(dataSources);
-                this.ApplicableGroups.Add(group);
-            }
-
-            return groups;
         }
     }
 }

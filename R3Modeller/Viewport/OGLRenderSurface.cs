@@ -200,23 +200,28 @@ namespace R3Modeller.Viewport {
 
             Point mpos = e.GetPosition(this); // use "this" instead of OGLViewPort as it's easier due to the scale being -1
             if (this.lastMouse is Point lastPos && this.isOrbitActive) {
+                if (Math.Abs(mpos.X - lastPos.X) < 0.001f && Math.Abs(mpos.Y - lastPos.Y) < 0.001f) {
+                    return;
+                }
+
                 bool wrap = false;
-                double wrapX = mpos.X;
-                double wrapY = mpos.Y;
+                double wrapX = mpos.X, w = this.ActualWidth;
+                double wrapY = mpos.Y, h = this.ActualHeight;
+
                 if (mpos.X < 0) {
-                    wrapX = this.ActualWidth;
+                    wrapX = w;
                     wrap = true;
                 }
-                else if (mpos.X > this.ActualWidth) {
+                else if (mpos.X > w) {
                     wrapX = 0;
                     wrap = true;
                 }
 
                 if (mpos.Y < 0) {
-                    wrapY = this.ActualHeight;
+                    wrapY = h;
                     wrap = true;
                 }
-                else if (mpos.Y > this.ActualHeight) {
+                else if (mpos.Y > h) {
                     wrapY = 0;
                     wrap = true;
                 }
@@ -323,7 +328,9 @@ namespace R3Modeller.Viewport {
             IReadOnlyList<SceneObject> items = project.Scene.Root.Items;
             for (int i = 0, c = items.Count; i < c; i++) {
                 SceneObject obj = items[i];
-                obj.Render(camera);
+                if (obj.IsVisible) {
+                    obj.Render(camera);
+                }
             }
 
             // Cached ortho projection matrix for the VP size

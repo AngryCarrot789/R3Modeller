@@ -114,6 +114,7 @@ namespace R3Modeller.Core.Engine.Objs {
         public IReadOnlyList<SceneObject> Items => this.items;
 
         public string DisplayName;
+        public bool IsVisible;
 
         /// <summary>
         /// Whether or not this is this root scene object container. The scene graph is stored in a single
@@ -126,8 +127,9 @@ namespace R3Modeller.Core.Engine.Objs {
             this.relativeScale = Vector3.One;
             this.relativeRot = Quaternion.Identity;
             this.items = new List<SceneObject>();
-            this.UpdateAbsoluteValues();
             this.DisplayName = this.GetType().Name;
+            this.IsVisible = true;
+            this.UpdateAbsoluteValues();
         }
 
         public static void ValidateOwnsObject(SceneObject @this, SceneObject obj) {
@@ -253,7 +255,9 @@ namespace R3Modeller.Core.Engine.Objs {
 
         public virtual void RenderChildren(Camera camera) {
             foreach (SceneObject obj in this.items) {
-                obj.Render(camera);
+                if (obj.IsVisible) {
+                    obj.Render(camera);
+                }
             }
         }
 

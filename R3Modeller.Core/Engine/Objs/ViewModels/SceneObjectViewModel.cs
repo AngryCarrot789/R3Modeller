@@ -25,16 +25,11 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         /// </summary>
         public ReadOnlyObservableCollection<SceneObjectViewModel> Children { get; }
 
-        // TODO: figure out another way to store the text "n objects selected" as
-        // converters don't really work well with observable collections
-        public string PropertyEditorText { get; set; }
-
         public Vector3 Pos {
             get => this.Model.RelativePosition;
             set {
                 this.Model.RelativePosition = value;
                 this.RaisePropertyChanged(nameof(this.Pos));
-                this.RaisePropertyChanged(nameof(this.PosX));
                 this.RaisePropertyChanged(nameof(this.PosY));
                 this.RaisePropertyChanged(nameof(this.PosZ));
                 this.Project.OnRenderInvalidated();
@@ -66,12 +61,12 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             }
         }
 
-        public float PosX { get => this.Pos.X; set => this.Pos = this.Pos.SetX(value); }
-        public float PosY { get => this.Pos.Y; set => this.Pos = this.Pos.SetY(value); }
-        public float PosZ { get => this.Pos.Z; set => this.Pos = this.Pos.SetZ(value); }
+        public float PosX { get => this.Pos.X; set => this.Pos = this.Pos.WithX(value); }
+        public float PosY { get => this.Pos.Y; set => this.Pos = this.Pos.WithY(value); }
+        public float PosZ { get => this.Pos.Z; set => this.Pos = this.Pos.WithZ(value); }
 
         public float Yaw {
-            get { return this.yaw; }
+            get => this.yaw;
             set {
                 this.yaw = value;
                 this.UpdateQuaternionForYawPitchRoll();
@@ -80,7 +75,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         }
 
         public float Pitch {
-            get { return this.pitch; }
+            get => this.pitch;
             set {
                 this.pitch = value;
                 this.UpdateQuaternionForYawPitchRoll();
@@ -89,7 +84,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         }
 
         public float Roll {
-            get { return this.roll; }
+            get => this.roll;
             set {
                 this.roll = value;
                 this.UpdateQuaternionForYawPitchRoll();
@@ -97,9 +92,9 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             }
         }
 
-        public float ScaleX { get => this.Scale.X; set => this.Scale = this.Scale.SetX(value); }
-        public float ScaleY { get => this.Scale.Y; set => this.Scale = this.Scale.SetY(value); }
-        public float ScaleZ { get => this.Scale.Z; set => this.Scale = this.Scale.SetZ(value); }
+        public float ScaleX { get => this.Scale.X; set => this.Scale = this.Scale.WithX(value); }
+        public float ScaleY { get => this.Scale.Y; set => this.Scale = this.Scale.WithY(value); }
+        public float ScaleZ { get => this.Scale.Z; set => this.Scale = this.Scale.WithZ(value); }
 
         /// <summary>
         /// The project associated with this scene object. Should only really be set once
@@ -130,14 +125,18 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             set => this.RaisePropertyChanged(ref this.Model.DisplayName, value);
         }
 
+        public bool IsVisible {
+            get => this.Model.IsVisible;
+            set {
+                this.RaisePropertyChanged(ref this.Model.IsVisible, value);
+                this.Project.OnRenderInvalidated();
+            }
+        }
+
         public SceneObjectViewModel(SceneObject model) {
             this.Model = model ?? throw new ArgumentNullException(nameof(model));
             this.children = new ObservableCollection<SceneObjectViewModel>();
             this.Children = new ReadOnlyObservableCollection<SceneObjectViewModel>(this.children);
-            this.children.CollectionChanged += (sender, args) => {
-                this.PropertyEditorText = $"{this.children.Count} item{Lang.S(this.children.Count)} selected";
-                this.RaisePropertyChanged(nameof(this.PropertyEditorText));
-            };
             for (int i = 0, c = model.Items.Count; i < c; i++) {
                 this.InsertInternal(i, SORegistry.Instance.CreateViewModelFromModel(model.Items[i]));
             }
@@ -173,13 +172,13 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             double sqz = q.Z * q.Z;
 
             double rollRad = Math.Atan2(2.0 * (q.Y * q.Z + q.W * q.X), (sqw - sqx - sqy + sqz));
-            this.roll = (float)(rollRad * (180.0 / Math.PI));
+            this.roll = (float) (rollRad * (180.0 / Math.PI));
 
             double pitchRad = Math.Asin(-2.0 * (q.X * q.Z - q.W * q.Y));
-            this.pitch = (float)(pitchRad * (180.0 / Math.PI));
+            this.pitch = (float) (pitchRad * (180.0 / Math.PI));
 
             double yawRad = Math.Atan2(2.0 * (q.X * q.Y + q.W * q.Z), (sqw + sqx - sqy - sqz));
-            this.yaw = (float)(yawRad * (180.0 / Math.PI));
+            this.yaw = (float) (yawRad * (180.0 / Math.PI));
         }
 
         public static void ValidateOwnsObject(SceneObjectViewModel @this, SceneObjectViewModel obj) {

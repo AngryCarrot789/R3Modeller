@@ -16,7 +16,12 @@ namespace R3Modeller.PropertyEditing {
                 typeof(PropertyEditor),
                 new PropertyMetadata(null, (d, e) => ((PropertyEditor) d).OnDataSourceChanged((IEnumerable) e.OldValue, (IEnumerable) e.NewValue)));
 
-        public static readonly DependencyPropertyKey ApplicableGroupsProperty = DependencyProperty.RegisterReadOnly("ApplicableGroups", typeof(IEnumerable<PropertyGroupViewModel>), typeof(PropertyEditor), new PropertyMetadata(default(IEnumerable<PropertyGroupViewModel>)));
+        public static readonly DependencyProperty ApplicableDataSourcesProperty =
+            DependencyProperty.Register(
+                "ApplicableDataSources",
+                typeof(IEnumerable),
+                typeof(PropertyEditor),
+                new PropertyMetadata(null));
 
         // INPUT
         public IEnumerable DataSources {
@@ -25,9 +30,10 @@ namespace R3Modeller.PropertyEditing {
         }
 
         // OUTPUT
-        public IEnumerable<PropertyGroupViewModel> ApplicableGroups {
-            get => (IEnumerable<PropertyGroupViewModel>) this.GetValue(ApplicableGroupsProperty.DependencyProperty);
-            private set => this.SetValue(ApplicableGroupsProperty, value);
+
+        public IEnumerable ApplicableDataSources {
+            get => (IEnumerable) this.GetValue(ApplicableDataSourcesProperty);
+            set => this.SetValue(ApplicableDataSourcesProperty, value);
         }
 
         private readonly bool isInDesigner;
@@ -42,7 +48,6 @@ namespace R3Modeller.PropertyEditing {
                 ((INotifyCollectionChanged) oldItems).CollectionChanged -= this.OnDataSourceCollectionChanged;
             if (newItems is INotifyCollectionChanged)
                 ((INotifyCollectionChanged) newItems).CollectionChanged += this.OnDataSourceCollectionChanged;
-
             this.ClearInternal();
         }
 
@@ -57,7 +62,11 @@ namespace R3Modeller.PropertyEditing {
         private void ClearInternal() {
             IEnumerable items = this.DataSources;
             List<object> list = items != null ? items.Cast<object>().ToList() : new List<object>();
-            this.ApplicableGroups = R3PropertyEditorRegistry.Instance.SetupObjects(list);
+
+            // Release bindings from the editor, then setup objects, then re-assign to the original value
+            // this.ClearValue(ApplicableDataSourcesProperty);
+            R3PropertyEditorRegistry.Instance.SetupObjects(list);
+            // this.ApplicableDataSources = new List<object>(R3PropertyEditorRegistry.Instance.Root.Values);
         }
     }
 }

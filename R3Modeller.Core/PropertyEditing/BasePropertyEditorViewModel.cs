@@ -6,25 +6,38 @@ namespace R3Modeller.Core.PropertyEditing {
     /// <summary>
     /// The base property editor view model class for handling a single (or multiple) properties, and updating a collection of handlers
     /// </summary>
-    public abstract class BasePropertyEditorViewModel : BaseViewModel {
+    public abstract class BasePropertyEditorViewModel : BasePropertyObjectViewModel {
         private readonly Dictionary<object, PropertyHandler> handlerToDataMap;
         private readonly List<object> handlerList;
 
         public IReadOnlyList<object> Handlers => this.handlerList;
 
+        /// <summary>
+        /// Whether or not there are handlers currently using this property editor. Inverse of <see cref="IsEmpty"/>
+        /// </summary>
         public bool HasHandlers =>  this.handlerList != null && this.handlerList.Count > 0;
 
+        /// <summary>
+        /// Whether or not there are no handlers currently using this property editor. Inverse of <see cref="HasHandlers"/>
+        /// </summary>
+        public bool IsEmpty =>  this.handlerList == null || this.handlerList.Count < 1;
+
+        /// <summary>
+        /// Whether or not this editor has more than 1 handler
+        /// </summary>
         public bool IsMultiSelection => this.handlerList != null && this.handlerList.Count > 1;
 
-        protected BasePropertyEditorViewModel() {
+        protected BasePropertyEditorViewModel(Type applicableType) : base(applicableType) {
             this.handlerToDataMap = new Dictionary<object, PropertyHandler>();
             this.handlerList = new List<object>();
         }
 
-        public void Clear() {
+        public void ClearHandlers() {
             this.OnClearHandlers();
+            this.handlerList.Clear();
             this.handlerToDataMap.Clear();
             this.RaisePropertyChanged(nameof(this.HasHandlers));
+            this.RaisePropertyChanged(nameof(this.IsEmpty));
             this.RaisePropertyChanged(nameof(this.IsMultiSelection));
         }
 
@@ -33,18 +46,13 @@ namespace R3Modeller.Core.PropertyEditing {
             this.handlerList.Clear();
             this.handlerToDataMap.Clear();
             foreach (object entry in targets) {
-                if (this.handlerToDataMap.ContainsKey(entry)) {
-                    this.handlerList.Clear();
-                    this.handlerToDataMap.Clear();
-                    throw new Exception("Duplicate handler object");
-                }
-
                 this.handlerToDataMap[entry] = null;
                 this.handlerList.Add(entry);
             }
 
             this.OnHandlersLoaded();
             this.RaisePropertyChanged(nameof(this.HasHandlers));
+            this.RaisePropertyChanged(nameof(this.IsEmpty));
             this.RaisePropertyChanged(nameof(this.IsMultiSelection));
         }
 

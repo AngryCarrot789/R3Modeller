@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using ObjectLoader.Common;
 using ObjectLoader.Data.DataStore;
-using ObjectLoader.Data.VertexData;
 using ObjectLoader.TypeParsers.Interfaces;
 
 namespace ObjectLoader.TypeParsers {

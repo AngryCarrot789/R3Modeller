@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using ObjectLoader.Data.Elements;
-using ObjectLoader.Data.VertexData;
 using ObjectLoader.Loaders;
 using OpenTK.Graphics.OpenGL;
 using R3Modeller.Core.Engine.Utils;
@@ -33,27 +32,45 @@ namespace R3Modeller.Core.Engine.Objs {
                 vertices.Add(v.Z);
             }
 
+            foreach (Vector3 v in result.Normals) {
+                normalData.Add(v.X);
+                normalData.Add(v.Y);
+                normalData.Add(v.Z);
+            }
+
+            foreach (Vector3 v in result.Textures) {
+                texCoordData.Add(v.X);
+                texCoordData.Add(v.Y);
+                if (!float.IsNaN(v.Z)) {
+                    texCoordData.Add(v.Y);
+                    this.is3dTexture = true;
+                }
+            }
+
+            bool isQuad = false;
             foreach (Face face in group.Faces) {
-                foreach (FaceVertex faceVertex in face.Vertices) {
-                    // Vector3 v = result.Vertices[faceVertex.VertexIndex - 1];
-                    // vertices.Add(v.X);
-                    // vertices.Add(v.Y);
-                    // vertices.Add(v.Z);
+                if (face.Vertices.Count > 3) {
+                    isQuad = true;
+                }
 
-                    Vector3 uv = result.Textures[faceVertex.TextureIndex - 1];
-                    texCoordData.Add(uv.X);
-                    texCoordData.Add(uv.Y);
-                    if (!float.IsNaN(uv.Z)) {
-                        texCoordData.Add(uv.Y);
-                        this.is3dTexture = true;
-                    }
+                foreach (FaceVertex vertex in face.Vertices) {
+                    indices.Add((uint) (vertex.VertexIndex - 1));
+                }
+            }
 
-                    Normal norm = result.Normals[faceVertex.NormalIndex - 1];
-                    normalData.Add(norm.X);
-                    normalData.Add(norm.Y);
-                    normalData.Add(norm.Z);
+            if (isQuad) {
+                uint[] quadIndices = indices.ToArray();
+                indices.Clear();
+                for (int i = 0; i < quadIndices.Length; i += 4) {
+                    // Triangle 1 of the face
+                    indices.Add(quadIndices[i]);
+                    indices.Add(quadIndices[i + 1]);
+                    indices.Add(quadIndices[i + 2]);
 
-                    indices.Add((uint) (faceVertex.VertexIndex - 1));
+                    // Triangle 2 of the face
+                    indices.Add(quadIndices[i]);
+                    indices.Add(quadIndices[i + 2]);
+                    indices.Add(quadIndices[i + 3]);
                 }
             }
 
@@ -114,10 +131,8 @@ namespace R3Modeller.Core.Engine.Objs {
             // GL.BindVertexArray(0);
 
             GL.BindVertexArray(this.vao);
-            // GL.BindBuffer(BufferTarget.ElementArrayBuffer, this.ibo); // Bind the index buffer
-            GL.DrawElements(PrimitiveType.Quads, this.indicesCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.DrawElements(PrimitiveType.Triangles, this.indicesCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             GL.BindVertexArray(0);
-            // GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0); // Unbind the index buffer
 
             this.RenderChildren(camera);
         }
