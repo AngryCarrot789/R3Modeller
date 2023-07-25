@@ -97,8 +97,8 @@ namespace R3Modeller.Viewport {
         protected override void OnPreviewKeyDown(KeyEventArgs e) {
             base.OnPreviewKeyDown(e);
             switch (e.Key) {
-                case Key.System: {
-                    if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
+                case Key.LeftCtrl: {
+                    if (!e.IsRepeat) {
                         this.mousePosBeforeOrbitEnabled = Mouse.GetPosition(this);
                         this.isOrbitActive = true;
                         this.UpdateCursor();
@@ -114,8 +114,8 @@ namespace R3Modeller.Viewport {
         protected override void OnPreviewKeyUp(KeyEventArgs e) {
             base.OnPreviewKeyUp(e);
             switch (e.Key) {
-                case Key.System: {
-                    if (!e.IsRepeat && e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt) {
+                case Key.LeftCtrl: {
+                    if (!e.IsRepeat) {
                         this.isOrbitActive = false;
                         this.UpdateCursor();
                         this.InvalidateRender();
@@ -194,7 +194,7 @@ namespace R3Modeller.Viewport {
                 return;
             }
 
-            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt)) {
+            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl)) {
                 this.isOrbitActive = false;
                 this.UpdateCursor();
             }
@@ -377,7 +377,8 @@ namespace R3Modeller.Viewport {
                 this.Dispatcher.InvokeAsync(this.invalidateVisualAction);
             }
             else if (this.Dispatcher.CheckAccess()) {
-                this.invalidateVisualAction();
+                this.Dispatcher.Invoke(this.invalidateVisualAction, System.Windows.Threading.DispatcherPriority.Render);
+                // this.invalidateVisualAction();
             }
             else {
                 this.Dispatcher.Invoke(this.invalidateVisualAction);

@@ -237,15 +237,15 @@ namespace R3Modeller {
             ThemesController.SetTheme(type);
         }
 
-        protected override void OnActivated(EventArgs e) {
-            base.OnActivated(e);
-            this.OGLViewPort.InvalidateRender();
-        }
+        // protected override void OnActivated(EventArgs e) {
+        //     base.OnActivated(e);
+        //     this.OGLViewPort.InvalidateRender();
+        // }
 
-        protected override void OnDeactivated(EventArgs e) {
-            base.OnDeactivated(e);
-            this.OGLViewPort.InvalidateRender();
-        }
+        // protected override void OnDeactivated(EventArgs e) {
+        //     base.OnDeactivated(e);
+        //     this.OGLViewPort.InvalidateRender();
+        // }
 
         private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
             // this.VPPropertyEditor.DataSources = new List<Object>() {e.NewValue};

@@ -46,7 +46,7 @@
                     <ColumnDefinition Width="300"/>
                 </Grid.ColumnDefinitions>
                 <Grid>
-                    <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}"/>
+                    <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}" FocusVisualStyle="{x:Null}"/>
                     <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
                                        VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="5000"
                                        Value="{Binding OrbitRange, Mode=TwoWay}"
