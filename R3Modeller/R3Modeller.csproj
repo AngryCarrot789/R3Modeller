@@ -138,6 +138,7 @@
     <Compile Include="AttachedProperties\HorizontalScrolling.cs" />
     <Compile Include="AttachedProperties\MultiSelectorHelper.cs" />
     <Compile Include="AttachedProperties\ControlInteractivity.cs" />
+    <Compile Include="AttachedProperties\ScrollBinder.cs" />
     <Compile Include="AttachedProperties\TextBlockHelper.cs" />
     <Compile Include="AttachedProperties\TextBoxHelper.cs" />
     <Compile Include="AttachedProperties\ToggleButtonHelper.cs" />
@@ -186,7 +187,6 @@
     <Compile Include="Converters\EnumConverter.cs" />
     <Compile Include="Converters\FloatToDoubleConverter.cs" />
     <Compile Include="Converters\NullConverter.cs" />
-    <Compile Include="Converters\ScrollBinder.cs" />
     <Compile Include="Converters\SingleItemToListConverter.cs" />
     <Compile Include="Converters\SingletonValueConverter.cs" />
     <Compile Include="Converters\VolumeToDbConverter.cs" />

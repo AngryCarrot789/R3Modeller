@@ -54,7 +54,7 @@ namespace R3Modeller.Core.Engine {
         }
 
         public void SetOrbitRange(float range) {
-            this.orbitRange = Maths.Clamp(range, 0.0001f, 1000f);
+            this.orbitRange = Maths.Clamp(range, 0.0001f, 5000f);
             this.UpdateViewMatrix();
         }
 

@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using R3Modeller.Core.Utils;
 
-namespace R3Modeller.Converters {
+namespace R3Modeller.AttachedProperties {
     public static class ScrollBinder {
         public static readonly DependencyProperty VerticalBindGroupProperty =
             DependencyProperty.RegisterAttached(

@@ -14,165 +14,206 @@
         xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         xmlns:ap="clr-namespace:R3Modeller.AttachedProperties"
         xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
-        xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core"
+        xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core" 
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
         Style="{StaticResource CustomWindowStyleEx}"
         BorderBrush="{DynamicResource BrushPanelGap}"
+        TitlebarBrush="{DynamicResource ABrush.Tone6.Background.Static}"
         shortcuts:UIFocusGroup.IsShortcutInputSource="True"
         shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor">
     <Grid>
-        <Menu VerticalAlignment="Top" Background="{DynamicResource ABrush.Tone6.Background.Static}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 0 0 1">
-            <MenuItem Header="File">
-                <Separator/>
-            </MenuItem>
-            <MenuItem Header="Theme">
-                <MenuItem Header="Deep Dark"     Click="SetThemeClick" Uid="0"/>
-                <MenuItem Header="Soft Dark"     Click="SetThemeClick" Uid="1"/>
-                <MenuItem Header="Dark Grey"     Click="SetThemeClick" Uid="2"/>
-                <MenuItem Header="Grey"          Click="SetThemeClick" Uid="3"/>
-                <Separator/>
-                <MenuItem Header="Red and Black" Click="SetThemeClick" Uid="4"/>
-                <MenuItem Header="Light Theme (PLEASE DONT USE FOR YOUR OWN GOOD D:)"   Click="SetThemeClick" Uid="5"/>
-            </MenuItem>
-        </Menu>
-        <Grid Margin="0,19,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="300"/>
-            </Grid.ColumnDefinitions>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" VerticalAlignment="Top" Background="{DynamicResource ABrush.Tone6.Background.Static}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,0,0,1">
+                <MenuItem Header="File">
+                    <Separator/>
+                </MenuItem>
+                <MenuItem Header="Theme">
+                    <MenuItem Header="Deep Dark"     Click="SetThemeClick" Uid="0"/>
+                    <MenuItem Header="Soft Dark"     Click="SetThemeClick" Uid="1"/>
+                    <MenuItem Header="Dark Grey"     Click="SetThemeClick" Uid="2"/>
+                    <MenuItem Header="Grey"          Click="SetThemeClick" Uid="3"/>
+                    <Separator/>
+                    <MenuItem Header="Red and Black" Click="SetThemeClick" Uid="4"/>
+                    <MenuItem Header="Light Theme (PLEASE DONT USE FOR YOUR OWN GOOD D:)"   Click="SetThemeClick" Uid="5"/>
+                </MenuItem>
+            </Menu>
             <Grid>
-                <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}"/>
-                <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
-                                       VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="750"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}"/>
+                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
+                                       VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="5000"
                                        Value="{Binding OrbitRange, Mode=TwoWay}"
                                        EditStartedCommand="{Binding BeginOrbitRangeModificationCommand, Mode=OneTime}"
                                        EditCompletedCommand="{Binding EndOrbitRangeModificationCommand, Mode=OneTime}"
                                        TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
-                <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2"
+                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2"
                                        VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120"
                                        Value="{Binding Fov, Mode=TwoWay}"
                                        EditStartedCommand="{Binding BeginFovModificationCommand, Mode=OneTime}"
                                        EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
                                        TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
-            </Grid>
-            <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0" 
-                    Grid.Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="2*"/>
-                    </Grid.RowDefinitions>
-                    <!-- https://dlaa.me/blog/post/9898803 -->
-                    <Border BorderThickness="0">
-                        <!-- Content -->
-                        <Grid Grid.IsSharedSizeScope="True">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
+                </Grid>
+                <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0" Grid.Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <!-- https://dlaa.me/blog/post/9898803 -->
+                        <Border BorderThickness="0">
+                            <!-- Content -->
+                            <Grid Grid.IsSharedSizeScope="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <!-- Column headers -->
+                                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden"
+                                          ap:ScrollBinder.HorizontalBindGroup="ObjectViewerTreeHorizontalBind">
+                                    <TreeViewItem BorderBrush="Transparent" BorderThickness="0" Style="{x:Null}">
+                                        <TreeViewItem.Header>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="DisplayName" Width="Auto"/>
+                                                    <ColumnDefinition SharedSizeGroup="Separator0" Width="Auto"/>
+                                                    <ColumnDefinition SharedSizeGroup="Data"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Task"/>
+                                                <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Separator0" group-->
+                                                <TreeViewItem Grid.Column="1" Padding="0" Style="{x:Null}"/>
+                                                <TextBlock Grid.Column="2" Text="Data"/>
+                                                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Columns" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"/>
+                                                <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Column="1" Width="1" Background="{DynamicResource BrushPanelGap}" IsHitTestVisible="False"/>
+                                            </Grid>
+                                        </TreeViewItem.Header>
+                                    </TreeViewItem>
+                                </ScrollViewer>
 
-                            <!-- Column headers -->
-                            <TreeViewItem Grid.Row="0" BorderThickness="1">
-                                <TreeViewItem.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                            <!-- Placeholders for two columns of ToggleButton -->
-                                            <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                            <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                            <ColumnDefinition SharedSizeGroup="Data"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="Task"/>
-                                        <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Toggle" group-->
-                                        <TreeViewItem Grid.Column="1" Padding="0"/>
-                                        <TextBlock Grid.Column="3" Text="Data"/>
-                                    </Grid>
-                                </TreeViewItem.Header>
-                            </TreeViewItem>
+                                <!-- Data rows -->
+                                <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                                    <TreeView.Style>
+                                        <Style TargetType="{x:Type TreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type TreeView}">
+                                                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                                                            <ScrollViewer x:Name="_tv_scrollviewer_" Background="{TemplateBinding Background}"
+                                                                      CanContentScroll="false" Focusable="false"
+                                                                      HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                                                      Padding="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                                                      ap:ScrollBinder.HorizontalBindGroup="ObjectViewerTreeHorizontalBind">
+                                                                <ItemsPresenter/>
+                                                            </ScrollViewer>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="false">
+                                                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeView.Disabled.Background}"/>
+                                                                <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeView.Disabled.Border}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                                                                <Setter Property="CanContentScroll" TargetName="_tv_scrollviewer_" Value="true"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                                                    <Setter Property="ItemsPanel">
+                                                        <Setter.Value>
+                                                            <ItemsPanelTemplate>
+                                                                <VirtualizingStackPanel/>
+                                                            </ItemsPanelTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TreeView.Style>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                            <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <!-- Level 0 template leaves space for 2 child "Separator0" levels -->
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                    <ColumnDefinition SharedSizeGroup="Separator0"/>
+                                                    <ColumnDefinition SharedSizeGroup="Data"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                <CheckBox IsChecked="{Binding IsVisible}" Grid.Column="2" Content="Is Visible"/>
+                                            </Grid>
 
-                            <!-- Data rows -->
-                            <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                        <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
+                                            <!-- Level 1 template leaves space for 1 child "Separator0" level -->
+                                            <HierarchicalDataTemplate.ItemTemplate>
+                                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition SharedSizeGroup="Data"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                        <CheckBox IsChecked="True" Grid.Column="2" Content="Is Enabled"/>
+                                                    </Grid>
 
-                                    <!-- Level 0 template leaves space for 2 child "Toggle" levels -->
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                                <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                                <ColumnDefinition SharedSizeGroup="Data"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                            <CheckBox IsChecked="{Binding IsVisible}" Grid.Column="3" Content="Is Visible"/>
-                                        </Grid>
-
-                                        <!-- Level 1 template leaves space for 1 child "Toggle" level -->
-                                        <HierarchicalDataTemplate.ItemTemplate>
-                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition SharedSizeGroup="Toggle"/>
-                                                        <ColumnDefinition SharedSizeGroup="Data"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                    <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
-                                                </Grid>
-
-                                                <!-- Level 2 template has no children -->
-                                                <HierarchicalDataTemplate.ItemTemplate>
-                                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                                <ColumnDefinition/>
-                                                                <ColumnDefinition/>
-                                                                <ColumnDefinition SharedSizeGroup="Data"/>
-                                                            </Grid.ColumnDefinitions>
-                                                            <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                            <CheckBox IsChecked="True" Grid.Column="3" Content="Is Enabled"/>
-                                                        </Grid>
-                                                    </HierarchicalDataTemplate>
-                                                </HierarchicalDataTemplate.ItemTemplate>
-                                            </HierarchicalDataTemplate>
-                                        </HierarchicalDataTemplate.ItemTemplate>
-                                    </HierarchicalDataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </TreeView>
-                        </Grid>
-                    </Border>
-                    <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
+                                                    <!-- Level 2 template has no children -->
+                                                    <HierarchicalDataTemplate.ItemTemplate>
+                                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
+                                                                    <ColumnDefinition/>
+                                                                    <ColumnDefinition SharedSizeGroup="Data"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                                                                <CheckBox IsChecked="True" Grid.Column="2" Content="Is Enabled"/>
+                                                            </Grid>
+                                                        </HierarchicalDataTemplate>
+                                                    </HierarchicalDataTemplate.ItemTemplate>
+                                                </HierarchicalDataTemplate>
+                                            </HierarchicalDataTemplate.ItemTemplate>
+                                        </HierarchicalDataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </TreeView>
+                            </Grid>
+                        </Border>
+                        <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
                              Grid.Row="1" SelectionMode="Extended"
                              BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,1"
                              ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
                              ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding DisplayName}"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <Border Grid.Row="2" BorderThickness="0">
-                        <Grid>
-                            <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
-                                <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
-                            </ScrollViewer>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </Border>
-        </Grid>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Border Grid.Row="2" BorderThickness="0">
+                            <Grid>
+                                <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
+                                    <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DockPanel>
         <Popup x:Name="NotificationPanelPopup" StaysOpen="True" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
             <Border Background="Transparent">
                 <ScrollViewer MaxHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:MainWindow}}, Path=ActualHeight}"

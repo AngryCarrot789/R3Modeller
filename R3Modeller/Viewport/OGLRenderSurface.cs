@@ -18,6 +18,7 @@ using R3Modeller.Core.Rendering;
 using R3Modeller.Core.Utils;
 using R3Modeller.Utils;
 using Vector3 = System.Numerics.Vector3;
+using Vector4 = System.Numerics.Vector4;
 
 namespace R3Modeller.Viewport {
     public class OGLRenderSurface : Control, IRenderTarget {
@@ -142,11 +143,11 @@ namespace R3Modeller.Viewport {
             float oldRange = camera.OrbitRange;
             float newRange;
             if (oldRange < 0.01f) {
-                newRange = Maths.Clamp(e.Delta > 0 ? (oldRange / 20f) : (oldRange * 20f), 0.0001f, 750f);
+                newRange = Maths.Clamp(e.Delta > 0 ? (oldRange / 20f) : (oldRange * 20f), 0.0001f, 5000f);
             }
             else {
                 float multiplier = e.Delta > 0 ? (1f - 0.25f) : (1f + 0.25f);
-                newRange = Maths.Clamp(oldRange * multiplier, 0.0001f, 750f);
+                newRange = Maths.Clamp(oldRange * multiplier, 0.0001f, 5000f);
             }
 
             if (Math.Abs(newRange - oldRange) > 0.00001f) {
@@ -353,9 +354,9 @@ namespace R3Modeller.Viewport {
                 Matrix4 mat4 = Unsafe.As<Matrix4x4, Matrix4>(ref lineMvp);
                 Matrix4x4 mvp = Unsafe.As<Matrix4, Matrix4x4>(ref mat4);
 
-                this.axisLineX.DrawAt(mvp, new Vector3(1f, 0f, 0f));
-                this.axisLineY.DrawAt(mvp, new Vector3(0f, 1f, 0f));
-                this.axisLineZ.DrawAt(mvp, new Vector3(0f, 0f, 1f));
+                this.axisLineX.DrawAt(mvp, new Vector4(1f, 0f, 0f, 1f));
+                this.axisLineY.DrawAt(mvp, new Vector4(0f, 1f, 0f, 1f));
+                this.axisLineZ.DrawAt(mvp, new Vector4(0f, 0f, 1f, 1f));
             }
 
             {
@@ -364,9 +365,9 @@ namespace R3Modeller.Viewport {
                     Vector3 position = Rotation.GetOrbitPosition(camera.yaw, camera.pitch);
                     Matrix4x4 lineModelView = Matrix4x4.CreateLookAt(position, new Vector3(), Vector3.UnitY);
                     Matrix4x4 mvp = lineModelView * ortho * Matrix4x4.CreateScale(10f);
-                    this.targetPointLineX.DrawAt(mvp, new Vector3(0.9f, 0.2f, 0.2f), 1f);
-                    this.targetPointLineY.DrawAt(mvp, new Vector3(0.2f, 0.9f, 0.2f), 1f);
-                    this.targetPointLineZ.DrawAt(mvp, new Vector3(0.2f, 0.2f, 0.9f), 1f);
+                    this.targetPointLineX.DrawAt(mvp, new Vector4(0.9f, 0.2f, 0.2f, 0.6f), 1f);
+                    this.targetPointLineY.DrawAt(mvp, new Vector4(0.2f, 0.9f, 0.2f, 0.6f), 1f);
+                    this.targetPointLineZ.DrawAt(mvp, new Vector4(0.2f, 0.2f, 0.9f, 0.6f), 1f);
                 }
             }
         }

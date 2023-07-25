@@ -29,9 +29,9 @@ namespace R3Modeller.Core.Engine.Utils {
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
-        public void DrawAt(Matrix4x4 mvp, Vector3 colour, float thickness = 3f) {
+        public void DrawAt(Matrix4x4 mvp, Vector4 colour, float thickness = 3f) {
             this.shader.Use();
-            this.shader.SetUniformVec3("in_color", colour);
+            this.shader.SetUniformVec4("in_color", colour);
             this.shader.SetUniformMatrix4("mvp", ref mvp);
 
             GL.Disable(EnableCap.DepthTest);
