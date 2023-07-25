@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectLoader", "ObjectLoader\ObjectLoader.csproj", "{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiSelectTreeView", "MultiSelectTreeView\MultiSelectTreeView.csproj", "{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -45,21 +43,12 @@ Global
 		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Release|x64.Build.0 = Release|x64
 		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Release|x86.ActiveCfg = Release|x86
 		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4}.Release|x86.Build.0 = Release|x86
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Debug|x64.ActiveCfg = Debug|x64
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Debug|x64.Build.0 = Debug|x64
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Debug|x86.ActiveCfg = Debug|x86
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Debug|x86.Build.0 = Debug|x86
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x64.ActiveCfg = Release|x64
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x64.Build.0 = Release|x64
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x86.ActiveCfg = Release|x86
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C9E18A89-1295-4C13-9A2A-F3F0C8DAD9B4} = {84883E91-BD7D-422C-83BC-81DD5DA6E384}
-		{ACDE95F3-218E-4BB9-A9F4-4B27A7F35BBB} = {84883E91-BD7D-422C-83BC-81DD5DA6E384}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24CD7E81-1E95-4D92-BF42-71E6D0EBBAD3}

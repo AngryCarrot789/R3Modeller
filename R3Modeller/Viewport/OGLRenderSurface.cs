@@ -188,13 +188,23 @@ namespace R3Modeller.Viewport {
             }
         }
 
+        private static bool IsOrbitKeyPressed() {
+            return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
+        }
+
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
             if (this.ignoreMouseMoveEvent) {
                 return;
             }
 
-            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt)) {
+            if (IsOrbitKeyPressed()) {
+                if (!this.isOrbitActive) {
+                    this.isOrbitActive = true;
+                    this.UpdateCursor();
+                }
+            }
+            else if (this.isOrbitActive) {
                 this.isOrbitActive = false;
                 this.UpdateCursor();
             }

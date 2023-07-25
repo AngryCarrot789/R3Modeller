@@ -19,16 +19,19 @@ namespace R3Modeller.Core.PropertyEditing {
             PropertyGroupViewModel transformation = typeGroup.CreateSubGroup(typeof(SceneObjectViewModel), "Transformation");
             // probably shouldn't really use stuff like this, as a huge amount of UI control is stripped.
             // A specific view model and data template for controlling stuff
-            transformation.AddPropertyEditor("Absolute Coords Grid", new CheckBoxGridEditorViewModel(typeof(SceneObjectViewModel)) {
-                CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Pos", (x) => x.IsPositionAbsolute, (x, v) => x.IsPositionAbsolute = v),
-                CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Scale", (x) => x.IsScaleAbsolute, (x, v) => x.IsScaleAbsolute = v),
-                CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Rotate", (x) => x.IsRotationAbsolute, (x, v) => x.IsRotationAbsolute = v),
-            });
+            // transformation.AddPropertyEditor("Absolute Coords Grid", new CheckBoxGridEditorViewModel(typeof(SceneObjectViewModel)) {
+            //     CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Pos", (x) => x.IsPositionAbsolute, (x, v) => x.IsPositionAbsolute = v),
+            //     CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Scale", (x) => x.IsScaleAbsolute, (x, v) => x.IsScaleAbsolute = v),
+            //     CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Rotate", (x) => x.IsRotationAbsolute, (x, v) => x.IsRotationAbsolute = v),
+            // });
+            transformation.AddPropertyEditor("Absolute Coord Grid", new AbsControlsEditorViewModel(typeof(SceneObjectViewModel)));
             transformation.AddPropertyEditor("Transformation", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
 
             // only for testing the UI and the applicability calculators.
+
             // passing typeof(SceneObjectViewModel) to the transformation editor is not necessary but it
-            // makes debugging the code easier as I can fake a higher applicable types
+            // makes debugging the code easier as I can fake higher applicable types
+
             // PropertyGroupViewModel group1 = typeGroup.CreateSubGroup(typeof(SceneObjectViewModel), "Group 1");
             // group1.AddPropertyEditor("Position 1", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
             // group1.AddPropertyEditor("Floor Position 1", new TransformationEditorViewModel(typeof(FloorPlaneObjectViewModel)));

@@ -3,19 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:R3Modeller" xmlns:controls="clr-namespace:R3Modeller.Controls"
+        xmlns:local="clr-namespace:R3Modeller"
         xmlns:views="clr-namespace:R3Modeller.Views"
         xmlns:dragger="clr-namespace:R3Modeller.Controls.Dragger"
         xmlns:viewModels="clr-namespace:R3Modeller.Core.Engine.ViewModels;assembly=R3Modeller.Core"
         xmlns:shortcuts="clr-namespace:R3Modeller.Shortcuts"
         xmlns:n="clr-namespace:R3Modeller.Notifications"
         xmlns:n1="clr-namespace:R3Modeller.Core.Notifications;assembly=R3Modeller.Core"
-        xmlns:c1="clr-namespace:MultiSelectTreeViews.Controls;assembly=MultiSelectTreeViews"
         xmlns:viewport="clr-namespace:R3Modeller.Viewport"
         xmlns:ap="clr-namespace:R3Modeller.AttachedProperties"
         xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
-        xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core" 
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core"
+        xmlns:c="clr-namespace:R3Modeller.Controls.TreeViews.Controls"
+        xmlns:vm="clr-namespace:R3Modeller.Core.Engine.Objs.ViewModels;assembly=R3Modeller.Core"
         mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
@@ -60,6 +60,62 @@
                                        EditStartedCommand="{Binding BeginFovModificationCommand, Mode=OneTime}"
                                        EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
                                        TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                    <ScrollViewer VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="250" Margin="0,80,10,10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl DataContext="{Binding Project}" ItemsSource="{Binding Scene.SelectedItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:SceneObjectViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0" Grid.ColumnSpan="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Margin="0,0,10,0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
+                                            <Border Margin="10,0,0,0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontWeight="Bold" TextDecorations="Underline"/>
+                                        </Grid>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="X"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" TextAlignment="Center" Text="Y"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="3" TextAlignment="Center" Text="Z"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Pos"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Scale"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Rotation"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="{Binding PosX, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" TextAlignment="Center" Text="{Binding PosY, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="3" TextAlignment="Center" Text="{Binding PosZ, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Center" Text="{Binding ScaleX, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" TextAlignment="Center" Text="{Binding ScaleY, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="3" TextAlignment="Center" Text="{Binding ScaleZ, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="{Binding Pitch, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="2" TextAlignment="Center" Text="{Binding Yaw, StringFormat={}{0:F2}}"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="3" TextAlignment="Center" Text="{Binding Roll, StringFormat={}{0:F2}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </Grid>
                 <Border Grid.Column="2" BorderThickness="0" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
                     <Grid>
@@ -68,135 +124,58 @@
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="2*"/>
                         </Grid.RowDefinitions>
-                        <!-- https://dlaa.me/blog/post/9898803 -->
-                        <Border BorderThickness="0">
-                            <!-- Content -->
-                            <Grid Grid.IsSharedSizeScope="True">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <!-- Column headers -->
-                                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden"
-                                          ap:ScrollBinder.HorizontalBindGroup="ObjectViewerTreeHorizontalBind">
-                                    <TreeViewItem BorderBrush="Transparent" BorderThickness="0" Style="{x:Null}">
-                                        <TreeViewItem.Header>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition SharedSizeGroup="DisplayName" Width="Auto"/>
-                                                    <ColumnDefinition SharedSizeGroup="Separator0" Width="Auto"/>
-                                                    <ColumnDefinition SharedSizeGroup="Data"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Task"/>
-                                                <!-- Empty TreeViewItem to measure the size of its ToggleButton into the "Separator0" group-->
-                                                <TreeViewItem Grid.Column="1" Padding="0" Style="{x:Null}"/>
-                                                <TextBlock Grid.Column="2" Text="Data"/>
-                                                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Columns" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"/>
-                                                <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Column="1" Width="1" Background="{DynamicResource BrushPanelGap}" IsHitTestVisible="False"/>
-                                            </Grid>
-                                        </TreeViewItem.Header>
-                                    </TreeViewItem>
-                                </ScrollViewer>
-
-                                <!-- Data rows -->
-                                <TreeView SelectedItemChanged="TreeView_OnSelectedItemChanged" DataContext="{Binding Project.Scene}" Grid.Row="1" ItemsSource="{Binding RootObject.Children}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
-                                    <TreeView.Style>
-                                        <Style TargetType="{x:Type TreeView}" BasedOn="{StaticResource {x:Type TreeView}}">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type TreeView}">
-                                                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
-                                                            <ScrollViewer x:Name="_tv_scrollviewer_" Background="{TemplateBinding Background}"
-                                                                      CanContentScroll="false" Focusable="false"
-                                                                      HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                                                      Padding="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
-                                                                      ap:ScrollBinder.HorizontalBindGroup="ObjectViewerTreeHorizontalBind">
-                                                                <ItemsPresenter/>
-                                                            </ScrollViewer>
-                                                        </Border>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsEnabled" Value="false">
-                                                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeView.Disabled.Background}"/>
-                                                                <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeView.Disabled.Border}"/>
-                                                            </Trigger>
-                                                            <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
-                                                                <Setter Property="CanContentScroll" TargetName="_tv_scrollviewer_" Value="true"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
-                                                    <Setter Property="ItemsPanel">
-                                                        <Setter.Value>
-                                                            <ItemsPanelTemplate>
-                                                                <VirtualizingStackPanel/>
-                                                            </ItemsPanelTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TreeView.Style>
-                                    <ItemsControl.ItemContainerStyle>
-                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                            <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
-                                        </Style>
-                                    </ItemsControl.ItemContainerStyle>
-                                    <ItemsControl.ItemTemplate>
-                                        <!-- Level 0 template leaves space for 2 child "Separator0" levels -->
-                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                    <ColumnDefinition SharedSizeGroup="Separator0"/>
-                                                    <ColumnDefinition SharedSizeGroup="Data"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                <CheckBox IsChecked="{Binding IsVisible}" Grid.Column="2" Content="Is Visible"/>
-                                            </Grid>
-
-                                            <!-- Level 1 template leaves space for 1 child "Separator0" level -->
-                                            <HierarchicalDataTemplate.ItemTemplate>
-                                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition SharedSizeGroup="Data"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                        <CheckBox IsChecked="True" Grid.Column="2" Content="Is Enabled"/>
-                                                    </Grid>
-
-                                                    <!-- Level 2 template has no children -->
-                                                    <HierarchicalDataTemplate.ItemTemplate>
-                                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition SharedSizeGroup="DisplayName"/>
-                                                                    <ColumnDefinition/>
-                                                                    <ColumnDefinition SharedSizeGroup="Data"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                                                                <CheckBox IsChecked="True" Grid.Column="2" Content="Is Enabled"/>
-                                                            </Grid>
-                                                        </HierarchicalDataTemplate>
-                                                    </HierarchicalDataTemplate.ItemTemplate>
-                                                </HierarchicalDataTemplate>
-                                            </HierarchicalDataTemplate.ItemTemplate>
-                                        </HierarchicalDataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </TreeView>
-                            </Grid>
-                        </Border>
+                        <c:MultiSelectTreeView DataContext="{Binding Project.Scene}"
+                                               SelectedItems="{Binding SelectedItems, Mode=OneWay}" Grid.Row="0"
+                                               ItemsSource="{Binding RootObject.Children}"
+                                               BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                            <c:MultiSelectTreeView.Style>
+                                <Style TargetType="{x:Type c:MultiSelectTreeView}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeView}}">
+                                    <Setter Property="Background" Value="{DynamicResource TreeView.Static.Background}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource TreeView.Static.Border}"/>
+                                    <Setter Property="BackgroundSelectionRectangle" Value="Transparent"/>
+                                    <Setter Property="BorderBrushSelectionRectangle" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Padding" Value="1"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}" />
+                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                                    <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+                                    <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                </Style>
+                            </c:MultiSelectTreeView.Style>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="{x:Type c:MultiSelectTreeViewItem}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeViewItem}}">
+                                    <Setter Property="Background" Value="{DynamicResource TreeViewItem.Static.Background}"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="BackgroundHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
+                                    <Setter Property="BorderBrushHovered" Value="{DynamicResource TreeViewItem.MouseOver.Border}"/>
+                                    <Setter Property="BackgroundSelected" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                    <Setter Property="BorderBrushSelected" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                    <Setter Property="BackgroundSelectedHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
+                                    <Setter Property="BackgroundFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                    <Setter Property="BorderBrushFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                    <Setter Property="BackgroundInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
+                                    <Setter Property="BorderBrushInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                    <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                    <Setter Property="Padding" Value="1,0,0,0"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
+                                    <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+                                    <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                </HierarchicalDataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </c:MultiSelectTreeView>
                         <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
-                             Grid.Row="1" SelectionMode="Extended"
-                             BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,1"
-                             ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
-                             ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
+                                 Grid.Row="1" SelectionMode="Extended"
+                                 BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,1"
+                                 ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
+                                 ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayName}"/>

@@ -11,11 +11,13 @@ namespace R3Modeller.Core.Utils {
         public const float PI_NEG = -3.14159265358979f;
         public const float PI_NEG_DOUBLE = -6.28318530717958f;
 
-        private const float R2D = 180.0f / PI;
-        private const float D2R = PI / 180.0f;
+        private const double R2D = 180.0f / PI;
+        private const double D2R = PI / 180.0f;
 
-        public static float Rad2Deg(float radians) => radians * R2D;
-        public static float Deg2Rad(float degrees) => degrees * D2R;
+        public static float Rad2Deg(float radians) => (float) (radians * R2D);
+        public static float Deg2Rad(float degrees) => (float) (degrees * D2R);
+        public static double Rad2Deg(double radians) => radians * R2D;
+        public static double Deg2Rad(double degrees) => degrees * D2R;
 
         /// <summary>
         /// Maps a double value from the input range to the output range

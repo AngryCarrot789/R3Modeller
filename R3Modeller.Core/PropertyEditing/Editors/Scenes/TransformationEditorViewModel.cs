@@ -7,53 +7,30 @@ using R3Modeller.Core.Utils;
 namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
     public class TransformationEditorViewModel : BasePropertyEditorViewModel {
         private Vector3 pos;
-
         private Vector3 scale;
-
-        private float pitch;
-        private float yaw;
-        private float roll;
-        private Quaternion rot;
+        private Vector3 rot;
 
         // A lot of this code may end up being duplicated between the scene object view model and this class...
 
-        public float PosX {
-            get => this.pos.X;
-            set => this.OnModifiedPos(this.pos, this.pos.WithX(value));
-        }
+        public float PosX { get => this.pos.X; set => this.OnModifiedPos(this.pos, this.pos.WithX(value)); }
 
-        public float PosY {
-            get => this.pos.Y;
-            set => this.OnModifiedPos(this.pos, this.pos.WithY(value));
-        }
+        public float PosY { get => this.pos.Y; set => this.OnModifiedPos(this.pos, this.pos.WithY(value)); }
 
-        public float PosZ {
-            get => this.pos.Z;
-            set => this.OnModifiedPos(this.pos, this.pos.WithZ(value));
-        }
+        public float PosZ { get => this.pos.Z; set => this.OnModifiedPos(this.pos, this.pos.WithZ(value)); }
 
         public float Pitch {
-            get => this.pitch;
-            set {
-                this.pitch = value;
-                this.OnModifiedRotation(this.rot, this.GetQuaternionForYawPitchRoll());
-            }
+            get => this.rot.X;
+            set => this.OnModifiedRotation(this.rot, this.rot.WithX(value));
         }
 
         public float Yaw {
-            get => this.yaw;
-            set {
-                this.yaw = value;
-                this.OnModifiedRotation(this.rot, this.GetQuaternionForYawPitchRoll());
-            }
+            get => this.rot.Y;
+            set => this.OnModifiedRotation(this.rot, this.rot.WithY(value));
         }
 
         public float Roll {
-            get => this.roll;
-            set {
-                this.roll = value;
-                this.OnModifiedRotation(this.rot, this.GetQuaternionForYawPitchRoll());
-            }
+            get => this.rot.Z;
+            set => this.OnModifiedRotation(this.rot, this.rot.WithZ(value));
         }
 
         public float ScaleX { get => this.scale.X; set => this.OnModifiedScale(this.scale, this.scale.WithX(value)); }
@@ -135,7 +112,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
             else {
                 Vector3 change = newVal - oldVal;
-                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
+                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
                     Vector3 p = obj.Handler.Pos;
                     if (this.isEditingPosX || this.isEditingPosY || this.isEditingPosZ) {
                         p += change;
@@ -149,7 +126,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
         }
 
-        private void OnModifiedRotation(Quaternion oldVal, Quaternion newVal) {
+        private void OnModifiedRotation(Vector3 oldVal, Vector3 newVal) {
             // more convenient and cleaner to update the pos here than in the property setter block
             this.rot = newVal;
             this.RaisePropertyChanged(nameof(this.Pitch));
@@ -160,23 +137,52 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
 
             if (this.Handlers.Count == 1) {
-                ((SceneObjectViewModel) this.Handlers[0]).Rotation = newVal;
+                ((SceneObjectViewModel) this.Handlers[0]).PitchYawRoll = newVal;
             }
             else {
-                Quaternion change = Quaternion.Inverse(oldVal) * newVal;
-                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
-                    Quaternion rotation;
+                Vector3 change = newVal - oldVal;
+                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
+                    Vector3 rotation;
                     if (this.isEditingYaw || this.isEditingPitch || this.isEditingRoll) {
-                        rotation = obj.Handler.Rotation * change;
+                        rotation = obj.Handler.PitchYawRoll + change;
                     }
                     else {
                         rotation = newVal;
                     }
 
-                    obj.Handler.Rotation = rotation;
+                    obj.Handler.PitchYawRoll = rotation;
                 }
             }
         }
+
+        // private void OnModifiedRotation(Quaternion oldVal, Quaternion newVal) {
+        //     // more convenient and cleaner to update the pos here than in the property setter block
+        //     this.rot = newVal;
+        //     this.RaisePropertyChanged(nameof(this.Pitch));
+        //     this.RaisePropertyChanged(nameof(this.Yaw));
+        //     this.RaisePropertyChanged(nameof(this.Roll));
+        //     if (this.IsEmpty) {
+        //         return;
+        //     }
+        //
+        //     if (this.Handlers.Count == 1) {
+        //         ((SceneObjectViewModel) this.Handlers[0]).PitchYawRoll = newVal;
+        //     }
+        //     else {
+        //         Quaternion change = Quaternion.Inverse(oldVal) * newVal;
+        //         foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
+        //             Quaternion rotation;
+        //             if (this.isEditingYaw || this.isEditingPitch || this.isEditingRoll) {
+        //                 rotation = obj.Handler.PitchYawRoll * change;
+        //             }
+        //             else {
+        //                 rotation = newVal;
+        //             }
+        //
+        //             obj.Handler.PitchYawRoll = rotation;
+        //         }
+        //     }
+        // }
 
         private void OnModifiedScale(Vector3 oldVal, Vector3 newVal) {
             // more convenient and cleaner to update the scale here than in the property setter block
@@ -193,7 +199,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
             else {
                 Vector3 change = newVal - oldVal;
-                foreach (HandlerData obj in this.GetHandlersData<HandlerData>()) {
+                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
                     Vector3 s = obj.Handler.Scale;
                     if (this.isEditingScaleX || this.isEditingScaleY || this.isEditingScaleZ) {
                         s += change;
@@ -206,46 +212,15 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             }
         }
 
-        private Quaternion GetQuaternionForYawPitchRoll() {
-            double radPitch = this.pitch * (Math.PI / 180.0);
-            double radYaw = this.yaw * (Math.PI / 180.0);
-            double radRoll = this.roll * (Math.PI / 180.0);
-            return Quaternion.CreateFromYawPitchRoll((float) radYaw, (float) radPitch, (float) radRoll);
-        }
-
         protected override void OnHandlersLoaded() {
             base.OnHandlersLoaded();
             if (this.IsEmpty) {
                 return;
             }
 
-            if (this.IsMultiSelection) {
-                this.pos = new Vector3();
-                this.scale = Vector3.One;
-                this.rot = Quaternion.Identity;
-            }
-            else {
-                SceneObjectViewModel first = (SceneObjectViewModel) this.Handlers[0];
-                this.pos = first.Pos;
-                this.scale = first.Scale;
-                this.rot = first.Rotation;
-            }
-
-            Quaternion q = this.rot;
-            // Extract yaw, pitch, and roll from the quaternion
-            double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
-            double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
-            this.roll = (float) (Math.Atan2(sinr_cosp, cosr_cosp) * (180.0 / Math.PI));
-
-            double sinp = 2 * (q.W * q.Y - q.Z * q.X);
-            if (Math.Abs(sinp) >= 1)
-                this.pitch = (float) (Math.Sign(sinp) * (Math.PI / 2) * (180.0 / Math.PI)); // Use 90 degrees if out of range
-            else
-                this.pitch = (float) (Math.Asin(sinp) * (180.0 / Math.PI));
-
-            double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
-            double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
-            this.yaw = (float) (Math.Atan2(siny_cosp, cosy_cosp) * (180.0 / Math.PI));
+            this.pos = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).Pos, out Vector3 a) ? a : Vector3.Zero;
+            this.scale = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).Scale, out Vector3 b) ? b : Vector3.One;
+            this.rot = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).PitchYawRoll, out Vector3 c) ? c : Vector3.Zero;
 
             this.RaisePropertyChanged(nameof(this.PosX));
             this.RaisePropertyChanged(nameof(this.PosY));
@@ -292,12 +267,12 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         //     }
         // }
 
-        protected override PropertyHandler NewHandler(object target) => new HandlerData((SceneObjectViewModel) target);
+        protected override PropertyHandler NewHandler(object target) => new TEHandlerData((SceneObjectViewModel) target);
 
-        private class HandlerData : PropertyHandler {
+        private class TEHandlerData : PropertyHandler {
             public new SceneObjectViewModel Handler => (SceneObjectViewModel) base.Target;
 
-            public HandlerData(object target) : base(target) {
+            public TEHandlerData(object target) : base(target) {
             }
         }
     }

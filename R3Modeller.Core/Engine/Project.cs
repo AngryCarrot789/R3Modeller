@@ -20,7 +20,7 @@ namespace R3Modeller.Core.Engine {
             project.Scene.Root.AddItem(floor);
 
             TriangleObject tri1 = new TriangleObject();
-            tri1.SetTransformation(new Vector3(1f, 0f, 0f), new Vector3(1.5f), Quaternion.Identity);
+            tri1.SetTransformation(new Vector3(1f, 0f, 0f), new Vector3(1.5f), Vector3.Zero);
 
             TriangleObject tri2 = new TriangleObject();
             tri2.RelativePosition = new Vector3(4, 2, 4);

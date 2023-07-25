@@ -13,9 +13,9 @@ namespace R3Modeller.Core.Engine.Utils {
         public LineObject(Vector3 a, Vector3 b) {
             this.shader = SharedShader ?? (SharedShader = new Shader(ResourceLocator.ReadFile("Shaders/LineShader.vert"), ResourceLocator.ReadFile("Shaders/LineShader.frag")));
             this.vao = GL.GenVertexArray();
-            this.vbo = GL.GenBuffer();
             GL.BindVertexArray(this.vao);
 
+            this.vbo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
             GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * 6, new[] {
                 a.X, a.Y, a.Z,

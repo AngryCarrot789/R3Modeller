@@ -25,11 +25,7 @@ namespace R3Modeller.Core {
                 throw new InvalidCastException($"The target service type '{typeof(T)}' is incompatible with actual service type '{(service == null ? "NULL" : service.GetType().Name)}'");
             }
 
-            #if DEBUG
             return default;
-            #else
-            throw new Exception($"No service registered with type: {typeof(T)}");
-            #endif
         }
 
         /// <summary>
@@ -47,11 +43,7 @@ namespace R3Modeller.Core {
                 throw new InvalidCastException($"The target service type '{type}' is incompatible with actual service type '{(service == null ? "NULL" : service.GetType().Name)}'");
             }
 
-            #if DEBUG
             return default;
-            #else
-            throw new Exception($"No service registered with type: {type}");
-            #endif
         }
 
         /// <summary>

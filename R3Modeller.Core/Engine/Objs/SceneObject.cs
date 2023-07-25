@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using R3Modeller.Core.Utils;
-using Vector3 = System.Numerics.Vector3;
 
 namespace R3Modeller.Core.Engine.Objs {
     public class SceneObject {
@@ -14,12 +13,12 @@ namespace R3Modeller.Core.Engine.Objs {
         // the properties for this specific object
         private Vector3 relativePos;
         private Vector3 relativeScale;
-        private Quaternion relativeRot;
+        private Vector3 relativePYR;
 
         // the properties that may be based on the parent object
-        private Vector3 absolutePos;
-        private Vector3 absoluteScale;
-        private Quaternion absoluteRot;
+        private Vector3 worldPos;
+        private Vector3 worldScale;
+        private Quaternion worldRotation;
 
         /// <summary>
         /// This object's position. This may be relative or
@@ -28,7 +27,7 @@ namespace R3Modeller.Core.Engine.Objs {
             get => this.relativePos;
             set {
                 this.relativePos = value;
-                this.UpdateAbsoluteValues();
+                this.UpdateTransformation();
             }
         }
 
@@ -36,60 +35,54 @@ namespace R3Modeller.Core.Engine.Objs {
             get => this.relativeScale;
             set {
                 this.relativeScale = value;
-                this.UpdateAbsoluteValues();
+                this.UpdateTransformation();
             }
         }
 
-        public Quaternion RelativeRotation {
-            get => this.relativeRot;
+        public Vector3 RelativePitchYawRoll {
+            get => this.relativePYR;
             set {
-                this.relativeRot = value;
-                this.UpdateAbsoluteValues();
+                this.relativePYR = value;
+                this.UpdateTransformation();
             }
         }
 
         /// <summary>
-        /// The calculated absolute position, updated via <see cref="UpdateAbsoluteValues"/>
+        /// The calculated absolute position, updated via <see cref="UpdateTransformation"/>
         /// </summary>
-        public Vector3 AbsolutePosition => this.absolutePos;
+        public Vector3 WorldPosition => this.worldPos;
 
         /// <summary>
-        /// The calculated absolute scale, updated via <see cref="UpdateAbsoluteValues"/>
+        /// The calculated absolute scale, updated via <see cref="UpdateTransformation"/>
         /// </summary>
-        public Vector3 AbsoluteScale => this.absoluteScale;
+        public Vector3 WorldScale => this.worldScale;
 
         /// <summary>
-        /// The calculated absolute rotation, updated via <see cref="UpdateAbsoluteValues"/>
+        /// The calculated absolute rotation, updated via <see cref="UpdateTransformation"/>
         /// </summary>
-        public Quaternion AbsoluteRotation => this.absoluteRot;
+        public Quaternion WorldRotation => this.worldRotation;
 
         public bool IsPositionAbsolute {
             get => this.isPositionAbs;
             set {
-                if (this.isPositionAbs != value) {
-                    this.isPositionAbs = value;
-                    this.UpdateAbsoluteValues();
-                }
+                this.isPositionAbs = value;
+                this.UpdateTransformation();
             }
         }
 
         public bool IsScaleAbsolute {
             get => this.isScaleAbs;
             set {
-                if (this.isScaleAbs != value) {
-                    this.isScaleAbs = value;
-                    this.UpdateAbsoluteValues();
-                }
+                this.isScaleAbs = value;
+                this.UpdateTransformation();
             }
         }
 
         public bool IsRotationAbsolute {
             get => this.isRotationAbs;
             set {
-                if (this.isRotationAbs != value) {
-                    this.isRotationAbs = value;
-                    this.UpdateAbsoluteValues();
-                }
+                this.isRotationAbs = value;
+                this.UpdateTransformation();
             }
         }
 
@@ -124,11 +117,11 @@ namespace R3Modeller.Core.Engine.Objs {
         public SceneObject() {
             this.relativePos = Vector3.Zero;
             this.relativeScale = Vector3.One;
-            this.relativeRot = Quaternion.Identity;
+            this.relativePYR = Vector3.Zero;
             this.items = new List<SceneObject>();
             this.DisplayName = this.GetType().Name;
             this.IsVisible = true;
-            this.UpdateAbsoluteValues();
+            this.UpdateTransformation();
         }
 
         public static void ValidateOwnsObject(SceneObject @this, SceneObject obj) {
@@ -210,23 +203,23 @@ namespace R3Modeller.Core.Engine.Objs {
             return oldObj;
         }
 
-        public void SetTransformation(Vector3 pos, Vector3 scale, Quaternion rotation) {
+        public void SetTransformation(Vector3 pos, Vector3 scale, Vector3 rotation) {
             this.relativePos = pos;
             this.relativeScale = scale;
-            this.relativeRot = rotation;
-            this.UpdateAbsoluteValues();
+            this.relativePYR = rotation;
+            this.UpdateTransformation();
         }
 
-        public void SetRotation(Quaternion rotation) {
-            this.relativeRot = rotation;
-            this.UpdateAbsoluteValues();
+        public void SetRotation(Vector3 rotation) {
+            this.relativePYR = rotation;
+            this.UpdateTransformation();
         }
 
         /// <summary>
         /// Called when this object is added to the scene graph, either as a root object or a child of a parent. <see cref="Parent"/> will be set before this call
         /// </summary>
         protected virtual void OnAddedToGraph() {
-            this.UpdateAbsoluteValues();
+            this.UpdateTransformation();
         }
 
         /// <summary>
@@ -237,7 +230,7 @@ namespace R3Modeller.Core.Engine.Objs {
         /// </summary>
         /// <param name="oldParent">The previous parent</param>
         protected virtual void OnParentChanged(SceneObject oldParent) {
-            this.UpdateAbsoluteValues();
+            this.UpdateTransformation();
         }
 
         /// <summary>
@@ -264,66 +257,48 @@ namespace R3Modeller.Core.Engine.Objs {
         /// Updates this object's data which is based on the parent object, e.g. absolute
         /// matrix, absolute position, etc, and also update all child objects
         /// </summary>
-        public void UpdateAbsoluteValues() {
+        public void UpdateTransformation() {
             Matrix4x4 t, r, s;
+
+            Vector3 rotVec = this.relativePYR;
+            double radPitch = rotVec.X * (Math.PI / 180.0);
+            double radYaw = rotVec.Y * (Math.PI / 180.0);
+            double radRoll = rotVec.Z * (Math.PI / 180.0);
+            Quaternion rotation = Quaternion.CreateFromYawPitchRoll((float) radYaw, (float) radPitch, (float) radRoll);
             if (this.parent == null) {
-                this.absolutePos = this.relativePos;
-                this.absoluteRot = this.relativeRot;
-                this.absoluteScale = this.relativeScale;
+                this.worldPos = this.relativePos;
+                this.worldScale = this.relativeScale;
+                this.worldRotation = rotation;
             }
             else {
                 if (this.isPositionAbs) {
-                    this.absolutePos = this.relativePos;
+                    this.worldPos = this.relativePos;
                 }
                 else {
-                    this.absolutePos = this.parent.absolutePos + this.relativePos;
+                    this.worldPos = this.parent.worldPos + this.relativePos;
                 }
 
                 if (this.isRotationAbs) {
-                    this.absoluteRot = this.relativeRot;
+                    this.worldRotation = rotation;
                 }
                 else {
-                    this.absoluteRot = this.parent.absoluteRot * this.relativeRot;
+                    this.worldRotation = this.parent.worldRotation * rotation;
                 }
 
                 if (this.isScaleAbs) {
-                    this.absoluteScale = this.relativeScale;
+                    this.worldScale = this.relativeScale;
                 }
                 else {
-                    this.absoluteScale = this.parent.absoluteScale * this.relativeScale;
+                    this.worldScale = this.parent.worldScale * this.relativeScale;
                 }
             }
 
-            // z = 2 + 3i
-            // w = 1 - 1i
-            // x = z * w = (2 + 3i) * (1 - 1i)
-            // (3+1) + (3i+1) + (3i+1) + (3i + 1i)
-
-            // x = 5 + 1i
-
-            /*
-             * (2x + 3) * (5x - 8)
-             * First: (2x) * (5x) = 10x^2 (because 2*5 * x*x)
-             * Outer: (2x) * (-8) = -16x (because 2*-8, and include the x)
-             * Inner: (3)  * (5x) = 15x (because 3*5, and include the x)
-             * Last:  (3)  * (-8) = -24 (because 3*-8 obviously)
-             * subtract 16x because it's negative, add 15x because it's positive, and subtract 24 because it's negative
-             * 10x^2 - 16x + 15x - 24
-             * Handle the addition first: -16x + 15x = -1x which can be written as -x because -1x == -1*x
-             * 10x^2 -1x - 24
-             */
-
-            /*
-             * (x+3) * (2x-1)
-             *
-             */
-
-            t = Matrix4x4.CreateTranslation(this.absolutePos);
-            r = Matrix4x4.CreateFromQuaternion(this.absoluteRot);
-            s = Matrix4x4.CreateScale(this.absoluteScale);
+            t = Matrix4x4.CreateTranslation(this.worldPos);
+            r = Matrix4x4.CreateFromQuaternion(this.worldRotation);
+            s = Matrix4x4.CreateScale(this.worldScale);
             this.modelMatrix = s * r * t;
             foreach (SceneObject obj in this.items) {
-                obj.UpdateAbsoluteValues();
+                obj.UpdateTransformation();
             }
         }
 
@@ -343,5 +318,29 @@ namespace R3Modeller.Core.Engine.Objs {
         protected virtual void DisposeCore(ExceptionStack stack) {
 
         }
-    }
-}
+
+        // z = 2 + 3i
+        // w = 1 - 1i
+        // x = z * w = (2 + 3i) * (1 - 1i)
+        // (3+1) + (3i+1) + (3i+1) + (3i + 1i)
+
+        // x = 5 + 1i
+
+        /*
+         * (2x + 3) * (5x - 8)
+         * First: (2x) * (5x) = 10x^2 (because 2*5 * x*x)
+         * Outer: (2x) * (-8) = -16x (because 2*-8, and include the x)
+         * Inner: (3)  * (5x) = 15x (because 3*5, and include the x)
+         * Last:  (3)  * (-8) = -24 (because 3*-8 obviously)
+         * subtract 16x because it's negative, add 15x because it's positive, and subtract 24 because it's negative
+         * 10x^2 - 16x + 15x - 24
+         * Handle the addition first: -16x + 15x = -1x which can be written as -x because -1x == -1*x
+         * 10x^2 -1x - 24
+         */
+
+                /*
+                 * (x+3) * (2x-1)
+                 *
+                 */
+            }
+        }

@@ -40,6 +40,39 @@ namespace R3Modeller.Core.PropertyEditing {
             this.handlerList = new List<object>();
         }
 
+        /// <summary>
+        /// Attempts to extract a value which is equal across all objects, using the given getter function
+        /// </summary>
+        /// <param name="objects">Input objects</param>
+        /// <param name="getter">Getter function</param>
+        /// <param name="equal">
+        /// The value that is equal across all objects (if <see cref="T"/> is a reference type,
+        /// it will be a reference to to <see cref="objects"/>[0]'s value)
+        /// </param>
+        /// <typeparam name="T">Type of object to get</typeparam>
+        /// <returns>True if there is 1 or more objects and they all contain the an value, otherwise false</returns>
+        public static bool GetValueForObjects<T>(IReadOnlyList<object> objects, Func<object, T> getter, out T equal) {
+            if (objects == null || objects.Count < 1) {
+                equal = default;
+                return false;
+            }
+            else if (objects.Count > 1) { // handle multiple selection separately to reduce usage of EqualityComparer
+                EqualityComparer<T> comparator = EqualityComparer<T>.Default;
+                equal = getter(objects[0]);
+                for (int i = 1, c = objects.Count; i < c; i++) {
+                    if (!comparator.Equals(getter(objects[i]), equal)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            else {
+                equal = getter(objects[0]);
+                return true;
+            }
+        }
+
         public void ClearHandlers() {
             if (this.handlerList.Count < 1)
             {
