@@ -97,8 +97,9 @@ namespace R3Modeller.Viewport {
         protected override void OnPreviewKeyDown(KeyEventArgs e) {
             base.OnPreviewKeyDown(e);
             switch (e.Key) {
-                case Key.LeftCtrl: {
-                    if (!e.IsRepeat) {
+                case Key.System: {
+                    if (!e.IsRepeat && (e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt)) {
+                        e.Handled = true;
                         this.mousePosBeforeOrbitEnabled = Mouse.GetPosition(this);
                         this.isOrbitActive = true;
                         this.UpdateCursor();
@@ -114,8 +115,9 @@ namespace R3Modeller.Viewport {
         protected override void OnPreviewKeyUp(KeyEventArgs e) {
             base.OnPreviewKeyUp(e);
             switch (e.Key) {
-                case Key.LeftCtrl: {
-                    if (!e.IsRepeat) {
+                case Key.System: {
+                    if (!e.IsRepeat && (e.SystemKey == Key.LeftAlt || e.SystemKey == Key.RightAlt)) {
+                        e.Handled = true;
                         this.isOrbitActive = false;
                         this.UpdateCursor();
                         this.InvalidateRender();
@@ -125,8 +127,6 @@ namespace R3Modeller.Viewport {
                 }
                 default: return;
             }
-
-            e.Handled = true;
         }
 
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e) {
@@ -194,7 +194,7 @@ namespace R3Modeller.Viewport {
                 return;
             }
 
-            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl)) {
+            if (this.isOrbitActive && !Keyboard.IsKeyDown(Key.LeftAlt) && !Keyboard.IsKeyDown(Key.RightAlt)) {
                 this.isOrbitActive = false;
                 this.UpdateCursor();
             }

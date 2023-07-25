@@ -43,9 +43,10 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
                     <ColumnDefinition Width="300"/>
                 </Grid.ColumnDefinitions>
-                <Grid>
+                <Grid Grid.Column="0">
                     <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}" FocusVisualStyle="{x:Null}"/>
                     <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
                                        VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="5000"
@@ -60,7 +61,7 @@
                                        EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
                                        TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
                 </Grid>
-                <Border BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="1,0,0,0" Grid.Column="1" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                <Border Grid.Column="2" BorderThickness="0" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
@@ -212,6 +213,8 @@
                         </Border>
                     </Grid>
                 </Border>
+                <Border Grid.Column="1" Background="{DynamicResource BrushPanelGap}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
+                <GridSplitter ResizeDirection="Columns" Grid.Column="1" Margin="-4,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0"/>
             </Grid>
         </DockPanel>
         <Popup x:Name="NotificationPanelPopup" StaysOpen="True" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">

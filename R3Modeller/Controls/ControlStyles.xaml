@@ -18,6 +18,7 @@
     </Style>
 
     <Style TargetType="{x:Type dragger:NumberDragger}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Focusable" Value="True"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -42,6 +43,7 @@
     </Style>
 
     <Style x:Key="AbletonNumberDraggerStyle" TargetType="{x:Type dragger:NumberDragger}" BasedOn="{StaticResource {x:Type dragger:NumberDragger}}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
         <Setter Property="Background" Value="{DynamicResource PanelBackground2}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BrushPanelGap}"/>
         <Setter Property="BorderThickness" Value="1"/>

@@ -9,9 +9,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle Margin="2" SnapsToDevicePixels="true"
-                               Stroke="{DynamicResource ABrush.ColourfulGlyph.Static}"
-                               StrokeThickness="1" StrokeDashArray="1 2" />
+                    <Border BorderBrush="{DynamicResource ABrush.AccentTone3.Border.Static}" BorderThickness="2" Margin="0" SnapsToDevicePixels="true" Opacity="0.8"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
