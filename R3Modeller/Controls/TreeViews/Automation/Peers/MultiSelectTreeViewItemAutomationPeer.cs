@@ -58,6 +58,15 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
 
         #endregion Constructor
 
+        #region IInvokeProvider members
+
+        public void Invoke() {
+            MultiSelectTreeViewItem treeViewItem = (MultiSelectTreeViewItem) this.Owner;
+            treeViewItem.InvokeMouseDown();
+        }
+
+        #endregion IInvokeProvider members
+
         protected override Rect GetBoundingRectangleCore() {
             var treeViewItem = (MultiSelectTreeViewItem) this.Owner;
             var contentPresenter = GetContentPresenter(treeViewItem);
@@ -151,15 +160,6 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
                 }
             }
         }
-
-        #region IInvokeProvider members
-
-        public void Invoke() {
-            MultiSelectTreeViewItem treeViewItem = (MultiSelectTreeViewItem) this.Owner;
-            treeViewItem.InvokeMouseDown();
-        }
-
-        #endregion IInvokeProvider members
 
         #region Explicit interface properties
 

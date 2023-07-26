@@ -49,9 +49,9 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         public PreviewSelectionChangedEventArgs(bool selecting, object item) {
 #if DEBUG
-			// Make sure we don't confuse MultiSelectTreeViewItems and their DataContexts while development
-			if (item is MultiSelectTreeViewItem)
-				throw new ArgumentException("The selection preview event was passed a MultiSelectTreeViewItem instance. Only their DataContext instances must be used here!");
+            // Make sure we don't confuse MultiSelectTreeViewItems and their DataContexts while development
+            if (item is MultiSelectTreeViewItem)
+                throw new ArgumentException("The selection preview event was passed a MultiSelectTreeViewItem instance. Only their DataContext instances must be used here!");
 #endif
 
             this.Selecting = selecting;

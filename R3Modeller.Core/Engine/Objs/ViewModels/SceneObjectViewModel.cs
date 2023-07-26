@@ -24,10 +24,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             get => this.Model.RelativePosition;
             set {
                 this.Model.RelativePosition = value;
-                this.RaisePropertyChanged(nameof(this.Pos));
-                this.RaisePropertyChanged(nameof(this.PosX));
-                this.RaisePropertyChanged(nameof(this.PosY));
-                this.RaisePropertyChanged(nameof(this.PosZ));
+                this.RaisePositionChanged();
                 this.Project.OnRenderInvalidated();
             }
         }
@@ -36,10 +33,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             get => this.Model.RelativePitchYawRoll;
             set {
                 this.Model.SetRotation(value);
-                this.RaisePropertyChanged(nameof(this.PitchYawRoll));
-                this.RaisePropertyChanged(nameof(this.Pitch));
-                this.RaisePropertyChanged(nameof(this.Yaw));
-                this.RaisePropertyChanged(nameof(this.Roll));
+                this.RaiseRotationChanged();
                 this.Project.OnRenderInvalidated();
             }
         }
@@ -48,10 +42,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             get => this.Model.RelativeScale;
             set {
                 this.Model.RelativeScale = value;
-                this.RaisePropertyChanged(nameof(this.Scale));
-                this.RaisePropertyChanged(nameof(this.ScaleX));
-                this.RaisePropertyChanged(nameof(this.ScaleY));
-                this.RaisePropertyChanged(nameof(this.ScaleZ));
+                this.RaiseScaleChanged();
                 this.Project.OnRenderInvalidated();
             }
         }
@@ -66,6 +57,12 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
         public float ScaleY { get => this.Scale.Y; set => this.Scale = this.Scale.WithY(value); }
         public float ScaleZ { get => this.Scale.Z; set => this.Scale = this.Scale.WithZ(value); }
 
+        // public float AbsoluteWorldPosX => this.Model.WorldPosition.X;
+        // public float AbsoluteWorldPosY => this.Model.WorldPosition.Y;
+        // public float AbsoluteWorldPosZ => this.Model.WorldPosition.Z;
+        // public float AbsoluteWorldScaleX => this.Model.WorldScale.X;
+        // public float AbsoluteWorldScaleY => this.Model.WorldScale.Y;
+        // public float AbsoluteWorldScaleZ => this.Model.WorldScale.Z;
 
         public bool IsPositionAbsolute {
             get => this.Model.IsPositionAbsolute;
@@ -74,10 +71,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                     return;
                 this.Model.IsPositionAbsolute = value;
                 this.RaisePropertyChanged();
-                this.RaisePropertyChanged(nameof(this.Pos));
-                this.RaisePropertyChanged(nameof(this.PosX));
-                this.RaisePropertyChanged(nameof(this.PosY));
-                this.RaisePropertyChanged(nameof(this.PosZ));
+                this.RaisePositionChanged();
             }
         }
 
@@ -88,10 +82,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                     return;
                 this.Model.IsScaleAbsolute = value;
                 this.RaisePropertyChanged();
-                this.RaisePropertyChanged(nameof(this.Scale));
-                this.RaisePropertyChanged(nameof(this.ScaleX));
-                this.RaisePropertyChanged(nameof(this.ScaleY));
-                this.RaisePropertyChanged(nameof(this.ScaleZ));
+                this.RaiseScaleChanged();
             }
         }
 
@@ -102,10 +93,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                     return;
                 this.Model.IsRotationAbsolute = value;
                 this.RaisePropertyChanged();
-                this.RaisePropertyChanged(nameof(this.PitchYawRoll));
-                this.RaisePropertyChanged(nameof(this.Pitch));
-                this.RaisePropertyChanged(nameof(this.Yaw));
-                this.RaisePropertyChanged(nameof(this.Roll));
+                this.RaiseRotationChanged();
             }
         }
 
@@ -142,6 +130,14 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             get => this.Model.IsVisible;
             set {
                 this.RaisePropertyChanged(ref this.Model.IsVisible, value);
+                this.Project.OnRenderInvalidated();
+            }
+        }
+
+        public bool IsObjectSelected {
+            get => this.Model.IsObjectSelected;
+            set {
+                this.RaisePropertyChanged(ref this.Model.IsObjectSelected, value);
                 this.Project.OnRenderInvalidated();
             }
         }
@@ -187,6 +183,27 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
             foreach (SceneObjectViewModel obj in this.children) {
                 obj.SetProject(project);
             }
+        }
+
+        public void RaisePositionChanged() {
+            this.RaisePropertyChanged(nameof(this.Pos));
+            this.RaisePropertyChanged(nameof(this.PosX));
+            this.RaisePropertyChanged(nameof(this.PosY));
+            this.RaisePropertyChanged(nameof(this.PosZ));
+        }
+
+        public void RaiseScaleChanged() {
+            this.RaisePropertyChanged(nameof(this.Scale));
+            this.RaisePropertyChanged(nameof(this.ScaleX));
+            this.RaisePropertyChanged(nameof(this.ScaleY));
+            this.RaisePropertyChanged(nameof(this.ScaleZ));
+        }
+
+        public void RaiseRotationChanged() {
+            this.RaisePropertyChanged(nameof(this.PitchYawRoll));
+            this.RaisePropertyChanged(nameof(this.Pitch));
+            this.RaisePropertyChanged(nameof(this.Yaw));
+            this.RaisePropertyChanged(nameof(this.Roll));
         }
     }
 }

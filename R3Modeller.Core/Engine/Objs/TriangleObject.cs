@@ -1,4 +1,5 @@
 using System.Numerics;
+using OpenTK.Graphics.OpenGL;
 using R3Modeller.Core.Engine.Meshes;
 using R3Modeller.Core.Engine.Utils;
 using R3Modeller.Core.Utils;
@@ -31,6 +32,14 @@ namespace R3Modeller.Core.Engine.Objs {
 
             // Draw mesh
             this.mesh.DrawTriangles();
+
+            if (this.IsObjectSelected) {
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+                this.shader.SetUniformVec3("in_color", new Vector3(1f, 1f, 1f));
+                this.mesh.DrawTriangles();
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            }
+
             this.RenderChildren(camera);
         }
 

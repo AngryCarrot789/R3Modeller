@@ -71,7 +71,7 @@
                                 <DataTemplate DataType="{x:Type vm:SceneObjectViewModel}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="52"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
@@ -95,6 +95,7 @@
                                             <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontWeight="Bold" TextDecorations="Underline"/>
                                         </Grid>
 
+                                        <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Relative"/>
                                         <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="X"/>
                                         <TextBlock Grid.Row="1" Grid.Column="2" TextAlignment="Center" Text="Y"/>
                                         <TextBlock Grid.Row="1" Grid.Column="3" TextAlignment="Center" Text="Z"/>
@@ -127,7 +128,7 @@
                         <c:MultiSelectTreeView DataContext="{Binding Project.Scene}"
                                                SelectedItems="{Binding SelectedItems, Mode=OneWay}" Grid.Row="0"
                                                ItemsSource="{Binding RootObject.Children}"
-                                               BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0 1 0 0">
+                                               BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0">
                             <c:MultiSelectTreeView.Style>
                                 <Style TargetType="{x:Type c:MultiSelectTreeView}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeView}}">
                                     <Setter Property="Background" Value="{DynamicResource TreeView.Static.Background}"/>
@@ -163,6 +164,20 @@
                                     <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
                                     <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
                                     <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                    <Setter Property="IsSelected" Value="{Binding IsObjectSelected, Mode=OneWayToSource}"/>
+                                    <!--
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding (VirtualizingStackPanel.IsVirtualizing), RelativeSource={RelativeSource AncestorType={x:Type c:MultiSelectTreeView}}, FallbackValue=True}" Value="True">
+                                            <Setter Property="ItemsControl.ItemsPanel">
+                                                <Setter.Value>
+                                                    <ItemsPanelTemplate>
+                                                        <VirtualizingStackPanel IsItemsHost="True" />
+                                                    </ItemsPanelTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    -->
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>

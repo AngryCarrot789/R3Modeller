@@ -18,7 +18,6 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         public static void Focus(MultiSelectTreeViewItem element, bool bringIntoView = false) {
             //System.Diagnostics.Debug.WriteLine("FocusHelper focusing " + (bringIntoView ? "[into view] " : "") + element.DataContext);
             FocusCore(element);
-
             if (bringIntoView) {
                 FrameworkElement itemContent = (FrameworkElement) element.Template.FindName("headerBorder", element);
                 if (itemContent != null) // May not be rendered yet...
@@ -43,23 +42,16 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             }
 
 #if DEBUG
-			// no good idea, seems to block sometimes
-			int i = 0;
-			while (i < 5)
-			{
-				if (element.IsFocused)
-				{
-					//if (i > 0)
-					//    System.Diagnostics.Debug.WriteLine("- Element is focused now in round " + i + ", leaving");
-					return;
-				}
-				Thread.Sleep(20);
-				i++;
-			}
-			//if (i >= 5)
-			//{
-			//    System.Diagnostics.Debug.WriteLine("- Element is not focused after 500 ms, giving up");
-			//}
+            // no good idea, seems to block sometimes
+            int i = 0;
+            while (i < 5) {
+                if (element.IsFocused) {
+                    return;
+                }
+
+                Thread.Sleep(20);
+                i++;
+            }
 #endif
         }
 

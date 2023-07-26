@@ -524,18 +524,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\Shaders\pink.frag" />
-    <None Include="Resources\Shaders\pink.vert" />
-    <None Include="Resources\Shaders\rgb.frag" />
-    <None Include="Resources\Shaders\rgb.vert" />
-    <None Include="Resources\Shaders\sky.frag" />
-    <None Include="Resources\Shaders\sky.vert" />
-    <None Include="Resources\Shaders\texture.frag" />
-    <None Include="Resources\Shaders\texture.vert" />
-    <None Include="Resources\Shaders\textureatlas.frag" />
-    <None Include="Resources\Shaders\textureatlas.vert" />
-    <None Include="Resources\Shaders\xyz.frag" />
-    <None Include="Resources\Shaders\xyz.vert" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -560,7 +548,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.NativeAssets.macOS.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.macOS.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.macOS.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.macOS.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -571,4 +558,7 @@
     <Error Condition="!Exists('..\packages\SkiaSharp.NativeAssets.Win32.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.Win32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.NativeAssets.Win32.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.Win32.targets'))" />
   </Target>
   <Import Project="..\packages\SkiaSharp.NativeAssets.Win32.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.Win32.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(SolutionDir)Assets" "$(TargetDir)Assets" /E /I /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>

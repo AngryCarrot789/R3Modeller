@@ -22,15 +22,15 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         // TODO: Provide more details. Fire once for every single change and once for all groups of changes, with different flags
         public event EventHandler SelectionChanged;
 
-        public static readonly DependencyProperty BackgroundSelectionRectangleProperty =  DependencyProperty.Register("BackgroundSelectionRectangle",  typeof(Brush),  typeof(MultiSelectTreeView), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(0x60, 0x33, 0x99, 0xFF))));
-        public static readonly DependencyProperty BorderBrushSelectionRectangleProperty = DependencyProperty.Register("BorderBrushSelectionRectangle", typeof(Brush),  typeof(MultiSelectTreeView), new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x33, 0x99, 0xFF))));
-        public static readonly DependencyProperty HoverHighlightingProperty =             DependencyProperty.Register("HoverHighlighting",             typeof(bool),   typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.True));
-        public static readonly DependencyProperty VerticalRulersProperty =                DependencyProperty.Register("VerticalRulers",                typeof(bool),   typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
-        public static readonly DependencyProperty ItemIndentProperty =                    DependencyProperty.Register("ItemIndent",                    typeof(int),    typeof(MultiSelectTreeView), new PropertyMetadata(13));
-        public static readonly DependencyProperty IsKeyboardModeProperty =                DependencyProperty.Register("IsKeyboardMode",                typeof(bool),   typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
-        public static readonly DependencyProperty SelectedItemsProperty =                 DependencyProperty.Register("SelectedItems",                 typeof(IList),  typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedItemsPropertyChanged));
-        public static readonly DependencyProperty AllowEditItemsProperty =                DependencyProperty.Register("AllowEditItems",                typeof(bool),   typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
-        private static readonly DependencyPropertyKey LastSelectedItemPropertyKey =       DependencyProperty.RegisterReadOnly("LastSelectedItem",      typeof(object), typeof(MultiSelectTreeView), new PropertyMetadata(null));
+        public static readonly DependencyProperty BackgroundSelectionRectangleProperty = DependencyProperty.Register("BackgroundSelectionRectangle", typeof(Brush), typeof(MultiSelectTreeView), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(0x60, 0x33, 0x99, 0xFF))));
+        public static readonly DependencyProperty BorderBrushSelectionRectangleProperty = DependencyProperty.Register("BorderBrushSelectionRectangle", typeof(Brush), typeof(MultiSelectTreeView), new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x33, 0x99, 0xFF))));
+        public static readonly DependencyProperty HoverHighlightingProperty = DependencyProperty.Register("HoverHighlighting", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.True));
+        public static readonly DependencyProperty VerticalRulersProperty = DependencyProperty.Register("VerticalRulers", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty ItemIndentProperty = DependencyProperty.Register("ItemIndent", typeof(int), typeof(MultiSelectTreeView), new PropertyMetadata(13));
+        public static readonly DependencyProperty IsKeyboardModeProperty = DependencyProperty.Register("IsKeyboardMode", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedItemsPropertyChanged));
+        public static readonly DependencyProperty AllowEditItemsProperty = DependencyProperty.Register("AllowEditItems", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(BoolBox.False));
+        private static readonly DependencyPropertyKey LastSelectedItemPropertyKey = DependencyProperty.RegisterReadOnly("LastSelectedItem", typeof(object), typeof(MultiSelectTreeView), new PropertyMetadata(null));
 
         #endregion
 
@@ -486,9 +486,9 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             switch (e.Action) {
                 case NotifyCollectionChangedAction.Add:
 #if DEBUG
-					// Make sure we don't confuse MultiSelectTreeViewItems and their DataContexts while development
-					if (e.NewItems.OfType<MultiSelectTreeViewItem>().Any())
-						throw new ArgumentException("A MultiSelectTreeViewItem instance was added to the SelectedItems collection. Only their DataContext instances must be added to this list!");
+                    // Make sure we don't confuse MultiSelectTreeViewItems and their DataContexts while development
+                    if (e.NewItems.OfType<MultiSelectTreeViewItem>().Any())
+                        throw new ArgumentException("A MultiSelectTreeViewItem instance was added to the SelectedItems collection. Only their DataContext instances must be added to this list!");
 #endif
                     object last = null;
                     foreach (var item in this.GetTreeViewItemsFor(e.NewItems)) {

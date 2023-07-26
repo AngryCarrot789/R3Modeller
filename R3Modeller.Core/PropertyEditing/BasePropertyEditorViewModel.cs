@@ -46,8 +46,7 @@ namespace R3Modeller.Core.PropertyEditing {
         /// <param name="objects">Input objects</param>
         /// <param name="getter">Getter function</param>
         /// <param name="equal">
-        /// The value that is equal across all objects (if <see cref="T"/> is a reference type,
-        /// it will be a reference to to <see cref="objects"/>[0]'s value)
+        /// The value that is equal across all objects (will be set to <see cref="objects"/>[0]'s value)
         /// </param>
         /// <typeparam name="T">Type of object to get</typeparam>
         /// <returns>True if there is 1 or more objects and they all contain the an value, otherwise false</returns>

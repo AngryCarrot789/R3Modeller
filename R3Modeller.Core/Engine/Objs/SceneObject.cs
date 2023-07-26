@@ -107,6 +107,7 @@ namespace R3Modeller.Core.Engine.Objs {
 
         public string DisplayName;
         public bool IsVisible;
+        public bool IsObjectSelected;
 
         /// <summary>
         /// Whether or not this is this root scene object container. The scene graph is stored in a single

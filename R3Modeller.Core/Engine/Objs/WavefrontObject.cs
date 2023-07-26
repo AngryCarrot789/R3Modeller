@@ -132,6 +132,13 @@ namespace R3Modeller.Core.Engine.Objs {
 
             GL.BindVertexArray(this.vao);
             GL.DrawElements(PrimitiveType.Triangles, this.indicesCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            if (this.IsObjectSelected) {
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+                this.shader.SetUniformVec3("in_color", new Vector3(1f, 1f, 1f));
+                GL.DrawElements(PrimitiveType.Triangles, this.indicesCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            }
+
             GL.BindVertexArray(0);
 
             this.RenderChildren(camera);
