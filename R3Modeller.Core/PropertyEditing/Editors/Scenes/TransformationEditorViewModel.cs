@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Windows.Input;
 using R3Modeller.Core.Engine.Objs.ViewModels;
@@ -13,26 +14,11 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         // A lot of this code may end up being duplicated between the scene object view model and this class...
 
         public float PosX { get => this.pos.X; set => this.OnModifiedPos(this.pos, this.pos.WithX(value)); }
-
         public float PosY { get => this.pos.Y; set => this.OnModifiedPos(this.pos, this.pos.WithY(value)); }
-
         public float PosZ { get => this.pos.Z; set => this.OnModifiedPos(this.pos, this.pos.WithZ(value)); }
-
-        public float Pitch {
-            get => this.rot.X;
-            set => this.OnModifiedRotation(this.rot, this.rot.WithX(value));
-        }
-
-        public float Yaw {
-            get => this.rot.Y;
-            set => this.OnModifiedRotation(this.rot, this.rot.WithY(value));
-        }
-
-        public float Roll {
-            get => this.rot.Z;
-            set => this.OnModifiedRotation(this.rot, this.rot.WithZ(value));
-        }
-
+        public float Pitch { get => this.rot.X; set => this.OnModifiedRotation(this.rot, this.rot.WithX(value)); }
+        public float Yaw { get => this.rot.Y; set => this.OnModifiedRotation(this.rot, this.rot.WithY(value)); }
+        public float Roll { get => this.rot.Z; set => this.OnModifiedRotation(this.rot, this.rot.WithZ(value)); }
         public float ScaleX { get => this.scale.X; set => this.OnModifiedScale(this.scale, this.scale.WithX(value)); }
         public float ScaleY { get => this.scale.Y; set => this.OnModifiedScale(this.scale, this.scale.WithY(value)); }
         public float ScaleZ { get => this.scale.Z; set => this.OnModifiedScale(this.scale, this.scale.WithZ(value)); }
@@ -92,65 +78,37 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         }
 
 #if RELEASE
-        public override bool IsApplicable(object value) {
-            return value is SceneObjectViewModel;
-        }
+        public override bool IsApplicable(object value) => value is SceneObjectViewModel;
 #endif
 
         private void OnModifiedPos(Vector3 oldVal, Vector3 newVal) {
-            // more convenient and cleaner to update the pos here than in the property setter block
             this.pos = newVal;
-            this.RaisePropertyChanged(nameof(this.PosX));
-            this.RaisePropertyChanged(nameof(this.PosY));
-            this.RaisePropertyChanged(nameof(this.PosZ));
-            if (this.IsEmpty) {
-                return;
-            }
-
-            if (this.Handlers.Count == 1) {
-                ((SceneObjectViewModel) this.Handlers[0]).Pos = newVal;
+            this.RaisePositionChanged();
+            if (this.Handlers.Count > 1 && (this.isEditingPosX || this.isEditingPosY || this.isEditingPosZ)) {
+                Vector3 change = newVal - oldVal;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).Pos += change;
+                }
             }
             else {
-                Vector3 change = newVal - oldVal;
-                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
-                    Vector3 p = obj.Handler.Pos;
-                    if (this.isEditingPosX || this.isEditingPosY || this.isEditingPosZ) {
-                        p += change;
-                    }
-                    else {
-                        p = newVal;
-                    }
-
-                    obj.Handler.Pos = p;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).Pos = newVal;
                 }
             }
         }
 
         private void OnModifiedRotation(Vector3 oldVal, Vector3 newVal) {
-            // more convenient and cleaner to update the pos here than in the property setter block
             this.rot = newVal;
-            this.RaisePropertyChanged(nameof(this.Pitch));
-            this.RaisePropertyChanged(nameof(this.Yaw));
-            this.RaisePropertyChanged(nameof(this.Roll));
-            if (this.IsEmpty) {
-                return;
-            }
-
-            if (this.Handlers.Count == 1) {
-                ((SceneObjectViewModel) this.Handlers[0]).PitchYawRoll = newVal;
+            this.RaiseRotationChanged();
+            if (this.Handlers.Count > 1 && (this.isEditingYaw || this.isEditingPitch || this.isEditingRoll)) {
+                Vector3 change = newVal - oldVal;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).PitchYawRoll += change;
+                }
             }
             else {
-                Vector3 change = newVal - oldVal;
-                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
-                    Vector3 rotation;
-                    if (this.isEditingYaw || this.isEditingPitch || this.isEditingRoll) {
-                        rotation = obj.Handler.PitchYawRoll + change;
-                    }
-                    else {
-                        rotation = newVal;
-                    }
-
-                    obj.Handler.PitchYawRoll = rotation;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).PitchYawRoll = newVal;
                 }
             }
         }
@@ -185,29 +143,17 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         // }
 
         private void OnModifiedScale(Vector3 oldVal, Vector3 newVal) {
-            // more convenient and cleaner to update the scale here than in the property setter block
             this.scale = newVal;
-            this.RaisePropertyChanged(nameof(this.ScaleX));
-            this.RaisePropertyChanged(nameof(this.ScaleY));
-            this.RaisePropertyChanged(nameof(this.ScaleZ));
-            if (this.IsEmpty) {
-                return;
-            }
-
-            if (this.Handlers.Count == 1) {
-                ((SceneObjectViewModel) this.Handlers[0]).Scale = newVal;
+            this.RaiseScaleChanged();
+            if (this.Handlers.Count > 1 && (this.isEditingScaleX || this.isEditingScaleY || this.isEditingScaleZ)) {
+                Vector3 change = newVal - oldVal;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).Scale += change;
+                }
             }
             else {
-                Vector3 change = newVal - oldVal;
-                foreach (TEHandlerData obj in this.GetHandlersData<TEHandlerData>()) {
-                    Vector3 s = obj.Handler.Scale;
-                    if (this.isEditingScaleX || this.isEditingScaleY || this.isEditingScaleZ) {
-                        s += change;
-                    }
-                    else {
-                        s = newVal;
-                    }
-                    obj.Handler.Scale = s;
+                foreach (object target in this.Handlers) {
+                    ((SceneObjectViewModel) target).Scale = newVal;
                 }
             }
         }
@@ -222,50 +168,28 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             this.scale = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).Scale, out Vector3 b) ? b : Vector3.One;
             this.rot = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).PitchYawRoll, out Vector3 c) ? c : Vector3.Zero;
 
+            this.RaisePositionChanged();
+            this.RaiseRotationChanged();
+            this.RaiseScaleChanged();
+        }
+
+        private void RaisePositionChanged() {
             this.RaisePropertyChanged(nameof(this.PosX));
             this.RaisePropertyChanged(nameof(this.PosY));
             this.RaisePropertyChanged(nameof(this.PosZ));
-            this.RaisePropertyChanged(nameof(this.ScaleX));
-            this.RaisePropertyChanged(nameof(this.ScaleY));
-            this.RaisePropertyChanged(nameof(this.ScaleZ));
+        }
+
+        private void RaiseRotationChanged() {
             this.RaisePropertyChanged(nameof(this.Pitch));
             this.RaisePropertyChanged(nameof(this.Yaw));
             this.RaisePropertyChanged(nameof(this.Roll));
-            // foreach (object handler in this.Handlers) {
-            //     ((INotifyPropertyChanged) handler).PropertyChanged += this.handlerPropertyChangedEventHandler;
-            // }
         }
 
-        protected override void OnClearHandlers() {
-            base.OnClearHandlers();
-            // foreach (object handler in this.Handlers) {
-            //     ((INotifyPropertyChanged) handler).PropertyChanged -= this.handlerPropertyChangedEventHandler;
-            // }
+        private void RaiseScaleChanged() {
+            this.RaisePropertyChanged(nameof(this.ScaleX));
+            this.RaisePropertyChanged(nameof(this.ScaleY));
+            this.RaisePropertyChanged(nameof(this.ScaleZ));
         }
-
-        // private void OnHandlerPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        //     switch (e.PropertyName) {
-        //         case nameof(SceneObjectViewModel.Pos): {
-        //             this.pos = ((SceneObjectViewModel) sender).Pos;
-        //             this.RaisePropertyChanged(nameof(this.PosX));
-        //             this.RaisePropertyChanged(nameof(this.PosY));
-        //             this.RaisePropertyChanged(nameof(this.PosZ));
-        //             break;
-        //         }
-        //         case nameof(SceneObjectViewModel.Scale): {
-        //             this.RaisePropertyChanged(nameof(this.ScaleX));
-        //             this.RaisePropertyChanged(nameof(this.ScaleY));
-        //             this.RaisePropertyChanged(nameof(this.ScaleZ));
-        //             break;
-        //         }
-        //         case nameof(SceneObjectViewModel.Rotation): {
-        //             this.RaisePropertyChanged(nameof(this.Pitch));
-        //             this.RaisePropertyChanged(nameof(this.Yaw));
-        //             this.RaisePropertyChanged(nameof(this.Roll));
-        //             break;
-        //         }
-        //     }
-        // }
 
         protected override PropertyHandler NewHandler(object target) => new TEHandlerData((SceneObjectViewModel) target);
 

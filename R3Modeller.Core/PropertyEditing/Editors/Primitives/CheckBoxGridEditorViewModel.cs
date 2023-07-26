@@ -15,20 +15,16 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
             this.Editors.Add(editor);
         }
 
-        protected override void OnHandlersLoaded()
-        {
+        protected override void OnHandlersLoaded() {
             base.OnHandlersLoaded();
-            foreach (CheckBoxEditorViewModel editor in this.Editors)
-            {
+            foreach (CheckBoxEditorViewModel editor in this.Editors) {
                 editor.LoadHandlers(this.Handlers);
             }
         }
 
-        protected override void OnClearHandlers()
-        {
+        protected override void OnClearHandlers() {
             base.OnClearHandlers();
-            foreach (CheckBoxEditorViewModel editor in this.Editors)
-            {
+            foreach (CheckBoxEditorViewModel editor in this.Editors) {
                 editor.ClearHandlers();
             }
         }

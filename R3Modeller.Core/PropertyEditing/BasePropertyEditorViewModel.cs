@@ -55,7 +55,8 @@ namespace R3Modeller.Core.PropertyEditing {
                 equal = default;
                 return false;
             }
-            else if (objects.Count > 1) { // handle multiple selection separately to reduce usage of EqualityComparer
+            else if (objects.Count > 1) {
+                // handle multiple selection separately to reduce usage of EqualityComparer
                 EqualityComparer<T> comparator = EqualityComparer<T>.Default;
                 equal = getter(objects[0]);
                 for (int i = 1, c = objects.Count; i < c; i++) {
@@ -73,8 +74,7 @@ namespace R3Modeller.Core.PropertyEditing {
         }
 
         public void ClearHandlers() {
-            if (this.handlerList.Count < 1)
-            {
+            if (this.handlerList.Count < 1) {
                 return;
             }
 
@@ -133,27 +133,17 @@ namespace R3Modeller.Core.PropertyEditing {
 
         }
 
-        protected virtual PropertyHandler GetHandlerData(object target) {
+        protected PropertyHandler GetHandlerData(object target) {
             PropertyHandler data = this.handlerToDataMap[target];
             if (data == null)
                 this.handlerToDataMap[target] = data = this.NewHandler(target);
             return data;
         }
 
-        protected virtual PropertyHandler GetHandlerData(int index) {
-            object target = this.Handlers[index];
-            PropertyHandler data = this.handlerToDataMap[target];
-            if (data == null)
-                this.handlerToDataMap[target] = data = this.NewHandler(target);
-            return data;
-        }
+        protected PropertyHandler GetHandlerData(int index) => this.GetHandlerData(this.handlerList[index]);
 
-        protected IEnumerable<T> GetHandlersData<T>() where T : PropertyHandler {
-            return this.handlerList.Select(this.GetHandlerData).Cast<T>();
-        }
+        protected T GetHandlerData<T>(int index) where T : PropertyHandler => (T) this.GetHandlerData(index);
 
-        protected IEnumerable<T> GetHandlers<T>() where T : BaseViewModel {
-            return this.handlerList.Cast<T>();
-        }
+        protected IEnumerable<T> GetHandlerData<T>() where T : PropertyHandler => this.handlerList.Select(this.GetHandlerData).Cast<T>();
     }
 }
