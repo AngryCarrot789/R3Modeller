@@ -20,13 +20,13 @@ namespace R3Modeller.Core.Utils {
             return new Vector3((float) Math.Round(vector.X, digits), (float) Math.Round(vector.Y, digits), (float) Math.Round(vector.Z, digits));
         }
 
-        public static bool IsPositiveInfinityX(in this Vector2 vector) => float.IsPositiveInfinity(vector.X);
+        public static bool IsPositiveInfinityX(this Vector2 vector) => float.IsPositiveInfinity(vector.X);
 
-        public static bool IsPositiveInfinityY(in this Vector2 vector) => float.IsPositiveInfinity(vector.Y);
+        public static bool IsPositiveInfinityY(this Vector2 vector) => float.IsPositiveInfinity(vector.Y);
 
-        public static bool IsNegativeInfinityX(in this Vector2 vector) => float.IsNegativeInfinity(vector.X);
+        public static bool IsNegativeInfinityX(this Vector2 vector) => float.IsNegativeInfinity(vector.X);
 
-        public static bool IsNegativeInfinityY(in this Vector2 vector) => float.IsNegativeInfinity(vector.Y);
+        public static bool IsNegativeInfinityY(this Vector2 vector) => float.IsNegativeInfinity(vector.Y);
 
         public static Vector2 Lerp(in this Vector2 a, in Vector2 b, float blend) {
             return new Vector2(blend * (b.X - a.X) + a.X, blend * (b.Y - a.Y) + a.Y);
@@ -40,6 +40,6 @@ namespace R3Modeller.Core.Utils {
         public static Vector4 WithX(this Vector4 v, float x) => new Vector4(x, v.Y, v.Z, v.W);
         public static Vector4 WithY(this Vector4 v, float y) => new Vector4(v.X, y, v.Z, v.W);
         public static Vector4 WithZ(this Vector4 v, float z) => new Vector4(v.X, v.Y, z, v.W);
-        public static Vector4 SetW(this Vector4 v, float w) => new Vector4(v.X, v.Y, v.Z, w);
+        public static Vector4 WithW(this Vector4 v, float w) => new Vector4(v.X, v.Y, v.Z, w);
     }
 }

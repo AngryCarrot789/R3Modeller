@@ -46,6 +46,7 @@ namespace R3Modeller.Viewport {
         private int contextUsageCounter;
 
         private readonly bool isDesignerMode;
+        private volatile bool isRenderScheduled;
 
         // This will be the same size as the BRT, but without the -1 scale on the Y axis
         private Border PART_RenderTarget_LayoutProxy;
@@ -329,6 +330,7 @@ namespace R3Modeller.Viewport {
             GL.ReadBuffer(ReadBufferMode.Back);
             GL.ReadPixels(0, 0, e.Width, e.Height, PixelFormat.Bgra, PixelType.UnsignedByte, e.BackBuffer);
             this.ogl.MakeCurrent(false);
+            this.isRenderScheduled = false;
         }
 
         private void PaintInternal(Camera camera, Project project, DrawEventArgs e) {
@@ -383,6 +385,10 @@ namespace R3Modeller.Viewport {
         }
 
         public void InvalidateRender(bool schedule = false) {
+            if (this.isRenderScheduled) {
+                return;
+            }
+
             if (schedule) {
                 this.Dispatcher.InvokeAsync(this.invalidateVisualAction);
             }

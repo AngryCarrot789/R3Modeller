@@ -259,8 +259,6 @@ namespace R3Modeller.Core.Engine.Objs {
         /// matrix, absolute position, etc, and also update all child objects
         /// </summary>
         public void UpdateTransformation() {
-            Matrix4x4 t, r, s;
-
             Vector3 rotVec = this.relativePYR;
             double radPitch = rotVec.X * (Math.PI / 180.0);
             double radYaw = rotVec.Y * (Math.PI / 180.0);
@@ -276,7 +274,7 @@ namespace R3Modeller.Core.Engine.Objs {
                     this.worldPos = this.relativePos;
                 }
                 else {
-                    this.worldPos = this.parent.worldPos + this.relativePos;
+                    this.worldPos = this.parent.worldPos + Vector3.Transform(this.relativePos, this.parent.worldRotation);
                 }
 
                 if (this.isRotationAbs) {
@@ -294,9 +292,9 @@ namespace R3Modeller.Core.Engine.Objs {
                 }
             }
 
-            t = Matrix4x4.CreateTranslation(this.worldPos);
-            r = Matrix4x4.CreateFromQuaternion(this.worldRotation);
-            s = Matrix4x4.CreateScale(this.worldScale);
+            Matrix4x4 s = Matrix4x4.CreateScale(this.worldScale);
+            Matrix4x4 r = Matrix4x4.CreateFromQuaternion(this.worldRotation);
+            Matrix4x4 t = Matrix4x4.CreateTranslation(this.worldPos);
             this.modelMatrix = s * r * t;
             foreach (SceneObject obj in this.items) {
                 obj.UpdateTransformation();

@@ -72,6 +72,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                 this.Model.IsPositionAbsolute = value;
                 this.RaisePropertyChanged();
                 this.RaisePositionChanged();
+                this.Project.OnRenderInvalidated();
             }
         }
 
@@ -83,6 +84,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                 this.Model.IsScaleAbsolute = value;
                 this.RaisePropertyChanged();
                 this.RaiseScaleChanged();
+                this.Project.OnRenderInvalidated();
             }
         }
 
@@ -94,6 +96,7 @@ namespace R3Modeller.Core.Engine.Objs.ViewModels {
                 this.Model.IsRotationAbsolute = value;
                 this.RaisePropertyChanged();
                 this.RaiseRotationChanged();
+                this.Project.OnRenderInvalidated();
             }
         }
 
