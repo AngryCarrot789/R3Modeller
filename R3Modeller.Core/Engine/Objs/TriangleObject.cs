@@ -19,11 +19,8 @@ namespace R3Modeller.Core.Engine.Objs {
         }
 
         public override void Render(Camera camera) {
-            Matrix4x4 view = camera.view;
-            Matrix4x4 projection = camera.proj;
-
             // Calculates model-view-projection matrix
-            Matrix4x4 matrix = this.modelMatrix * view * projection;
+            Matrix4x4 matrix = this.modelMatrix * camera.view * camera.proj;
 
             // Upload the final matrix to shader
             this.shader.Use();

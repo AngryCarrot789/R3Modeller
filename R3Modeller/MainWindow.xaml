@@ -136,19 +136,14 @@
                                     <Setter Property="BackgroundSelectionRectangle" Value="Transparent"/>
                                     <Setter Property="BorderBrushSelectionRectangle" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
                                     <Setter Property="BorderThickness" Value="1"/>
-                                    <Setter Property="Padding" Value="1"/>
                                     <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}" />
-                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-                                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
                                     <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
                                     <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
                                 </Style>
                             </c:MultiSelectTreeView.Style>
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="{x:Type c:MultiSelectTreeViewItem}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeViewItem}}">
                                     <Setter Property="Background" Value="{DynamicResource TreeViewItem.Static.Background}"/>
-                                    <Setter Property="BorderBrush" Value="Transparent"/>
                                     <Setter Property="BackgroundHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
                                     <Setter Property="BorderBrushHovered" Value="{DynamicResource TreeViewItem.MouseOver.Border}"/>
                                     <Setter Property="BackgroundSelected" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
@@ -199,7 +194,7 @@
                         </ListBox>
                         <Border Grid.Row="2" BorderThickness="0">
                             <Grid>
-                                <TextBlock Text="{Binding Project.Scene.PropertyEditorText}" Margin="2,0" Padding="2"/>
+                                <TextBlock Text="{Binding Project.Scene.SelectedItems.Count, StringFormat={}{0} selected items(s)}" Margin="2,0" Padding="2"/>
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
                                     <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
                                 </ScrollViewer>

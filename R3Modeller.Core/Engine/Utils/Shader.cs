@@ -109,20 +109,20 @@ namespace R3Modeller.Core.Engine.Utils {
                 GL.Uniform4(index, value.X, value.Y, value.Z, value.W);
         }
 
-        public void SetUniformMatrix4(string name, ref Matrix4x4 value) {
+        public void SetUniformMatrix4(string name, ref Matrix4x4 value, bool transposed = false) {
             if (this.GetUniformLocation(name, out int index)) {
-                GL.UniformMatrix4(index, 1, false, ref value.M11);
+                GL.UniformMatrix4(index, 1, transposed, ref value.M11);
             }
         }
 
-        public unsafe void SetUniformMatrix4(string name, float* ptr) {
+        public unsafe void SetUniformMatrix4(string name, float* ptr, bool transposed = false) {
             if (this.GetUniformLocation(name, out int index)) {
-                GL.UniformMatrix4(index, 1, false, ptr);
+                GL.UniformMatrix4(index, 1, transposed, ptr);
             }
         }
 
-        public static void SetUniformMatrix4(int location, ref Matrix4x4 value) {
-            GL.UniformMatrix4(location, 1, false, ref value.M11);
+        public static void SetUniformMatrix4(int location, ref Matrix4x4 value, bool transposed = false) {
+            GL.UniformMatrix4(location, 1, transposed, ref value.M11);
         }
 
         public void Use() {

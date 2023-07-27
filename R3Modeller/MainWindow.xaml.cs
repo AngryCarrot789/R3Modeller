@@ -56,7 +56,7 @@ namespace R3Modeller {
             this.Editor.MainViewport.Model.Camera.SetYawPitch(0.45f, -0.35f);
             this.project.Scene.Root.AddItem(new TriangleObject());
             TriangleObject tri = new TriangleObject();
-            tri.RelativePosition = new Vector3(3f, 2f, 3f);
+            tri.RelativeTranslation = new Vector3(3f, 2f, 3f);
             this.project.Scene.Root.Items[0].AddItem(tri);
 
             this.project.Scene.Root.AddItem(new FloorPlaneObject());
