@@ -20,13 +20,13 @@
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
         Style="{StaticResource CustomWindowStyleEx}"
-        BorderBrush="{DynamicResource BrushPanelGap}"
+        BorderBrush="{DynamicResource PanelBorderBrush}"
         TitlebarBrush="{DynamicResource ABrush.Tone6.Background.Static}"
-        shortcuts:UIFocusGroup.IsShortcutInputSource="True"
-        shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor">
+        shortcuts:UIInputManager.IsInputSource="True"
+        shortcuts:UIInputManager.FocusPath="Application/Editor">
     <Grid>
         <DockPanel>
-            <Menu DockPanel.Dock="Top" VerticalAlignment="Top" Background="{DynamicResource ABrush.Tone6.Background.Static}" BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,0,0,1">
+            <Menu DockPanel.Dock="Top" VerticalAlignment="Top" Background="{DynamicResource ABrush.Tone6.Background.Static}" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,0,0,1">
                 <MenuItem Header="File">
                     <Separator/>
                 </MenuItem>
@@ -118,7 +118,7 @@
                         </ItemsControl>
                     </ScrollViewer>
                 </Grid>
-                <Border Grid.Column="2" BorderThickness="0" shortcuts:UIFocusGroup.FocusGroupPath="Application/Editor/ObjectList">
+                <Border Grid.Column="2" BorderThickness="0" shortcuts:UIInputManager.FocusPath="Application/Editor/ObjectList">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
@@ -128,7 +128,7 @@
                         <c:MultiSelectTreeView DataContext="{Binding Project.Scene}"
                                                SelectedItems="{Binding SelectedItems, Mode=OneWay}" Grid.Row="0"
                                                ItemsSource="{Binding RootObject.Children}"
-                                               BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0">
+                                               BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0">
                             <c:MultiSelectTreeView.Style>
                                 <Style TargetType="{x:Type c:MultiSelectTreeView}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeView}}">
                                     <Setter Property="Background" Value="{DynamicResource TreeView.Static.Background}"/>
@@ -158,7 +158,7 @@
                                     <Setter Property="Padding" Value="1,0,0,0"/>
                                     <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
                                     <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
-                                    <Setter Property="shortcuts:UIFocusGroup.FocusGroupPath" Value="Application/Editor/ObjectList/Item"/>
+                                    <Setter Property="shortcuts:UIInputManager.FocusPath" Value="Application/Editor/ObjectList/Item"/>
                                     <Setter Property="IsSelected" Value="{Binding IsObjectSelected, Mode=OneWayToSource}"/>
                                     <!--
                                     <Style.Triggers>
@@ -183,7 +183,7 @@
                         </c:MultiSelectTreeView>
                         <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
                                  Grid.Row="1" SelectionMode="Extended"
-                                 BorderBrush="{DynamicResource BrushPanelGap}" BorderThickness="0,1"
+                                 BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,1"
                                  ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
                                  ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
                             <ListBox.ItemTemplate>
@@ -202,7 +202,7 @@
                         </Border>
                     </Grid>
                 </Border>
-                <Border Grid.Column="1" Background="{DynamicResource BrushPanelGap}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
+                <Border Grid.Column="1" Background="{DynamicResource PanelBorderBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
                 <GridSplitter ResizeDirection="Columns" Grid.Column="1" Margin="-4,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0"/>
             </Grid>
         </DockPanel>

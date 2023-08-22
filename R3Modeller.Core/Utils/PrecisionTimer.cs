@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 namespace R3Modeller.Core.Utils {
     public class PrecisionTimer : IDisposable {
         private const long MILLIS_PER_THREAD_SPLICE = 16; // 16.4
+
         private static readonly long THREAD_SPLICE_IN_TICKS = (long) (16.4d * Time.TICK_PER_MILLIS);
+
         // 1.71ms to 2.3ms is the max yield interval i found
         // private static readonly long YIELD_MILLIS_IN_TICKS = (long) (1.71d * Time.TICK_PER_MILLIS);
         private static readonly long YIELD_MILLIS_IN_TICKS = Time.TICK_PER_MILLIS / 10;
@@ -32,7 +34,6 @@ namespace R3Modeller.Core.Utils {
         private long intervalTicks;
 
         public PrecisionTimer() {
-
         }
 
         public void Start(bool usePrecisionMode) {
@@ -48,7 +49,10 @@ namespace R3Modeller.Core.Utils {
                         await this.task;
                     }
                 }
-                catch { /* ignored */ }
+                catch {
+                    /* ignored */
+                }
+
                 this.task = null;
             }
 
@@ -56,7 +60,10 @@ namespace R3Modeller.Core.Utils {
                 try {
                     this.osTimer.Dispose();
                 }
-                catch { /* ignored */ }
+                catch {
+                    /* ignored */
+                }
+
                 this.osTimer = null;
             }
         }
@@ -118,7 +125,10 @@ namespace R3Modeller.Core.Utils {
             try {
                 this.task?.Dispose();
             }
-            catch { /* ignored */ }
+            catch {
+                /* ignored */
+            }
+
             this.osTimer?.Dispose();
             this.TickCallback = null;
         }

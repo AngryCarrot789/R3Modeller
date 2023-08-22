@@ -18,19 +18,18 @@ namespace R3Modeller.AdvancedContextService {
         public Style SeparatorStyle { get; set; }
 
         public AdvancedMenuItemStyleSelector() {
-
         }
 
         public override Style SelectStyle(object item, DependencyObject container) {
             if (container is AdvancedMenuItem) {
                 switch (item) {
-                    case ActionCheckableContextEntry  _: return this.CheckableActionMenuItemStyle ?? this.NonCheckableActionMenuItemStyle;
-                    case ActionContextEntry           _: return this.NonCheckableActionMenuItemStyle;
+                    case ActionCheckableContextEntry _: return this.CheckableActionMenuItemStyle ?? this.NonCheckableActionMenuItemStyle;
+                    case ActionContextEntry _: return this.NonCheckableActionMenuItemStyle;
                     case CommandCheckableContextEntry _: return this.CheckableCommandMenuItemStyle ?? this.NonCheckableCommandMenuItemStyle;
-                    case CommandContextEntry          _: return this.NonCheckableCommandMenuItemStyle;
-                    case ShortcutCommandContextEntry  _: return this.ShortcutCommandMenuItemStyle;
-                    case GroupContextEntry            _: return this.GroupingMenuItemStyle;
-                    default:                             return this.DefaultAdvancedMenuItemStyle;
+                    case CommandContextEntry _: return this.NonCheckableCommandMenuItemStyle;
+                    case ShortcutCommandContextEntry _: return this.ShortcutCommandMenuItemStyle;
+                    case GroupContextEntry _: return this.GroupingMenuItemStyle;
+                    default: return this.DefaultAdvancedMenuItemStyle;
                 }
             }
             else if (container is Separator) {

@@ -35,23 +35,18 @@ namespace R3Modeller.Core.AdvancedContextService {
         }
 
         public CommandContextEntry(string header, string inputGestureText, string description, ICommand command, IEnumerable<IContextEntry> children = null) : this(header, inputGestureText, description, command, null, children) {
-
         }
 
         public CommandContextEntry(string header, string inputGestureText, ICommand command, IEnumerable<IContextEntry> children = null) : this(header, inputGestureText, null, command, null, children) {
-
         }
 
         public CommandContextEntry(string header, string inputGestureText, ICommand command, object commandParam, IEnumerable<IContextEntry> children = null) : this(header, inputGestureText, null, command, commandParam, children) {
-
         }
 
         public CommandContextEntry(string header, ICommand command, IEnumerable<IContextEntry> children = null) : this(header, null, null, command, null, children) {
-
         }
 
         public CommandContextEntry(string header, ICommand command, object commandParam, IEnumerable<IContextEntry> children = null) : this(header, null, null, command, commandParam, children) {
-
         }
     }
 }

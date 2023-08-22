@@ -7,6 +7,7 @@ namespace R3Modeller.Core.AdvancedContextService {
     /// </summary>
     public class ActionContextEntry : BaseContextEntry {
         private string actionId;
+
         public string ActionId {
             get => this.actionId;
             set => this.RaisePropertyChanged(ref this.actionId, value);
@@ -17,15 +18,12 @@ namespace R3Modeller.Core.AdvancedContextService {
         }
 
         public ActionContextEntry(object dataContext, string actionId, string header, IEnumerable<IContextEntry> children = null) : this(dataContext, actionId, header, null, children) {
-
         }
 
         public ActionContextEntry(object dataContext, string actionId, IEnumerable<IContextEntry> children = null) : this(dataContext, actionId, StringUtils.SplitLast(actionId, '.'), null, children) {
-
         }
 
         public ActionContextEntry(object dataContext, IEnumerable<IContextEntry> children = null) : this(dataContext, null, null, null, children) {
-
         }
 
         public ActionContextEntry Set(string key, object value) {

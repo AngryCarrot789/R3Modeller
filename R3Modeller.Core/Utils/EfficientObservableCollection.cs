@@ -20,11 +20,9 @@ namespace R3Modeller.Core.Utils {
         }
 
         public EfficientObservableCollection(IEnumerable<T> collection) : base(collection) {
-
         }
 
         public EfficientObservableCollection(List<T> list) : base(list) {
-
         }
 
         public void AddRange(IEnumerable<T> collection) {

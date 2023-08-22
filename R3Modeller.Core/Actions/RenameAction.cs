@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using MCNBTEditor.Utils;
+using R3Modeller.Core.Utils;
 
-namespace MCNBTEditor.Actions {
+namespace R3Modeller.Core.Actions {
     [ActionRegistration("actions.general.RenameItem")]
     public class RenameAction : AnAction {
         public override async Task<bool> ExecuteAsync(AnActionEventArgs e) {

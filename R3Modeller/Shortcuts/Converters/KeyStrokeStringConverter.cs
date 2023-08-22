@@ -40,9 +40,12 @@ namespace R3Modeller.Shortcuts.Converters {
                 throw new Exception("This converter requires 3 elements; keycode, modifiers, isRelease");
             }
 
-            if (!(values[0] is int keyCode)) throw new Exception("values[0] must be an int: keycode");
-            if (!(values[1] is int modifiers)) throw new Exception("values[1] must be an int: modifiers");
-            if (!(values[2] is bool isRelease)) throw new Exception("values[2] must be a bool: isRelease");
+            if (!(values[0] is int keyCode))
+                throw new Exception("values[0] must be an int: keycode");
+            if (!(values[1] is int modifiers))
+                throw new Exception("values[1] must be an int: modifiers");
+            if (!(values[2] is bool isRelease))
+                throw new Exception("values[2] must be a bool: isRelease");
 
             return ToStringFunction(keyCode, modifiers, isRelease, this.AppendKeyDown, this.AppendKeyUp);
         }
@@ -53,10 +56,14 @@ namespace R3Modeller.Shortcuts.Converters {
 
         public static string ModsToString(ModifierKeys keys) {
             StringJoiner joiner = new StringJoiner("+");
-            if ((keys & ModifierKeys.Control) != 0) joiner.Append("Ctrl");
-            if ((keys & ModifierKeys.Alt) != 0)     joiner.Append("Alt");
-            if ((keys & ModifierKeys.Shift) != 0)   joiner.Append("Shift");
-            if ((keys & ModifierKeys.Windows) != 0) joiner.Append("Win");
+            if ((keys & ModifierKeys.Control) != 0)
+                joiner.Append("Ctrl");
+            if ((keys & ModifierKeys.Alt) != 0)
+                joiner.Append("Alt");
+            if ((keys & ModifierKeys.Shift) != 0)
+                joiner.Append("Shift");
+            if ((keys & ModifierKeys.Windows) != 0)
+                joiner.Append("Win");
             return joiner.ToString();
         }
     }

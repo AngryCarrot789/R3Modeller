@@ -63,7 +63,8 @@ namespace R3Modeller.Core.Utils {
                 try {
                     await t;
                 }
-                catch (TaskCanceledException) { }
+                catch (TaskCanceledException) {
+                }
             }
 
             if ((t = func()) == null) {

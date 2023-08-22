@@ -72,9 +72,9 @@ namespace R3Modeller.Converters {
         }
 
         public EmptyStringToVisibilityConverter() {
-            base.NullValue = NullToVisibilityConverter.CollapsedBox;
-            base.EmptyValue = NullToVisibilityConverter.CollapsedBox;
-            base.NonEmptyValue = NullToVisibilityConverter.VisibleBox;
+            base.NullValue = NullToVisibilityConverter._CollapsedBox;
+            base.EmptyValue = NullToVisibilityConverter._CollapsedBox;
+            base.NonEmptyValue = NullToVisibilityConverter._VisibleBox;
         }
     }
 }

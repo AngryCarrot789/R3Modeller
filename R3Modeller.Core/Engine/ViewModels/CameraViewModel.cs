@@ -3,7 +3,7 @@ using System.Windows.Input;
 using R3Modeller.Core.PropertyEditing;
 
 namespace R3Modeller.Core.Engine.ViewModels {
-    public class CameraViewModel : BaseViewModel, IPropertyEditReceiver {
+    public class CameraViewModel : BaseViewModel {
         public Camera Model { get; }
 
         public float OrbitRange {

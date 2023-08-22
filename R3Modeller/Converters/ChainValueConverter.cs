@@ -6,13 +6,13 @@ using System.Windows.Data;
 namespace R3Modeller.Converters {
     public class ChainValueConverter : IValueConverter {
         private List<IValueConverter> converters;
+
         public List<IValueConverter> Converters {
             get => this.converters ?? (this.converters = new List<IValueConverter>());
             set => this.converters = value;
         }
 
         public ChainValueConverter() {
-
         }
 
         public ChainValueConverter(IEnumerable<IValueConverter> converters) {

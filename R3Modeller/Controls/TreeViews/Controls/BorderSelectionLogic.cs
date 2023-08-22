@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -26,25 +27,16 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         #region Constructor
 
         public BorderSelectionLogic(MultiSelectTreeView treeView, Border selectionBorder, ScrollViewer scrollViewer, ItemsPresenter content, IEnumerable<MultiSelectTreeViewItem> items) {
-            if (treeView == null) {
+            if (treeView == null)
                 throw new ArgumentNullException(nameof(treeView));
-            }
-
-            if (selectionBorder == null) {
+            if (selectionBorder == null)
                 throw new ArgumentNullException(nameof(selectionBorder));
-            }
-
-            if (scrollViewer == null) {
+            if (scrollViewer == null)
                 throw new ArgumentNullException(nameof(scrollViewer));
-            }
-
-            if (content == null) {
+            if (content == null)
                 throw new ArgumentNullException(nameof(content));
-            }
-
-            if (items == null) {
+            if (items == null)
                 throw new ArgumentNullException(nameof(items));
-            }
 
             this.treeView = treeView;
             this.border = selectionBorder;
@@ -89,7 +81,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             // Capture the mouse right now so that the MouseUp event will not be missed
             Mouse.Capture(this.treeView);
 
-            this.initialSelection = new HashSet<object>(this.treeView.SelectedItems.Cast<object>());
+            IList selection = this.treeView.SelectedItems;
+            this.initialSelection = selection == null ? new HashSet<object>() : new HashSet<object>(selection.Cast<object>());
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e) {
@@ -154,6 +147,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 // Debug.WriteLine(string.Format("left:{1};right:{2};top:{3};bottom:{4}", null, left, right, top, bottom));
                 SelectionMultiple selection = (SelectionMultiple) this.treeView.Selection;
                 bool foundFocusItem = false;
+
+                IList selectedItems = this.treeView.SelectedItems;
                 foreach (var item in this.items) {
                     FrameworkElement itemContent = (FrameworkElement) item.Template.FindName("headerBorder", item);
                     Point p = itemContent.TransformToAncestor(this.content).Transform(new Point());
@@ -190,7 +185,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     // The new selection state for this item has been determined. Apply it.
                     if (newSelected) {
                         // The item shall be selected
-                        if (!this.treeView.SelectedItems.Contains(item.DataContext)) {
+                        if (selectedItems == null || !selectedItems.Contains(item.DataContext)) {
                             // The item is not currently selected. Try to select it.
                             if (!selection.SelectByRectangle(item)) {
                                 if (selection.LastCancelAll) {
@@ -202,7 +197,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     }
                     else {
                         // The item shall be deselected
-                        if (this.treeView.SelectedItems.Contains(item.DataContext)) {
+                        if (selectedItems != null && selectedItems.Contains(item.DataContext)) {
                             // The item is currently selected. Try to deselect it.
                             if (!selection.DeselectByRectangle(item)) {
                                 if (selection.LastCancelAll) {

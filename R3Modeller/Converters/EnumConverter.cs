@@ -49,7 +49,6 @@ namespace R3Modeller.Converters {
     public class KeyValuePair {
         public object Key { get; set; }
 
-        [DependsOn("Property")]
-        public object Value { get; set; }
+        [DependsOn("Property")] public object Value { get; set; }
     }
 }

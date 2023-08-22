@@ -38,16 +38,23 @@ namespace R3Modeller.AdvancedContextService {
         private object currentItem;
 
         public AdvancedContextMenu() {
-
         }
 
         public static DependencyObject CreateChildMenuItem(object item) {
             FrameworkElement element;
             switch (item) {
-                case ActionContextEntry _:          element = new AdvancedActionMenuItem(); break;
-                case ShortcutCommandContextEntry _: element = new AdvancedShortcutMenuItem(); break;
-                case BaseContextEntry _:            element = new AdvancedMenuItem(); break;
-                case SeparatorEntry _:              element = new Separator(); break;
+                case ActionContextEntry _:
+                    element = new AdvancedActionMenuItem();
+                    break;
+                case ShortcutCommandContextEntry _:
+                    element = new AdvancedShortcutMenuItem();
+                    break;
+                case BaseContextEntry _:
+                    element = new AdvancedMenuItem();
+                    break;
+                case SeparatorEntry _:
+                    element = new Separator();
+                    break;
                 default: throw new Exception("Unknown item type: " + item?.GetType());
             }
 
@@ -130,19 +137,16 @@ namespace R3Modeller.AdvancedContextService {
                     }
                     else {
                         DataContext context = new DataContext();
-                        object tarDc = VisualTreeUtils.GetDataContext(targetObject);
-                        if (tarDc != null)
+                        if (VisualTreeUtils.GetDataContextHelper(targetObject, out object tarDc))
                             context.AddContext(tarDc);
                         context.AddContext(targetObject);
 
-                        object srcDc = VisualTreeUtils.GetDataContext(sourceObject);
-                        if (srcDc != null)
+                        if (VisualTreeUtils.GetDataContextHelper(sourceObject, out object srcDc))
                             context.AddContext(srcDc);
                         context.AddContext(sourceObject);
 
                         if (Window.GetWindow(sourceObject) is Window window) {
-                            object winDc = VisualTreeUtils.GetDataContext(window);
-                            if (winDc != null)
+                            if (VisualTreeUtils.GetDataContextHelper(window, out object winDc))
                                 context.AddContext(winDc);
                             context.AddContext(window);
                         }

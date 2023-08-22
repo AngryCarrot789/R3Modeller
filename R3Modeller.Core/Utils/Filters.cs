@@ -13,15 +13,18 @@ namespace R3Modeller.Core.Utils {
                    AddAllFiles().
                    ToString();
 
-        public static readonly string ProjectTypeAndAllFiles =
-            Filter.Of().AddFilter("R3Modeller Project", FrameFPXExtension).AddAllFiles().ToString();
-
         public static readonly string VideoFormatsAndAll =
             Filter.Of().
                    AddFilter("MP4", "mp4").
                    AddFilter("MOV", "mov").
                    AddFilter("MKV", "mkv").
                    AddFilter("FLV", "flv").
+                   AddAllFiles().
+                   ToString();
+
+        public static readonly string ClassAndAll =
+            Filter.Of().
+                   AddFilter("Java Class File", "class").
                    AddAllFiles().
                    ToString();
     }

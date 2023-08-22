@@ -164,9 +164,9 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
                 return;
             }
 
-            this.pos = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).Pos, out Vector3 a) ? a : Vector3.Zero;
-            this.scale = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).Scale, out Vector3 b) ? b : Vector3.One;
-            this.rot = GetValueForObjects(this.Handlers, x => ((SceneObjectViewModel) x).PitchYawRoll, out Vector3 c) ? c : Vector3.Zero;
+            this.pos = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).Pos, out Vector3 a) ? a : Vector3.Zero;
+            this.scale = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).Scale, out Vector3 b) ? b : Vector3.One;
+            this.rot = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).PitchYawRoll, out Vector3 c) ? c : Vector3.Zero;
 
             this.RaisePositionChanged();
             this.RaiseRotationChanged();

@@ -29,31 +29,33 @@ namespace R3Modeller.Core.Shortcuts.ViewModels {
 
     public class KeyStrokeViewModel : InputStrokeViewModel {
         private int keyCode;
+
         public int KeyCode {
             get => this.keyCode;
             set => this.RaisePropertyChanged(ref this.keyCode, value);
         }
 
         private int modifiers;
+
         public int Modifiers {
             get => this.modifiers;
             set => this.RaisePropertyChanged(ref this.modifiers, value);
         }
 
         private bool isKeyRelease;
+
         public bool IsKeyRelease {
             get => this.isKeyRelease;
             set => this.RaisePropertyChanged(ref this.isKeyRelease, value);
         }
 
         public KeyStrokeViewModel() {
-
         }
 
         public KeyStrokeViewModel(KeyStroke stroke) {
             this.keyCode = stroke.KeyCode;
             this.modifiers = stroke.Modifiers;
-            this.isKeyRelease = stroke.IsKeyRelease;
+            this.isKeyRelease = stroke.IsRelease;
         }
 
         public KeyStroke ToKeyStroke() {
@@ -71,49 +73,53 @@ namespace R3Modeller.Core.Shortcuts.ViewModels {
 
     public class MouseStrokeViewModel : InputStrokeViewModel {
         private int mouseButton;
+
         public int MouseButton {
             get => this.mouseButton;
             set => this.RaisePropertyChanged(ref this.mouseButton, value);
         }
 
         private int modifiers;
+
         public int Modifiers {
             get => this.modifiers;
             set => this.RaisePropertyChanged(ref this.modifiers, value);
         }
 
+        private bool isRelease;
+
+        public bool IsRelease {
+            get => this.isRelease;
+            set => this.RaisePropertyChanged(ref this.isRelease, value);
+        }
+
         private int clickCount;
+
         public int ClickCount {
             get => this.clickCount;
             set => this.RaisePropertyChanged(ref this.clickCount, value);
         }
 
         private int wheelDelta;
+
         public int WheelDelta {
             get => this.wheelDelta;
             set => this.RaisePropertyChanged(ref this.wheelDelta, value);
         }
 
-        private int customParam;
-        public int CustomParam {
-            get => this.customParam;
-            set => this.RaisePropertyChanged(ref this.customParam, value);
-        }
-
         public MouseStrokeViewModel() {
-
         }
 
         public MouseStrokeViewModel(MouseStroke stroke) {
             this.mouseButton = stroke.MouseButton;
             this.modifiers = stroke.Modifiers;
+            this.isRelease = stroke.IsRelease;
             this.clickCount = stroke.ClickCount;
             this.wheelDelta = stroke.WheelDelta;
-            this.customParam = stroke.CustomParam;
         }
 
         public MouseStroke ToMouseStroke() {
-            return new MouseStroke(this.mouseButton, this.modifiers, this.clickCount, this.wheelDelta, this.customParam);
+            return new MouseStroke(this.mouseButton, this.modifiers, this.isRelease, this.clickCount, this.wheelDelta);
         }
 
         public override IInputStroke ToInputStroke() {

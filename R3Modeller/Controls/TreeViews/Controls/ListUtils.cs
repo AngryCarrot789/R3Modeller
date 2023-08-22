@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace MCNBTEditor.WPF.Controls.TreeViews.Controls {
+namespace R3Modeller.Controls.TreeViews.Controls {
     internal static class ListUtils {
         internal static object Last(this IList list) {
             if (list.Count < 1) {

@@ -3,6 +3,9 @@ using R3Modeller.Core.Shortcuts.Inputs;
 using R3Modeller.Core.Shortcuts.Usage;
 
 namespace R3Modeller.Core.Shortcuts {
+    /// <summary>
+    /// An interface for shortcuts that accept keyboard inputs
+    /// </summary>
     public interface IKeyboardShortcut : IShortcut {
         /// <summary>
         /// All of the Key Strokes that this shortcut contains

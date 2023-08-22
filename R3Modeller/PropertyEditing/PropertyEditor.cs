@@ -16,7 +16,7 @@ namespace R3Modeller.PropertyEditing {
                 typeof(PropertyEditor),
                 new PropertyMetadata(null, (d, e) => {
                     if (e.NewValue is PropertyEditorRegistry editor) {
-                        ((PropertyEditor) d).ApplicableItems = editor.Root.Values;
+                        ((PropertyEditor) d).ApplicableItems = editor.Root.PropertyObjects;
                     }
                 }));
 
@@ -33,6 +33,11 @@ namespace R3Modeller.PropertyEditing {
                 typeof(IEnumerable),
                 typeof(PropertyEditor),
                 new PropertyMetadata(null));
+
+        private static readonly GridLength Star = new GridLength(1, GridUnitType.Star);
+        public static readonly DependencyProperty ColumnWidth0Property = DependencyProperty.Register("ColumnWidth0", typeof(GridLength), typeof(PropertyEditor), new PropertyMetadata(new GridLength(100d)));
+        public static readonly DependencyProperty ColumnWidth1Property = DependencyProperty.Register("ColumnWidth1", typeof(GridLength), typeof(PropertyEditor), new PropertyMetadata(new GridLength(5)));
+        public static readonly DependencyProperty ColumnWidth2Property = DependencyProperty.Register("ColumnWidth2", typeof(GridLength), typeof(PropertyEditor), new PropertyMetadata(Star));
 
         public PropertyEditorRegistry EditorRegistry {
             get => (PropertyEditorRegistry) this.GetValue(EditorRegistryProperty);
@@ -51,6 +56,10 @@ namespace R3Modeller.PropertyEditing {
             get => (IEnumerable) this.GetValue(ApplicableItemsProperty);
             set => this.SetValue(ApplicableItemsProperty, value);
         }
+
+        public GridLength ColumnWidth0 { get => (GridLength) this.GetValue(ColumnWidth0Property); set => this.SetValue(ColumnWidth0Property, value); }
+        public GridLength ColumnWidth1 { get => (GridLength) this.GetValue(ColumnWidth1Property); set => this.SetValue(ColumnWidth1Property, value); }
+        public GridLength ColumnWidth2 { get => (GridLength) this.GetValue(ColumnWidth2Property); set => this.SetValue(ColumnWidth2Property, value); }
 
         private readonly bool isInDesigner;
 

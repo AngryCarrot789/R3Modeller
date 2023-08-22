@@ -41,6 +41,7 @@ namespace R3Modeller.Core.Utils {
                 RandomString(RANDOM, chars, 0, count);
                 str = new string(chars);
             } while (!canAccept(str));
+
             return str;
         }
 
@@ -59,6 +60,7 @@ namespace R3Modeller.Core.Utils {
                 RandomString(RANDOM, chars, len, count);
                 str = new string(chars);
             } while (!canAccept(str));
+
             return str;
         }
     }

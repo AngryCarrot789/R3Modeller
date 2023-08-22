@@ -15,23 +15,41 @@ namespace R3Modeller.Core.PropertyEditing {
             get => this.isCurrentlyApplicable;
             set => this.RaisePropertyChanged(ref this.isCurrentlyApplicable, value);
         }
-        
+
         /// <summary>
         /// The lowest applicable type. This will be null for the root group container. A valid group will contain a non-null applicable type
         /// </summary>
         public Type ApplicableType { get; }
+
+        /// <summary>
+        /// The handler count mode for this object, which determines if this object is applicable for
+        /// a specific number of handlers
+        /// </summary>
+        public virtual HandlerCountMode HandlerCountMode => HandlerCountMode.Any;
 
         public BasePropertyObjectViewModel(Type applicableType) {
             this.ApplicableType = applicableType;
         }
 
         /// <summary>
-        /// Whether or not this object is applicable to the given object
+        /// A helper function that determines if the given handler is applicable to this object (see <see cref="Type.IsInstanceOfType"/>)
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public virtual bool IsApplicable(object value) {
-            return this.ApplicableType.IsInstanceOfType(value);
+        /// <param name="value">The handler</param>
+        /// <returns>Handler is acceptable for this group</returns>
+        public bool IsApplicable(object value) => this.ApplicableType.IsInstanceOfType(value);
+
+        /// <summary>
+        /// A helper function that determines if this object can accept a specific number of handler objects
+        /// </summary>
+        /// <param name="count">The number of handlers that are available</param>
+        /// <returns>This property is applicable for the given number of handlers</returns>
+        public bool IsHandlerCountAcceptable(int count) {
+            switch (this.HandlerCountMode) {
+                case HandlerCountMode.Any: return true;
+                case HandlerCountMode.Single: return count == 1;
+                case HandlerCountMode.Multi: return count > 1;
+                default: throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

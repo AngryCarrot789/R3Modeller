@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace R3Modeller.Core.Utils {
     public readonly struct Resolution : IComparable<Resolution>, IEqualityComparer<Resolution> {
@@ -56,14 +55,6 @@ namespace R3Modeller.Core.Utils {
 
         public int GetHashCode(Resolution obj) {
             return obj.GetHashCode();
-        }
-
-        public static explicit operator Vector2(Resolution res) {
-            return new Vector2(res.Width, res.Height);
-        }
-
-        public static explicit operator Resolution(Vector2 res) {
-            return new Resolution((int) Math.Floor(res.X), (int) Math.Floor(res.Y));
         }
 
         public static explicit operator Resolution(ulong res) => new Resolution((int) (res >> 32), (int) (res & uint.MaxValue));

@@ -11,7 +11,18 @@ using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Shortcuts {
     public class WPFShortcutManager : ShortcutManager {
-        public const int BUTTON_WHEEL_UP = 143;   // Away from the user
+        private static readonly MouseButtonEventHandler RootMouseDownHandlerPreview = (s, args) => HandleRootMouseDown(s, args, true);
+        private static readonly MouseButtonEventHandler RootMouseDownHandlerNonPreview = (s, args) => HandleRootMouseDown(s, args, false);
+        private static readonly MouseButtonEventHandler RootMouseUpHandlerPreview = (s, args) => HandleRootMouseUp(s, args, true);
+        private static readonly MouseButtonEventHandler RootMouseUpHandlerNonPreview = (s, args) => HandleRootMouseUp(s, args, false);
+        private static readonly KeyEventHandler RootKeyDownHandlerPreview = (s, args) => HandleRootKeyDown(s, args, true);
+        private static readonly KeyEventHandler RootKeyDownHandlerNonPreview = (s, args) => HandleRootKeyDown(s, args, false);
+        private static readonly KeyEventHandler RootKeyUpHandlerPreview = (s, args) => HandleRootKeyUp(s, args, true);
+        private static readonly KeyEventHandler RootKeyUpHandlerNonPreview = (s, args) => HandleRootKeyUp(s, args, false);
+        private static readonly MouseWheelEventHandler RootWheelHandlerPreview = (s, args) => HandleRootMouseWheel(s, args, true);
+        private static readonly MouseWheelEventHandler RootWheelHandlerNonPreview = (s, args) => HandleRootMouseWheel(s, args, false);
+
+        public const int BUTTON_WHEEL_UP = 143; // Away from the user
         public const int BUTTON_WHEEL_DOWN = 142; // Towards the user
         public const string DEFAULT_USAGE_ID = "DEF";
 
@@ -28,10 +39,14 @@ namespace R3Modeller.Shortcuts {
             KeyStroke.ModifierToStringProvider = (x, s) => {
                 StringJoiner joiner = new StringJoiner(s ? " + " : "+");
                 ModifierKeys keys = (ModifierKeys) x;
-                if ((keys & ModifierKeys.Control) != 0) joiner.Append("Ctrl");
-                if ((keys & ModifierKeys.Alt) != 0)     joiner.Append("Alt");
-                if ((keys & ModifierKeys.Shift) != 0)   joiner.Append("Shift");
-                if ((keys & ModifierKeys.Windows) != 0) joiner.Append("Win");
+                if ((keys & ModifierKeys.Control) != 0)
+                    joiner.Append("Ctrl");
+                if ((keys & ModifierKeys.Alt) != 0)
+                    joiner.Append("Alt");
+                if ((keys & ModifierKeys.Shift) != 0)
+                    joiner.Append("Shift");
+                if ((keys & ModifierKeys.Windows) != 0)
+                    joiner.Append("Win");
                 return joiner.ToString();
             };
 
@@ -42,15 +57,35 @@ namespace R3Modeller.Shortcuts {
                     case 2: return "RMB";
                     case 3: return "X1";
                     case 4: return "X2";
-                    case BUTTON_WHEEL_UP:   return "WHEEL_UP";
+                    case BUTTON_WHEEL_UP: return "WHEEL_UP";
                     case BUTTON_WHEEL_DOWN: return "WHEEL_DOWN";
                     default: return $"Unknown Button ({x})";
                 }
             };
+
+            // InputManager.Current.PreProcessInput += OnPreProcessInput;
         }
 
-        public WPFShortcutManager() {
+        // private static void OnPreProcessInput(object sender, PreProcessInputEventArgs e) {
+        //     switch (e.StagingItem.Input) {
+        //         case KeyboardEventArgs k: {
+        //             if (k is KeyEventArgs kp) {
+        //                 Visual root = kp.InputSource.RootVisual;
+        //                 WPFShortcutProcessor processor = GetShortcutProcessorForUIObject(root);
+        //                 processor?.OnKeyEvent(root, (DependencyObject) (kp.Source ?? kp.OriginalSource ?? root), kp, kp.IsUp, kp.RoutedEvent == Keyboard.PreviewKeyDownEvent || kp.RoutedEvent == Keyboard.PreviewKeyUpEvent);
+        //                 if (kp.Handled) {
+        //                     e.Cancel();
+        //                 }
+        //             }
+        //             break;
+        //         }
+        //         case MouseButtonEventArgs m: {
+        //             break;
+        //         }
+        //     }
+        // }
 
+        public WPFShortcutManager() {
         }
 
         public static void UnregisterHandler(string shortcutId, string usageId) {
@@ -64,6 +99,9 @@ namespace R3Modeller.Shortcuts {
         public static void RegisterHandler(string shortcutId, string usageId, ShortcutActivateHandler handler, bool weak = true) {
             ShortcutUtils.EnforceIdFormat(shortcutId, nameof(shortcutId));
             ShortcutUtils.EnforceIdFormat(usageId, nameof(usageId));
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+
             if (!InputBindingCallbackMap.TryGetValue(shortcutId, out Dictionary<string, List<ActivationHandlerReference>> usageMap)) {
                 InputBindingCallbackMap[shortcutId] = usageMap = new Dictionary<string, List<ActivationHandlerReference>>();
             }
@@ -77,66 +115,57 @@ namespace R3Modeller.Shortcuts {
 
         public static WPFShortcutProcessor GetShortcutProcessorForUIObject(object sender) {
             if (sender != null && (sender is Window window || sender is DependencyObject obj && (window = Window.GetWindow(obj)) != null)) {
-                return UIFocusGroup.GetShortcutProcessor(window);
+                return (WPFShortcutProcessor) window.GetValue(UIInputManager.ShortcutProcessorProperty.DependencyProperty);
             }
 
             return null;
         }
 
-        private static readonly MouseButtonEventHandler RootMouseDownHandlerPreview = (s, args) => HandleRootMouseDown(s, args, true);
-        private static readonly MouseButtonEventHandler RootMouseDownHandlerNonPreview = (s, args) => HandleRootMouseDown(s, args, false);
-        private static readonly MouseButtonEventHandler RootMouseUpHandlerPreview = (s, args) => HandleRootMouseUp(s, args, true);
-        private static readonly MouseButtonEventHandler RootMouseUpHandlerNonPreview = (s, args) => HandleRootMouseUp(s, args, false);
-        private static readonly KeyEventHandler RootKeyDownHandlerPreview = (s, args) => HandleRootKeyDown(s, args, true);
-        private static readonly KeyEventHandler RootKeyDownHandlerNonPreview = (s, args) => HandleRootKeyDown(s, args, false);
-        private static readonly KeyEventHandler RootKeyUpHandlerPreview = (s, args) => HandleRootKeyUp(s, args, true);
-        private static readonly KeyEventHandler RootKeyUpHandlerNonPreview = (s, args) => HandleRootKeyUp(s, args, false);
-        private static readonly MouseWheelEventHandler RootWheelHandlerPreview = (s, args) => HandleRootMouseWheel(s, args, true);
-        private static readonly MouseWheelEventHandler RootWheelHandlerNonPreview = (s, args) => HandleRootMouseWheel(s, args, false);
-
-        // Typically applied only to windows
         public static void OnIsGlobalShortcutFocusTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is UIElement element) {
-                if (!(Instance is WPFShortcutManager manager)) {
-                    Debug.WriteLine($"ShortcutManager Global Instance is not an instance of {nameof(WPFShortcutManager)}: {Instance?.GetType()}");
-                    return;
-                }
+            if (!(d is Window window)) {
+                throw new Exception($"This property must be applied to objects of type {nameof(Window)} only, not " + d?.GetType());
+            }
 
-                element.MouseDown -= RootMouseDownHandlerNonPreview;
-                element.MouseUp -= RootMouseUpHandlerNonPreview;
-                element.KeyDown -= RootKeyDownHandlerNonPreview;
-                element.KeyUp -= RootKeyUpHandlerNonPreview;
-                element.MouseWheel -= RootWheelHandlerNonPreview;
-                element.PreviewMouseDown -= RootMouseDownHandlerPreview;
-                element.PreviewMouseUp -= RootMouseUpHandlerPreview;
-                element.PreviewKeyDown -= RootKeyDownHandlerPreview;
-                element.PreviewKeyUp -= RootKeyUpHandlerPreview;
-                element.PreviewMouseWheel -= RootWheelHandlerPreview;
-                if (e.NewValue != e.OldValue && (bool) e.NewValue) {
-                    element.MouseDown += RootMouseDownHandlerNonPreview;
-                    element.MouseUp += RootMouseUpHandlerNonPreview;
-                    element.KeyDown += RootKeyDownHandlerNonPreview;
-                    element.KeyUp += RootKeyUpHandlerNonPreview;
-                    element.MouseWheel += RootWheelHandlerNonPreview;
-                    element.PreviewMouseDown += RootMouseDownHandlerPreview;
-                    element.PreviewMouseUp += RootMouseUpHandlerPreview;
-                    element.PreviewKeyDown += RootKeyDownHandlerPreview;
-                    element.PreviewKeyUp += RootKeyUpHandlerPreview;
-                    element.PreviewMouseWheel += RootWheelHandlerPreview;
-                    element.SetValue(UIFocusGroup.ShortcutProcessorProperty, new WPFShortcutProcessor(manager));
-                }
-                else {
-                    element.ClearValue(UIFocusGroup.ShortcutProcessorProperty);
-                }
+            if (e.OldValue == e.NewValue) {
+                return;
+            }
+
+            if (!(Instance is WPFShortcutManager manager)) {
+                Debug.WriteLine($"ShortcutManager Global Instance is not an instance of {nameof(WPFShortcutManager)}: {Instance?.GetType()}");
+                return;
+            }
+
+            window.MouseDown -= RootMouseDownHandlerNonPreview;
+            window.MouseUp -= RootMouseUpHandlerNonPreview;
+            window.KeyDown -= RootKeyDownHandlerNonPreview;
+            window.KeyUp -= RootKeyUpHandlerNonPreview;
+            window.MouseWheel -= RootWheelHandlerNonPreview;
+            window.PreviewMouseDown -= RootMouseDownHandlerPreview;
+            window.PreviewMouseUp -= RootMouseUpHandlerPreview;
+            window.PreviewKeyDown -= RootKeyDownHandlerPreview;
+            window.PreviewKeyUp -= RootKeyUpHandlerPreview;
+            window.PreviewMouseWheel -= RootWheelHandlerPreview;
+            if ((bool) e.NewValue) {
+                window.MouseDown += RootMouseDownHandlerNonPreview;
+                window.MouseUp += RootMouseUpHandlerNonPreview;
+                window.KeyDown += RootKeyDownHandlerNonPreview;
+                window.KeyUp += RootKeyUpHandlerNonPreview;
+                window.MouseWheel += RootWheelHandlerNonPreview;
+                window.PreviewMouseDown += RootMouseDownHandlerPreview;
+                window.PreviewMouseUp += RootMouseUpHandlerPreview;
+                window.PreviewKeyDown += RootKeyDownHandlerPreview;
+                window.PreviewKeyUp += RootKeyUpHandlerPreview;
+                window.PreviewMouseWheel += RootWheelHandlerPreview;
+                window.SetValue(UIInputManager.ShortcutProcessorProperty, new WPFShortcutProcessor(manager));
             }
             else {
-                throw new Exception("This property must be applied to type UIElement only, not " + d?.GetType());
+                window.ClearValue(UIInputManager.ShortcutProcessorProperty);
             }
         }
 
         private static void HandleRootMouseDown(object sender, MouseButtonEventArgs e, bool isPreviewEvent) {
             if (isPreviewEvent && e.OriginalSource is DependencyObject hit) {
-                UIFocusGroup.ProcessFocusGroupChange(hit);
+                UIInputManager.ProcessFocusGroupChange(hit);
             }
 
             WPFShortcutProcessor processor = GetShortcutProcessorForUIObject(sender);
@@ -144,13 +173,12 @@ namespace R3Modeller.Shortcuts {
         }
 
         private static void HandleRootMouseUp(object sender, MouseButtonEventArgs e, bool isPreviewEvent) {
-            // if (e.OriginalSource is DependencyObject hit) {
-            //     string focusedPath = UIFocusGroup.ProcessFocusGroupChange(hit);
-            //     MouseStroke stroke = new MouseStroke((int) e.ChangedButton, (int) Keyboard.Modifiers, e.ClickCount);
-            //     if (Instance.OnMouseStroke(focusedPath, stroke)) {
-            //         e.Handled = true;
-            //     }
-            // }
+            if (isPreviewEvent && e.OriginalSource is DependencyObject hit) {
+                UIInputManager.ProcessFocusGroupChange(hit);
+            }
+
+            WPFShortcutProcessor processor = GetShortcutProcessorForUIObject(sender);
+            processor?.OnWindowMouseUp(sender, e, isPreviewEvent);
         }
 
         private static void HandleRootMouseWheel(object sender, MouseWheelEventArgs e, bool isPreviewEvent) {
@@ -194,6 +222,11 @@ namespace R3Modeller.Shortcuts {
             if (ic) {
                 ItemsControl itemsControl = ItemsControl.ItemsControlFromItemContainer(target);
                 if (itemsControl != null && itemsControl.IsItemItsOwnContainer(target)) {
+                    object dc = itemsControl.DataContext;
+                    if (dc != null) {
+                        context.AddContext(dc);
+                    }
+
                     context.AddContext(itemsControl);
                 }
             }

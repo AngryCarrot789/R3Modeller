@@ -1,9 +1,8 @@
 using System;
-using System.Numerics;
 
 namespace R3Modeller.Core.Utils {
     public static class Maths {
-        // these floats have more decimals that can possibly fit but meh
+       // these floats have more decimals that can possibly fit but meh
         public const float PI_HALF = 1.57079632679489f;
         public const float PI = 3.14159265358979f;
         public const float PI_DOUBLE = 6.28318530717958f;
@@ -45,19 +44,33 @@ namespace R3Modeller.Core.Utils {
         /// <returns>The output value, between outA and outB</returns>
         public static float Map(float dIn, float inA, float inB, float outA, float outB) => (float) Map((double) dIn, inA, inB, outA, outB);
 
-        public static float Clamp(float value, float min, float max) => Math.Max(Math.Min(value, max), min);
+        public static float Clamp(float value, float min, float max) {
+            return Math.Max(Math.Min(value, max), min);
+        }
 
-        public static double Clamp(double value, double min, double max) => Math.Max(Math.Min(value, max), min);
+        public static double Clamp(double value, double min, double max) {
+            return Math.Max(Math.Min(value, max), min);
+        }
 
-        public static byte Clamp(byte value, byte min, byte max) => Math.Max(Math.Min(value, max), min);
+        public static byte Clamp(byte value, byte min, byte max) {
+            return Math.Max(Math.Min(value, max), min);
+        }
 
-        public static int Clamp(int value, int min, int max) => Math.Max(Math.Min(value, max), min);
+        public static int Clamp(int value, int min, int max) {
+            return Math.Max(Math.Min(value, max), min);
+        }
 
-        public static long Clamp(long value, long min, long max) => Math.Max(Math.Min(value, max), min);
+        public static long Clamp(long value, long min, long max) {
+            return Math.Max(Math.Min(value, max), min);
+        }
 
-        public static bool Equals(double a, double b, double tolerance = 0.0001d) => Math.Abs(a - b) < tolerance;
+        public static bool Equals(double a, double b, double tolerance = 0.0001d) {
+            return Math.Abs(a - b) < tolerance;
+        }
 
-        public static bool Equals(float a, float b, float tolerance = 0.001f) => Math.Abs(a - b) < tolerance;
+        public static bool Equals(float a, float b, float tolerance = 0.001f) {
+            return Math.Abs(a - b) < tolerance;
+        }
 
         public static bool IsOne(double value) => Math.Abs(value - 1.0) < 2.22044604925031E-15;
 

@@ -5,6 +5,9 @@ using R3Modeller.Core.Shortcuts.Inputs;
 using R3Modeller.Core.Shortcuts.Usage;
 
 namespace R3Modeller.Core.Shortcuts {
+    /// <summary>
+    /// A shortcut that accepts a combination of key and mouse strokes
+    /// </summary>
     public class MouseKeyboardShortcut : IMouseShortcut, IKeyboardShortcut {
         public static readonly MouseShortcut EmptyMouseKeyboardShortcut = new MouseShortcut();
 

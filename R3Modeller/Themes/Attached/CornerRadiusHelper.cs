@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace MCNBTEditor.WPF.Themes.Attached {
+namespace R3Modeller.Themes.Attached {
     public static class CornerRadiusHelper {
         public static readonly DependencyProperty ValueProperty = DependencyProperty.RegisterAttached("Value", typeof(CornerRadius), typeof(CornerRadiusHelper), new PropertyMetadata(new CornerRadius(0)));
 

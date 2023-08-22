@@ -152,10 +152,8 @@
     <Compile Include="Controls\Dragger\EditStartEventArgs.cs" />
     <Compile Include="Controls\Dragger\EditStartEventHandler.cs" />
     <Compile Include="Controls\Dragger\IChangeMapper.cs" />
-    <Compile Include="Controls\Dragger\IValueFormatter.cs" />
     <Compile Include="Controls\Dragger\IValuePreProcessor.cs" />
     <Compile Include="Controls\Dragger\NumberDragger.cs" />
-    <Compile Include="Controls\Dragger\ValueStringFormatter.cs" />
     <Compile Include="Controls\FocusHelper.cs" />
     <Compile Include="Controls\FreeMoveViewPortV2.cs" />
     <Compile Include="Controls\HighlightableTextBlock.cs" />
@@ -166,6 +164,7 @@
     <Compile Include="Controls\BitmapRenderTarget.cs" />
     <Compile Include="Controls\DrawEventArgs.cs" />
     <Compile Include="Controls\SelectionAdorder.cs" />
+    <Compile Include="Controls\TreeExtension.cs" />
     <Compile Include="Controls\TreeViews\Automation\Peers\MultiSelectTreeViewAutomationPeer.cs" />
     <Compile Include="Controls\TreeViews\Automation\Peers\MultiSelectTreeViewItemAutomationPeer.cs" />
     <Compile Include="Controls\TreeViews\Automation\Peers\MultiSelectTreeViewItemDataAutomationPeer.cs" />
@@ -174,6 +173,7 @@
     <Compile Include="Controls\TreeViews\Controls\FocusHelper.cs" />
     <Compile Include="Controls\TreeViews\Controls\ISelectionStrategy.cs" />
     <Compile Include="Controls\TreeViews\Controls\ListExtensions.cs" />
+    <Compile Include="Controls\TreeViews\Controls\ListUtils.cs" />
     <Compile Include="Controls\TreeViews\Controls\MultiSelectTreeView.cs" />
     <Compile Include="Controls\TreeViews\Controls\MultiSelectTreeViewItem.cs" />
     <Compile Include="Controls\TreeViews\Controls\SelectionMultiple.cs" />
@@ -197,11 +197,24 @@
     <Compile Include="Converters\ChainValueConverter.cs" />
     <Compile Include="Converters\DbToVolumeConverter.cs" />
     <Compile Include="Converters\EmptyStringToBoolConverter.cs" />
+    <Compile Include="Converters\EnumBooleanConverter.cs" />
     <Compile Include="Converters\EnumConverter.cs" />
+    <Compile Include="Converters\EnumToStringConverter.cs" />
+    <Compile Include="Converters\FileExistsToBoolConverter.cs" />
+    <Compile Include="Converters\FilePathToWindowTitleConverter.cs" />
+    <Compile Include="Converters\FileSizeConverter.cs" />
+    <Compile Include="Converters\FileSizeFormatConverter.cs" />
     <Compile Include="Converters\FloatToDoubleConverter.cs" />
+    <Compile Include="Converters\InvertedBoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\LeftPaneOpenedToImageSourceConverter.cs" />
     <Compile Include="Converters\NullConverter.cs" />
+    <Compile Include="Converters\ScrollBinder.cs" />
     <Compile Include="Converters\SingleItemToListConverter.cs" />
     <Compile Include="Converters\SingletonValueConverter.cs" />
+    <Compile Include="Converters\TextChangedToUnsavedIndicatorConverter.cs" />
+    <Compile Include="Converters\TextToFontDecorationConverter.cs" />
+    <Compile Include="Converters\TopPaneOpenedToImageSourceConverter.cs" />
+    <Compile Include="Converters\TypeEqualityToTrueConverter.cs" />
     <Compile Include="Converters\VolumeToDbConverter.cs" />
     <Compile Include="Notifications\NotificationControl.cs" />
     <Compile Include="Notifications\NotificationList.cs" />
@@ -210,13 +223,17 @@
     <Compile Include="PropertyEditing\PropertyEditorItemContainer.cs" />
     <Compile Include="PropertyEditing\PropertyEditorItemsControl.cs" />
     <Compile Include="RawInputs\RAWINPUT.cs" />
+    <Compile Include="Resources\I18N\LangType.cs" />
+    <Compile Include="Resources\I18N\LocalizationController.cs" />
+    <Compile Include="Resources\I18N\WPFDictionaryTranslator.cs" />
     <Compile Include="Resources\IconTypeToImageSourceConverter.cs" />
     <Compile Include="Services\ClipboardService.cs" />
     <Compile Include="Services\WinExplorerService.cs" />
     <Compile Include="Shortcuts\ActivationHandlerReference.cs" />
-    <Compile Include="Shortcuts\Bindings\ContextualShortcutCommandBinding.cs" />
-    <Compile Include="Shortcuts\Bindings\ShortcutActionBinding.cs" />
+    <Compile Include="Shortcuts\Bindings\InputStateBinding.cs" />
+    <Compile Include="Shortcuts\Bindings\InputStateCollection.cs" />
     <Compile Include="Shortcuts\Bindings\ShortcutCommandBinding.cs" />
+    <Compile Include="Shortcuts\Bindings\ShortcutCommandCollection.cs" />
     <Compile Include="Shortcuts\Converters\ActionIdToGestureConverter.cs" />
     <Compile Include="Shortcuts\Converters\GlobalUpdateShortcutGestureConverter.cs" />
     <Compile Include="Shortcuts\Converters\KeyStrokeStringConverter.cs" />
@@ -235,7 +252,7 @@
     </Compile>
     <Compile Include="Shortcuts\ShortcutActivateHandler.cs" />
     <Compile Include="Shortcuts\ShortcutUtils.cs" />
-    <Compile Include="Shortcuts\UIFocusGroup.cs" />
+    <Compile Include="Shortcuts\UIInputManager.cs" />
     <Compile Include="Shortcuts\Views\ShortcutEditorWindow.xaml.cs">
       <DependentUpon>ShortcutEditorWindow.xaml</DependentUpon>
     </Compile>
@@ -243,7 +260,7 @@
     <Compile Include="Shortcuts\WPFKeyMapSerialiser.cs" />
     <Compile Include="Shortcuts\WPFShortcutManager.cs" />
     <Compile Include="Shortcuts\WPFShortcutProcessor.cs" />
-    <Compile Include="Themes\Attached\CornerHelper.cs" />
+    <Compile Include="Themes\Attached\CornerRadiusHelper.cs" />
     <Compile Include="Themes\Attached\MenuHelper.cs" />
     <Compile Include="Themes\Attached\PasswordBoxHelper.cs" />
     <Compile Include="Themes\Attached\TextBoxAutoSelect.cs" />
@@ -253,21 +270,37 @@
     </Compile>
     <Compile Include="Themes\Converters\TreeViewLineConverter.cs" />
     <Compile Include="Themes\ThemesController.cs" />
-    <Compile Include="Themes\ThemeTypes.cs" />
+    <Compile Include="Themes\ThemeType.cs" />
+    <Compile Include="Utils\AnimationFlag.cs" />
+    <Compile Include="Utils\AnimationHelpers.cs" />
+    <Compile Include="Utils\BindingProxy.cs" />
     <Compile Include="Utils\CASLock.cs" />
+    <Compile Include="Utils\ConditionMonitor.cs" />
     <Compile Include="Utils\CursorUtils.cs" />
     <Compile Include="Utils\DispatcherCallback.cs" />
     <Compile Include="Utils\DispatcherDelegate.cs" />
     <Compile Include="Utils\DispatcherUtils.cs" />
+    <Compile Include="Utils\DynamicCodeConverter.cs" />
+    <Compile Include="Utils\FileExtensionsHelper.cs" />
+    <Compile Include="Utils\FilePropertiesHelper.cs" />
     <Compile Include="Utils\FileUtils.cs" />
+    <Compile Include="Utils\GlobalPreferences.cs" />
+    <Compile Include="Utils\KBUtils.cs" />
     <Compile Include="Utils\KeyUtils.cs" />
+    <Compile Include="Utils\MouseLocationHelper.cs" />
+    <Compile Include="Utils\NewWinPrefs.cs" />
     <Compile Include="Utils\NumberAverager.cs" />
     <Compile Include="Utils\ResourceDictionaryDataTemplateSelector.cs" />
     <Compile Include="Utils\ResourceDictionaryStyleSelector.cs" />
     <Compile Include="Utils\ScrollerUtils.cs" />
+    <Compile Include="Utils\ShellIconSize.cs" />
+    <Compile Include="Utils\ShellUtils.cs" />
+    <Compile Include="Utils\StringHelper.cs" />
+    <Compile Include="Utils\TextBoxLineNumbers.cs" />
     <Compile Include="Utils\TextPointerUtils.cs" />
     <Compile Include="Utils\ThreadSafeDP.cs" />
     <Compile Include="Utils\ThreadTimer.cs" />
+    <Compile Include="Utils\Time.cs" />
     <Compile Include="Utils\UsageCounter.cs" />
     <Compile Include="Utils\Validate.cs" />
     <Compile Include="Utils\VisualTreeUtils.cs" />
@@ -411,6 +444,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\I18N\Text\de.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\I18N\Text\en.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Shortcuts\Dialogs\KeyStrokeInputWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -447,19 +488,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\ColourDictionaries\VeryDarkTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Themes\ControlColours.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\ControlColoursSoftDarkBlue.xaml">
+    <Page Include="Themes\Controls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\Controls.xaml">
+    <Page Include="Themes\Globals.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -547,6 +584,45 @@
     <Content Include="Keymap.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\alertSaveFile.png" />
+    <Resource Include="Resources\binCan.png" />
+    <Resource Include="Resources\closeAllFiles.png" />
+    <Resource Include="Resources\closeFile.png" />
+    <Resource Include="Resources\closePane.png" />
+    <Resource Include="Resources\copy.png" />
+    <Resource Include="Resources\cut.png" />
+    <Resource Include="Resources\downIcon.png" />
+    <Resource Include="Resources\file.ico" />
+    <Resource Include="Resources\FileExplorerIcons\drive.png" />
+    <Resource Include="Resources\FileExplorerIcons\file.png" />
+    <Resource Include="Resources\FileExplorerIcons\folder-closed.png" />
+    <Resource Include="Resources\FileExplorerIcons\folder-open.png" />
+    <Resource Include="Resources\findReplace.png" />
+    <Resource Include="Resources\focusWindow.png" />
+    <Resource Include="Resources\matchCaseIcon.png" />
+    <Resource Include="Resources\matchWholeWordIcon.png" />
+    <Resource Include="Resources\newFile.png" />
+    <Resource Include="Resources\oldSharpPadIcon.png" />
+    <Resource Include="Resources\openFile.png" />
+    <Resource Include="Resources\openFolder.png" />
+    <Resource Include="Resources\openInNewWindow.png" />
+    <Resource Include="Resources\openPane.png" />
+    <Resource Include="Resources\paste.png" />
+    <Resource Include="Resources\preferencesIcon.png" />
+    <Resource Include="Resources\previewWindow.png" />
+    <Resource Include="Resources\printIcon.png" />
+    <Resource Include="Resources\redo.png" />
+    <Resource Include="Resources\replaceAllIcon.png" />
+    <Resource Include="Resources\replaceIcon.png" />
+    <Resource Include="Resources\saveAll.png" />
+    <Resource Include="Resources\saveFile.png" />
+    <Resource Include="Resources\saveFileAs.png" />
+    <Resource Include="Resources\sharpPadIcon.ico" />
+    <Resource Include="Resources\sharpPadIcon.png" />
+    <Resource Include="Resources\topTabsClose.png" />
+    <Resource Include="Resources\topTabsOpen.png" />
+    <Resource Include="Resources\undo.png" />
+    <Resource Include="Resources\upIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.NativeAssets.macOS.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.macOS.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.macOS.2.88.4-preview.84\build\net462\SkiaSharp.NativeAssets.macOS.targets')" />

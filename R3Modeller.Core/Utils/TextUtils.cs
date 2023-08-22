@@ -11,7 +11,9 @@ namespace R3Modeller.Core.Utils {
             foreach (char ch in text) {
                 switch (ch) {
                     case '\n': return hasCarriageReturn ? CRLF : LF;
-                    case '\r': hasCarriageReturn = true; break;
+                    case '\r':
+                        hasCarriageReturn = true;
+                        break;
                 }
             }
 

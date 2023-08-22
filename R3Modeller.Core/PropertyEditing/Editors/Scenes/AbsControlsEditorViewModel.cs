@@ -59,9 +59,9 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
 
         }
 
-        public bool? CalculateDefaultPosition() => CheckBoxEditorViewModel.GetDefaultBool(this.Handlers, (x) => ((SceneObjectViewModel) x).IsPositionAbsolute);
-        public bool? CalculateDefaultScale() => CheckBoxEditorViewModel.GetDefaultBool(this.Handlers, (x) => ((SceneObjectViewModel) x).IsScaleAbsolute);
-        public bool? CalculateDefaultRotation() => CheckBoxEditorViewModel.GetDefaultBool(this.Handlers, (x) => ((SceneObjectViewModel) x).IsRotationAbsolute);
+        public bool? CalculateDefaultPosition() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsPositionAbsolute, out bool v) ? v : (bool?) null;
+        public bool? CalculateDefaultScale() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsScaleAbsolute, out bool v) ? v : (bool?) null;
+        public bool? CalculateDefaultRotation() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsRotationAbsolute, out bool v) ? v : (bool?) null;
 
         protected override void OnHandlersLoaded() {
             base.OnHandlersLoaded();

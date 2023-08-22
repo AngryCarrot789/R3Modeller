@@ -7,6 +7,7 @@ namespace R3Modeller.AdvancedContextService.Static {
     [ContentProperty("Items")]
     public class StaticBaseMenuItem : StaticMenuElement {
         private StaticMenuItemCollection items;
+
         public StaticMenuItemCollection Items {
             get => this.items ?? (this.items = new StaticMenuItemCollection());
         }

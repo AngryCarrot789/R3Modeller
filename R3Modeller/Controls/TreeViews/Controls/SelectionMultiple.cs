@@ -70,7 +70,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 this.lastShiftRoot = item.DataContext;
             }
             else if (IsShiftKeyDown && this.treeView.SelectedItems.Count > 0) {
-                object firstSelectedItem = this.lastShiftRoot ?? this.treeView.SelectedItems.First();
+                object firstSelectedItem = this.lastShiftRoot ?? ListUtils.First(this.treeView.SelectedItems);
                 MultiSelectTreeViewItem shiftRootItem = this.treeView.GetTreeViewItemsFor(new List<object> {firstSelectedItem}).First();
 
                 var newSelection = this.treeView.GetNodesToSelectBetween(shiftRootItem, item).Select(n => n.DataContext).ToList();

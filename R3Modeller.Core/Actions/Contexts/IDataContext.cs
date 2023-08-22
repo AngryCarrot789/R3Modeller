@@ -14,7 +14,7 @@ namespace R3Modeller.Core.Actions.Contexts {
         /// <summary>
         /// Returns all of the custom data. Will not return null, but may be empty
         /// </summary>
-        IEnumerable<(string, object)> CustomData { get; }
+        IEnumerable<(string, object)> Entries { get; }
 
         /// <summary>
         /// Gets a context object of a specific type

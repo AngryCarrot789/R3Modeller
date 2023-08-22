@@ -1,8 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
-using MCNBTEditor.Utils;
+using R3Modeller.Core.Utils;
 
-namespace MCNBTEditor.WPF.Controls {
+namespace R3Modeller.Controls {
     public static class TreeExtension {
         public static readonly DependencyProperty IsInitiallyExpandableProperty = DependencyProperty.RegisterAttached("IsInitiallyExpandable", typeof(bool), typeof(TreeExtension), new FrameworkPropertyMetadata(BoolBox.False, PropertyChangedCallback));
 

@@ -123,7 +123,5 @@ namespace R3Modeller.Core.Utils {
                 // do nothing but loop for the rest of the duration, for precise timing
             }
         }
-
-        public static double TicksToMillis(long ticks) => ticks / TICK_PER_MILLIS_D;
     }
 }

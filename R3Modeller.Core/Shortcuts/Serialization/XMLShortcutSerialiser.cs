@@ -44,8 +44,17 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
                     shortcutElement.SetAttribute("DisplayName", shortcut.DisplayName);
                 if (shortcut.IsGlobal)
                     shortcutElement.SetAttribute("IsGlobal", "true");
-                if (shortcut.IsInherited)
-                    shortcutElement.SetAttribute("Inherit", "true");
+                if (!shortcut.IsInherited) // inherit is true by default, so only serialise if explicitly false
+                    shortcutElement.SetAttribute("Inherit", "false");
+                switch (shortcut.RepeatMode) {
+                    case RepeatMode.NonRepeat:
+                        shortcutElement.SetAttribute("RepeatMode", "NonRepeat");
+                        break;
+                    case RepeatMode.RepeatOnly:
+                        shortcutElement.SetAttribute("RepeatMode", "RepeatOnly");
+                        break;
+                }
+
                 if (!string.IsNullOrWhiteSpace(shortcut.ActionId))
                     shortcutElement.SetAttribute("ActionId", shortcut.ActionId);
                 if (!string.IsNullOrWhiteSpace(shortcut.Description))
@@ -63,20 +72,68 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
                             this.SerialiseKeystroke(doc, shortcutElement, ks);
                         }
                         else {
-                            throw new Exception($"Unexpected input stroke: {stroke} ({stroke?.GetType()})");
+                            throw new Exception($"Unknown input stroke: {stroke} ({stroke?.GetType()})");
                         }
                     }
                 }
 
                 groupElement.AppendChild(shortcutElement);
             }
+
+            foreach (GroupedInputState state in group.InputStates) {
+                XmlElement stateElement = doc.CreateElement("InputState");
+                stateElement.SetAttribute("Name", state.Name); // guaranteed non-null, not empty and not whitespaces
+                if (state.ActivationStroke is KeyStroke ka) {
+                    if (state.DeactivationStroke is KeyStroke kd) {
+                        if (ka.EqualsExceptRelease(kd)) {
+                            KeyStroke stroke = new KeyStroke(ka.KeyCode, ka.Modifiers, false);
+                            this.SerialiseKeystroke(doc, stateElement, stroke, "InputState.ActivationKeyStroke");
+                        }
+                        else {
+                            this.SerialiseKeystroke(doc, stateElement, in ka, "InputState.ActivationKeyStroke");
+                            this.SerialiseKeystroke(doc, stateElement, in kd, "InputState.DeactivationKeyStroke");
+                        }
+                    }
+                    else if (state.DeactivationStroke is MouseStroke md) {
+                        this.SerialiseKeystroke(doc, stateElement, in ka, "InputState.ActivationKeyStroke");
+                        this.SerialiseMousestroke(doc, stateElement, in md, "InputState.DeactivationMouseStroke");
+                    }
+                    else {
+                        throw new Exception($"Unknown deactivation stroke: {state.DeactivationStroke}");
+                    }
+                }
+                else if (state.ActivationStroke is MouseStroke ma) {
+                    if (state.DeactivationStroke is MouseStroke md) {
+                        if (ma.Equals(md)) {
+                            MouseStroke stroke = new MouseStroke(ma.MouseButton, ma.Modifiers, false, ma.ClickCount, ma.WheelDelta);
+                            this.SerialiseMousestroke(doc, stateElement, in stroke, "InputState.ActivationMouseStroke");
+                        }
+                        else {
+                            this.SerialiseMousestroke(doc, stateElement, in ma, "InputState.ActivationMouseStroke");
+                            this.SerialiseMousestroke(doc, stateElement, in md, "InputState.DeactivationMouseStroke");
+                        }
+                    }
+                    else if (state.DeactivationStroke is KeyStroke kd) {
+                        this.SerialiseMousestroke(doc, stateElement, in ma, "InputState.ActivationMouseStroke");
+                        this.SerialiseKeystroke(doc, stateElement, in kd, "InputState.DeactivationKeyStroke");
+                    }
+                    else {
+                        throw new Exception($"Unknown deactivation stroke: {state.DeactivationStroke}");
+                    }
+                }
+                else {
+                    throw new Exception($"Unknown activation stroke: {state.ActivationStroke}");
+                }
+
+                groupElement.AppendChild(stateElement);
+            }
         }
 
         protected void SerialiseContext(XmlDocument doc, XmlElement shortcutElement, DataContext context) {
-            if (context.InternalDataMap != null && context.InternalDataMap.Count > 0) {
+            if (context.EntryMap != null && context.EntryMap.Count > 0) {
                 List<string> flags = new List<string>();
                 List<KeyValuePair<string, string>> entries = new List<KeyValuePair<string, string>>();
-                foreach (KeyValuePair<string, object> pair in context.InternalDataMap) {
+                foreach (KeyValuePair<string, object> pair in context.EntryMap) {
                     if (string.IsNullOrWhiteSpace(pair.Key)) {
                         continue;
                     }
@@ -146,34 +203,82 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
             return root;
         }
 
-        public void DeserialiseGroupData(XmlElement element, ShortcutGroup group) {
-            foreach (XmlElement child in element.ChildNodes.OfType<XmlElement>()) {
-                string name = child.GetAttribute("Name");
-                if (string.IsNullOrWhiteSpace(name)) {
-                    throw new Exception($"Invalid 'Name' attribute for element in group '{group.FullPath ?? "<root>"}'");
-                }
-
+        public void DeserialiseGroupData(XmlElement src, ShortcutGroup dst) {
+            foreach (XmlElement child in src.ChildNodes.OfType<XmlElement>()) {
                 DataContext context = null;
                 switch (child.Name) {
                     case "Group": {
-                        ShortcutGroup innerGroup = group.CreateGroupByName(name, GetIsGlobal(child), GetIsInherit(child));
+                        ShortcutGroup innerGroup = dst.CreateGroupByName(GetElementName(dst, child), GetIsGlobal(child), GetIsInherit(child));
                         innerGroup.Description = GetDescription(child);
                         innerGroup.DisplayName = GetDisplayName(child);
                         this.DeserialiseGroupData(child, innerGroup);
                         break;
                     }
-                    case "Shortcut": { // XML should have strict name cases, buuut... why not be nice ;)
+                    case "InputState": {
+                        string name = GetElementName(dst, child);
+                        Dictionary<string, XmlElement> elements = new Dictionary<string, XmlElement>();
+                        foreach (XmlElement element in child.ChildNodes.OfType<XmlElement>()) {
+                            elements[element.Name] = element;
+                        }
+
+                        IInputStroke activator, deactivator;
+                        if (elements.TryGetValue("InputState.ActivationKeyStroke", out XmlElement activationKeyStroke)) {
+                            KeyStroke activationStroke = this.DeserialiseKeyStroke(activationKeyStroke);
+                            KeyStroke deativationStroke;
+                            if (elements.TryGetValue("InputState.DeactivationKeyStroke", out XmlElement deativationKeyStroke)) {
+                                deativationStroke = this.DeserialiseKeyStroke(deativationKeyStroke);
+                            }
+                            else if (activationStroke.IsRelease) {
+                                deativationStroke = activationStroke;
+                                activationStroke = new KeyStroke(activationStroke.KeyCode, activationStroke.Modifiers, false);
+                            }
+                            else {
+                                deativationStroke = new KeyStroke(activationStroke.KeyCode, activationStroke.Modifiers, true);
+                            }
+
+                            activator = activationStroke;
+                            deactivator = deativationStroke;
+                        }
+                        else if (elements.TryGetValue("InputState.ActivationMouseStroke", out XmlElement activationMouseStroke)) {
+                            MouseStroke activationStroke = this.DeserialiseMouseStroke(activationMouseStroke);
+                            MouseStroke deativationStroke;
+                            if (elements.TryGetValue("InputState.DeactivationMouseStroke", out XmlElement deativationMouseStroke)) {
+                                deativationStroke = this.DeserialiseMouseStroke(deativationMouseStroke);
+                            }
+                            else if (activationStroke.IsRelease) {
+                                deativationStroke = activationStroke;
+                                activationStroke = new MouseStroke(activationStroke.MouseButton, activationStroke.Modifiers, false, activationStroke.ClickCount);
+                            }
+                            else {
+                                deativationStroke = new MouseStroke(activationStroke.MouseButton, activationStroke.Modifiers, true, activationStroke.ClickCount);
+                            }
+
+                            activator = activationStroke;
+                            deactivator = deativationStroke;
+                        }
+                        else {
+                            throw new Exception("Missing 'ActivationKeyStroke' or 'ActivationMouseStroke' for a key state");
+                        }
+
+                        dst.AddInputState(name, activator, deactivator);
+                        break;
+                    }
+                    case "Shortcut": {
+                        string name = GetElementName(dst, child);
                         List<IInputStroke> inputs = new List<IInputStroke>();
                         foreach (XmlElement innerElement in child.ChildNodes.OfType<XmlElement>()) {
+                            // XML should have strict name cases, buuuut... why not be nice ;)
                             switch (innerElement.Name) {
                                 case "KeyStroke":
                                 case "Keystroke":
                                 case "keystroke":
-                                    inputs.Add(this.DeserialiseKeyStroke(innerElement)); break;
+                                    inputs.Add(this.DeserialiseKeyStroke(innerElement));
+                                    break;
                                 case "MouseStroke":
                                 case "Mousestroke":
                                 case "mousestroke":
-                                    inputs.Add(this.DeserialiseMouseStroke(innerElement)); break;
+                                    inputs.Add(this.DeserialiseMouseStroke(innerElement));
+                                    break;
                                 case "Shortcut.Context":
                                 case "Shortcut.context": {
                                     if (innerElement.ChildNodes.Count < 1) {
@@ -190,13 +295,17 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
 
                                             foreach (string flag in flags.Split(' ')) {
                                                 if (!string.IsNullOrWhiteSpace(flag)) {
-                                                    context.Set(flag, true);
+                                                    context.Set(flag, BoolBox.True);
                                                 }
                                             }
                                         }
                                         else {
-                                            bool isBoolFlag = contextNode.Name.EqualsIgnoreCase("flag");
-                                            if (isBoolFlag || contextNode.Name.EqualsIgnoreCase("entry")) {
+                                            bool isBoolFlag, isFloatEntry = false, isIntEntry = false;
+                                            if ((isBoolFlag = contextNode.Name.EqualsIgnoreCase("flag")) ||
+                                                (isFloatEntry = contextNode.Name.EqualsIgnoreCase("floatentry")) ||
+                                                (isIntEntry = contextNode.Name.EqualsIgnoreCase("intentry")) ||
+                                                contextNode.Name.EqualsIgnoreCase("entry")) {
+                                                // slightly messy code above but it works ;)
                                                 string key = GetAttributeNullable(contextNode, "Key");
                                                 string value = GetAttributeNullable(contextNode, "Value");
                                                 if (string.IsNullOrEmpty(key)) {
@@ -214,6 +323,16 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
                                                         throw new Exception($"Invalid flag value. Expected 'true' or 'false', but got '{value}'");
                                                     }
                                                 }
+                                                else if (isIntEntry) {
+                                                    if (value == null || !long.TryParse(value, out long v))
+                                                        throw new Exception("Invalid int entry value: " + value);
+                                                    context.Set(key, v);
+                                                }
+                                                else if (isFloatEntry) {
+                                                    if (value == null || !double.TryParse(value, out double v))
+                                                        throw new Exception("Invalid float entry value: " + value);
+                                                    context.Set(key, v);
+                                                }
                                                 else {
                                                     context.Set(key, value ?? "");
                                                 }
@@ -221,7 +340,7 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
                                         }
                                     }
 
-                                    if (context.InternalDataMap == null || context.InternalDataMap.Count < 1) {
+                                    if (context.EntryMap == null || context.EntryMap.Count < 1) {
                                         context = null;
                                     }
 
@@ -246,7 +365,9 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
                             continue;
                         }
 
-                        GroupedShortcut managed = group.AddShortcut(name, shortcut, GetIsGlobal(child), GetIsInherit(child));
+                        GroupedShortcut managed = dst.AddShortcut(name, shortcut, GetIsGlobal(child));
+                        managed.IsInherited = GetIsInherit(child);
+                        managed.RepeatMode = GetRepeatMode(child);
                         managed.ActionId = GetAttributeNullable(child, "ActionId");
                         managed.Description = GetDescription(child);
                         managed.DisplayName = GetDisplayName(child);
@@ -261,18 +382,37 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
 
         #region Util functions
 
-        protected static bool GetIsGlobal(XmlElement element) { // false by default
+        protected static bool GetIsGlobal(XmlElement element) {
+            // false by default
             string attrib = element.GetAttribute("IsGlobal");
-            if (string.IsNullOrWhiteSpace(attrib))
+            if (attrib.Length == 0)
                 attrib = element.GetAttribute("Global");
             return !string.IsNullOrWhiteSpace(attrib) && attrib.Equals("True", StringComparison.OrdinalIgnoreCase);
         }
 
-        protected static bool GetIsInherit(XmlElement element) { // true by default
+        protected static bool GetIsInherit(XmlElement element) {
+            // true by default
             string attrib = element.GetAttribute("IsInherit");
-            if (string.IsNullOrWhiteSpace(attrib))
+            if (attrib.Length == 0)
                 attrib = element.GetAttribute("Inherit");
             return string.IsNullOrWhiteSpace(attrib) || attrib.Equals("True", StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected static RepeatMode GetRepeatMode(XmlElement element) {
+            // true by default
+            string attrib = element.GetAttribute("RepeatMode");
+            if (string.IsNullOrWhiteSpace(attrib)) {
+                return RepeatMode.Ignored;
+            }
+            else if (attrib.EqualsIgnoreCase("nonrepeat") || attrib.EqualsIgnoreCase("norepeat") || attrib.EqualsIgnoreCase("nonrepeated")) {
+                return RepeatMode.NonRepeat;
+            }
+            else if (attrib.EqualsIgnoreCase("repeatonly") || attrib.EqualsIgnoreCase("repeat") || attrib.EqualsIgnoreCase("onlyrepeat")) {
+                return RepeatMode.RepeatOnly;
+            }
+            else {
+                return RepeatMode.NonRepeat;
+            }
         }
 
         protected static string GetDescription(XmlElement element) {
@@ -291,11 +431,24 @@ namespace R3Modeller.Core.Shortcuts.Serialization {
             return string.IsNullOrEmpty(value) ? null : value;
         }
 
+        protected static string GetElementName(ShortcutGroup dst, XmlElement child) {
+            if (!child.HasAttribute("Name")) {
+                throw new Exception($"'Name' attribute must be provided, in group '{dst.FullPath ?? "<root>"}'");
+            }
+
+            string childName = child.GetAttribute("Name");
+            if (string.IsNullOrWhiteSpace(childName)) {
+                throw new Exception($"Invalid 'Name' attribute value, in group '{dst.FullPath ?? "<root>"}'");
+            }
+
+            return childName;
+        }
+
         #endregion
 
         protected abstract KeyStroke DeserialiseKeyStroke(XmlElement element);
         protected abstract MouseStroke DeserialiseMouseStroke(XmlElement element);
-        protected abstract void SerialiseKeystroke(XmlDocument doc, XmlElement shortcut, in KeyStroke stroke);
-        protected abstract void SerialiseMousestroke(XmlDocument doc, XmlElement shortcut, in MouseStroke stroke);
+        protected abstract void SerialiseKeystroke(XmlDocument doc, XmlElement elem, in KeyStroke stroke, string childElementName = "KeyStroke");
+        protected abstract void SerialiseMousestroke(XmlDocument doc, XmlElement elem, in MouseStroke stroke, string childElementName = "MouseStroke");
     }
 }

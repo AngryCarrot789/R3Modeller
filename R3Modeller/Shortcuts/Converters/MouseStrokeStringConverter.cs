@@ -22,20 +22,40 @@ namespace R3Modeller.Shortcuts.Converters {
 
             string name;
             switch (mouseButton) {
-                case 0: name = "Left Click"; break;
-                case 1: name = "Middle Click"; break;
-                case 2: name = "Right Click"; break;
-                case 3: name = "X1 (←)"; break;
-                case 4: name = "X2 (→)"; break;
-                case WPFShortcutManager.BUTTON_WHEEL_UP: name = "Wheel Up"; break;
-                case WPFShortcutManager.BUTTON_WHEEL_DOWN: name = "Wheel Down"; break;
+                case 0:
+                    name = "Left Click";
+                    break;
+                case 1:
+                    name = "Middle Click";
+                    break;
+                case 2:
+                    name = "Right Click";
+                    break;
+                case 3:
+                    name = "X1 (←)";
+                    break;
+                case 4:
+                    name = "X2 (→)";
+                    break;
+                case WPFShortcutManager.BUTTON_WHEEL_UP:
+                    name = "Wheel Up";
+                    break;
+                case WPFShortcutManager.BUTTON_WHEEL_DOWN:
+                    name = "Wheel Down";
+                    break;
                 default: throw new Exception("Invalid mouse button: " + mouseButton);
             }
 
             switch (clickCount) {
-                case 2: sb.Append("Double ").Append(name); break;
-                case 3: sb.Append("Triple ").Append(name); break;
-                case 4: sb.Append("Quad ").Append(name); break;
+                case 2:
+                    sb.Append("Double ").Append(name);
+                    break;
+                case 3:
+                    sb.Append("Triple ").Append(name);
+                    break;
+                case 4:
+                    sb.Append("Quad ").Append(name);
+                    break;
                 default: {
                     if (clickCount > 0) {
                         sb.Append(name).Append(" (x").Append(clickCount).Append(")");
@@ -57,9 +77,12 @@ namespace R3Modeller.Shortcuts.Converters {
                 return DependencyProperty.UnsetValue;
             }
 
-            if (!(values[0] is int mouseButton)) throw new Exception("values[0] must be an int: mouseButton");
-            if (!(values[1] is int modifiers)) throw new Exception("values[1] must be an int: modifiers");
-            if (!(values[2] is int clickCount)) throw new Exception("values[2] must be an int: clickCount");
+            if (!(values[0] is int mouseButton))
+                throw new Exception("values[0] must be an int: mouseButton");
+            if (!(values[1] is int modifiers))
+                throw new Exception("values[1] must be an int: modifiers");
+            if (!(values[2] is int clickCount))
+                throw new Exception("values[2] must be an int: clickCount");
 
             return ToStringFunction(mouseButton, modifiers, clickCount);
         }

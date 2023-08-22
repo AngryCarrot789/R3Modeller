@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MCNBTEditor.WPF.Themes {
+namespace R3Modeller.Themes {
     public enum ThemeType {
         DeepDark,
         SoftDark,

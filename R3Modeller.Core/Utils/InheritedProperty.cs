@@ -25,7 +25,6 @@ namespace R3Modeller.Core.Utils {
         public bool IsSet => this.hasValue;
 
         public InheritedProperty() {
-
         }
 
         public InheritedProperty(T value) {

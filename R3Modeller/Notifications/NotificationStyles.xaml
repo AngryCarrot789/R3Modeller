@@ -1,9 +1,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:utils="clr-namespace:R3Modeller.Utils"
+                    xmlns:n="clr-namespace:R3Modeller.Notifications"
                     xmlns:types="clr-namespace:R3Modeller.Core.Notifications.Types;assembly=R3Modeller.Core"
-                    xmlns:history="clr-namespace:R3Modeller.Core.History;assembly=R3Modeller.Core"
-                    xmlns:n="clr-namespace:R3Modeller.Notifications">
+                    xmlns:history="clr-namespace:R3Modeller.Core.History;assembly=R3Modeller.Core">
     <utils:ResourceDictionaryDataTemplateSelector x:Key="NotificationTemplateSelector">
         <utils:ResourceDictionaryDataTemplateSelector.ResourceDictionary>
             <ResourceDictionary>

@@ -61,34 +61,42 @@ namespace R3Modeller.Core.Shortcuts.Managing {
         public string ActionId { get; set; }
 
         /// <summary>
-        /// This shortcut's full path (the parent's path (if available/not root) and this shortcut's name)
+        /// This shortcut's full path (the parent's path (if available/not root) and this shortcut's name). Will not be null and will always containing valid characters
         /// </summary>
         public string FullPath { get; }
+
+        /// <summary>
+        /// Whether or not this shortcut is triggered by non-repeated key strokes, repeated key strokes, or if repeats are ignored
+        /// <para>
+        /// Set to true to accept
+        /// </para>
+        /// </summary>
+        public RepeatMode RepeatMode { get; set; }
 
         /// <summary>
         /// Additional context for this shortcut to be passed to the action system
         /// </summary>
         public DataContext ActionContext { get; set; }
 
-        public GroupedShortcut(ShortcutGroup group, string name, IShortcut shortcut, bool isGlobal = false, bool isInherited = true) {
+        public GroupedShortcut(ShortcutGroup group, string name, IShortcut shortcut, bool isGlobal = false) {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be null, empty, or consist of only whitespaces");
             this.Group = group ?? throw new ArgumentNullException(nameof(group), "Collection cannot be null");
             this.Name = name;
-            this.Shortcut = shortcut;
+            this.Shortcut = shortcut ?? throw new ArgumentNullException(nameof(shortcut));
             this.FullPath = group.GetPathForName(name);
             this.IsGlobal = isGlobal;
-            this.IsInherited = isInherited;
+            this.IsInherited = true;
         }
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder();
-            sb.Append(this.Shortcut.IsEmpty ? "Empty/No Shortcut" : this.Shortcut.ToString()).Append(" -> ").Append(this.FullPath);
+            sb.Append(nameof(GroupedShortcut)).Append(" (").Append(this.Shortcut.IsEmpty ? "Empty/No Shortcut" : this.Shortcut.ToString()).Append(" -> ").Append(this.FullPath);
             if (!string.IsNullOrWhiteSpace(this.Description)) {
                 sb.Append(" (").Append(this.Description).Append(")");
             }
 
-            return sb.ToString();
+            return sb.Append(')').ToString();
         }
     }
 }

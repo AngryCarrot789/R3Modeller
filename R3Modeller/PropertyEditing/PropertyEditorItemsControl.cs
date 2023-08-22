@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace R3Modeller.PropertyEditing {
     public class PropertyEditorItemsControl : ItemsControl {
+        public PropertyEditorItemsControl() {
+        }
+
         protected override bool IsItemItsOwnContainerOverride(object item) {
             return item is PropertyEditorItemContainer;
         }

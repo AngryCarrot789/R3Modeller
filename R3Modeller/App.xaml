@@ -8,10 +8,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml"/>
-                <ResourceDictionary Source="Themes/ControlColours.xaml"/>
-                <ResourceDictionary Source="Themes/Controls.xaml"/>
+                <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml" />
+                <ResourceDictionary Source="Themes/ControlColours.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
                 <ResourceDictionary Source="/Controls/TreeViews/Themes/Aero2.NormalColor.xaml" />
+
+                <ResourceDictionary Source="Themes/Globals.xaml"/>
 
                 <ResourceDictionary Source="Controls/ControlStyles.xaml"/>
                 <ResourceDictionary Source="AdvancedContextService/ContextStyles.xaml"/>

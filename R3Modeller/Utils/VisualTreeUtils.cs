@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,7 +12,7 @@ namespace R3Modeller.Utils {
         /// <param name="property"></param>
         /// <param name="startObject"></param>
         /// <returns></returns>
-        public static DependencyObject FindInheritedPropertyDefinition(DependencyProperty property, DependencyObject startObject) {
+        public static DependencyObject FindNearestInheritedPropertyDefinition(DependencyProperty property, DependencyObject startObject) {
             DependencyObject obj = startObject;
             while (obj != null && obj.ReadLocalValue(property) == DependencyProperty.UnsetValue) {
                 obj = GetParent(obj);
@@ -40,39 +41,40 @@ namespace R3Modeller.Utils {
             do {
                 obj = GetParent(obj);
             } while (obj != null && !(obj is T));
+
             return (T) obj;
         }
 
-        public static T FindVisualChild<T>(DependencyObject obj, bool includeSelf = true) where T : DependencyObject {
-            if (obj == null || includeSelf && obj is T) {
-                return (T) obj;
-            }
-
-            return FindVisualChildInternal<T>(obj);
+        public static T FindVisualChild<T>(DependencyObject obj, bool useSelf = true) where T : DependencyObject {
+            return useSelf && obj is T ? (T) obj : FindChildRecursive<T>(obj, null);
         }
 
-        private static T FindVisualChildInternal<T>(DependencyObject obj) where T : DependencyObject {
+        public static T FindVisualChildByName<T>(DependencyObject obj, string name, bool useSelf = true) where T : FrameworkElement {
+            return useSelf && obj is T && ((T) obj).Name == name ? (T) obj : FindChildRecursive<T>(obj, x => x.Name == name);
+        }
+
+        private static T FindChildRecursive<T>(DependencyObject obj, Predicate<T> filter) where T : DependencyObject {
             int count, i;
             if (obj is ContentControl) {
                 DependencyObject child = ((ContentControl) obj).Content as DependencyObject;
-                if (child is T) {
+                if (child is T && (filter == null || filter((T) child))) {
                     return (T) child;
                 }
                 else {
-                    return child != null ? FindVisualChildInternal<T>(child) : null;
+                    return child != null ? FindChildRecursive(child, filter) : null;
                 }
             }
             else if ((obj is Visual || obj is Visual3D) && (count = VisualTreeHelper.GetChildrenCount(obj)) > 0) {
-                for (i = 0; i < count;) {
-                    DependencyObject child = VisualTreeHelper.GetChild(obj, i++);
-                    if (child is T) {
+                for (i = 0; i < count; i++) {
+                    DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                    if (child is T && (filter == null || filter((T) child))) {
                         return (T) child;
                     }
                 }
 
-                for (i = 0; i < count;) {
-                    T child = FindVisualChildInternal<T>(VisualTreeHelper.GetChild(obj, i++));
-                    if (child != null) {
+                for (i = 0; i < count; i++) {
+                    T child = FindChildRecursive(VisualTreeHelper.GetChild(obj, i), filter);
+                    if (child != null && (filter == null || filter(child))) {
                         return child;
                     }
                 }
@@ -92,5 +94,7 @@ namespace R3Modeller.Utils {
                 return null;
             }
         }
+
+        public static bool GetDataContextHelper(DependencyObject src, out object context) => (context = GetDataContext(src)) != null;
     }
 }

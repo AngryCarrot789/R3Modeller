@@ -1,20 +1,19 @@
 using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using MCNBTEditor.WPF.Resources;
 using R3Modeller.Core;
-using R3Modeller.Resources;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.AdvancedContextService {
     public class AdvancedMenuItem : MenuItem {
         private object currentItem;
 
-        public static readonly DependencyProperty IconTypeProperty =
-            DependencyProperty.Register(
-                "IconType",
-                typeof(IconType),
-                typeof(AdvancedMenuItem),
-                new PropertyMetadata(IconType.None, PropertyChangedCallback));
+        public static readonly DependencyProperty IconTypeProperty = DependencyProperty.Register("IconType", typeof(IconType), typeof(AdvancedMenuItem), new PropertyMetadata(IconType.None, PropertyChangedCallback));
+        public static readonly DependencyProperty CommandParameterTargetTypeProperty = DependencyProperty.Register("CommandParameterTargetType", typeof(Type), typeof(AdvancedMenuItem), new PropertyMetadata(null));
+        public static readonly DependencyProperty ForceCommandOnMissingTargetTypeProperty = DependencyProperty.Register("ForceCommandOnMissingTargetType", typeof(bool), typeof(AdvancedMenuItem), new PropertyMetadata(BoolBox.False));
 
         private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if (d is AdvancedMenuItem item) {
@@ -38,13 +37,52 @@ namespace R3Modeller.AdvancedContextService {
             set => this.SetValue(IconTypeProperty, value);
         }
 
-        static AdvancedMenuItem() {
+        /// <summary>
+        /// Used to search for a specific type of object to pass as a command parameter
+        /// </summary>
+        public Type CommandParameterTargetType {
+            get => (Type) this.GetValue(CommandParameterTargetTypeProperty);
+            set => this.SetValue(CommandParameterTargetTypeProperty, value);
+        }
 
+        public bool ForceCommandOnMissingTargetType {
+            get => (bool) this.GetValue(ForceCommandOnMissingTargetTypeProperty);
+            set => this.SetValue(ForceCommandOnMissingTargetTypeProperty, value.Box());
+        }
+
+        static AdvancedMenuItem() {
         }
 
         public AdvancedMenuItem() {
-
         }
+
+        private static readonly MethodInfo FocusOrSelectMethodInfo = typeof(MenuItem).GetMethod("FocusOrSelect", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
+
+        // protected override void OnClick() {
+        //     // base.OnClick();
+        //     if (this.IsCheckable)
+        //         this.IsChecked = !this.IsChecked;
+        //     if (!this.IsKeyboardFocusWithin)
+        //         FocusOrSelectMethodInfo.Invoke(this, new object[0]);
+        //     // this.RaiseEvent(new RoutedEventArgs(MenuItem.PreviewClickEvent, (object) this));
+        //     this.Dispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(this.InvokeClickAfterRender), null);
+        // }
+        // private object InvokeClickAfterRender(object arg) {
+        //     ICommand command = this.Command;
+        //     if (command != null) {
+        //         object param = null;
+        //         if (this.CommandParameterTargetType is Type type) {
+        //             IInputElement element = Keyboard.FocusedElement;
+        //         }
+        //         if (param == null) {
+        //             param = this.CommandParameter;
+        //         }
+        //         if (command.CanExecute(param)) {
+        //             command.Execute(param);
+        //         }
+        //     }
+        //     return null;
+        // }
 
         protected override bool IsItemItsOwnContainerOverride(object item) {
             if (item is MenuItem || item is Separator)

@@ -17,15 +17,18 @@ namespace R3Modeller.Utils {
             }
 
             if (input.Length == 1) {
-                if (first >= '0' && first <= '9') { // Parse 0-9
+                if (first >= '0' && first <= '9') {
+                    // Parse 0-9
                     return (Key) (first - '0') + (int) Key.D0;
                 }
 
-                if (first >= 'a' && first <= 'z') { // Parse a-z
+                if (first >= 'a' && first <= 'z') {
+                    // Parse a-z
                     return (Key) (first - 'a') + (int) Key.A;
                 }
 
-                if (first >= 'A' && first <= 'Z') { // Parse A-Z
+                if (first >= 'A' && first <= 'Z') {
+                    // Parse A-Z
                     return (Key) (first - 'A') + (int) Key.A;
                 }
             }

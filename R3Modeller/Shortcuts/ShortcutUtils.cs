@@ -41,7 +41,7 @@ namespace R3Modeller.Shortcuts {
         }
 
         public static MouseStroke GetMouseStrokeForEvent(MouseButtonEventArgs e) {
-            return new MouseStroke((int) e.ChangedButton, (int) Keyboard.Modifiers, e.ClickCount);
+            return new MouseStroke((int) e.ChangedButton, (int) Keyboard.Modifiers, e.ButtonState == MouseButtonState.Released, e.ClickCount);
         }
 
         public static bool GetMouseStrokeForEvent(MouseWheelEventArgs e, out MouseStroke stroke) {
@@ -57,7 +57,7 @@ namespace R3Modeller.Shortcuts {
                 return false;
             }
 
-            stroke = new MouseStroke(button, (int) Keyboard.Modifiers, 0, e.Delta);
+            stroke = new MouseStroke(button, (int) Keyboard.Modifiers, false, 0, e.Delta);
             return true;
         }
 
@@ -81,8 +81,7 @@ namespace R3Modeller.Shortcuts {
                 case Key.OemClear:
                 case Key.Apps:
                     return true;
-                default:
-                    return false;
+                default: return false;
             }
         }
     }

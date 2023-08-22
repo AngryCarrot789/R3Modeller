@@ -18,7 +18,7 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
         protected override void OnHandlersLoaded() {
             base.OnHandlersLoaded();
             foreach (CheckBoxEditorViewModel editor in this.Editors) {
-                editor.LoadHandlers(this.Handlers);
+                editor.SetHandlers(this.Handlers);
             }
         }
 

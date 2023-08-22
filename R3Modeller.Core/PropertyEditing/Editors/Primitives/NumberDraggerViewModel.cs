@@ -4,6 +4,7 @@ using System.Windows.Input;
 namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
     public class NumberDraggerViewModel : BasePropertyEditorViewModel {
         private double value;
+
         public double Value {
             get => this.value;
             set {
@@ -14,12 +15,14 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Primitives {
         }
 
         private double minValue;
+
         public double MinValue {
             get => this.minValue;
             set => this.RaisePropertyChanged(ref this.minValue, value);
         }
 
         private double maxValue;
+
         public double MaxValue {
             get => this.maxValue;
             set => this.RaisePropertyChanged(ref this.maxValue, value);

@@ -11,15 +11,12 @@ namespace R3Modeller.Core.AdvancedContextService {
         }
 
         public GroupContextEntry(string header, string description, IEnumerable<IContextEntry> children = null) : this(null, header, description, children) {
-
         }
 
         public GroupContextEntry(object dataContext, string header, IEnumerable<IContextEntry> children = null) : this(dataContext, header, null, children) {
-
         }
 
         public GroupContextEntry(string header, IEnumerable<IContextEntry> children = null) : this(null, header, null, children) {
-
         }
     }
 }

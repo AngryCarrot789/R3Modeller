@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace R3Modeller.Core.AdvancedContextService {
     public class ShortcutActionContextEntry : ActionContextEntry {
         private string shortcutId;
+
         public string ShortcutId {
             get => this.shortcutId;
             set => this.RaisePropertyChanged(ref this.shortcutId, value);

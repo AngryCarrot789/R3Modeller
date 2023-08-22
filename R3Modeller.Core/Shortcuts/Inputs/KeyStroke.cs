@@ -32,40 +32,45 @@ namespace R3Modeller.Core.Shortcuts.Inputs {
         /// <summary>
         /// Whether this key stroke corresponds to a key release. False means key pressed
         /// </summary>
-        public bool IsKeyRelease { get; }
+        public bool IsRelease { get; }
 
         /// <summary>
-        /// Whether this key stroke corresponds to a key press. This is the inverse of <see cref="IsKeyRelease"/>
+        /// Whether this key stroke corresponds to a key press. This is the inverse of <see cref="IsRelease"/>
         /// </summary>
-        public bool IsKeyDown => !this.IsKeyRelease;
+        public bool IsKeyDown => !this.IsRelease;
 
         public bool IsKeyboard => true;
 
         public bool IsMouse => false;
 
-        public KeyStroke(int keyCode, int modifiers, bool isKeyRelease) {
+        public KeyStroke(int keyCode, int modifiers, bool isRelease) {
             this.KeyCode = keyCode;
             this.Modifiers = modifiers;
-            this.IsKeyRelease = isKeyRelease;
+            this.IsRelease = isRelease;
         }
 
-        public bool Equals(IInputStroke stroke) {
-            return stroke is KeyStroke other && this.Equals(other);
-        }
+        /// <summary>
+        /// Gets whether the given stroke is a key stroke and it matches this instance
+        /// </summary>
+        /// <param name="stroke">The stroke to compare</param>
+        /// <returns>The current instance and the given stroke are "equal/match"</returns>
+        public bool Equals(IInputStroke stroke) => stroke is KeyStroke other && this.Equals(other);
+
+        public override bool Equals(object obj) => obj is KeyStroke other && this.Equals(other);
 
         public bool Equals(KeyStroke stroke) {
-            return this.KeyCode == stroke.KeyCode && this.Modifiers == stroke.Modifiers && this.IsKeyRelease == stroke.IsKeyRelease;
+            return this.KeyCode == stroke.KeyCode && this.Modifiers == stroke.Modifiers && this.IsRelease == stroke.IsRelease;
         }
 
-        public override bool Equals(object obj) {
-            return obj is KeyStroke other && this.Equals(other);
+        public bool EqualsExceptRelease(KeyStroke stroke) {
+            return this.KeyCode == stroke.KeyCode && this.Modifiers == stroke.Modifiers;
         }
 
         public override int GetHashCode() {
             unchecked {
                 int hash = this.KeyCode;
                 hash = (hash * 397) ^ this.Modifiers;
-                hash = (hash * 397) ^ (this.IsKeyRelease ? 1 : 0);
+                hash = (hash * 397) ^ (this.IsRelease ? 1 : 0);
                 return hash;
             }
         }
@@ -83,12 +88,12 @@ namespace R3Modeller.Core.Shortcuts.Inputs {
 
             sb.Append(KeyCodeToStringProvider(this.KeyCode));
             if (appendIsReleaseOnly) {
-                if (this.IsKeyRelease) {
+                if (this.IsRelease) {
                     sb.Append(" (Release)");
                 }
             }
             else {
-                sb.Append(this.IsKeyRelease ? " (Release)" : " (Press)");
+                sb.Append(this.IsRelease ? " (Release)" : " (Press)");
             }
 
             return sb.ToString();

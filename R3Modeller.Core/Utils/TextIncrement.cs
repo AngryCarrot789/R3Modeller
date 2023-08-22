@@ -110,7 +110,7 @@ namespace R3Modeller.Core.Utils {
             char[] chars = new char[index + 23];
             content.CopyTo(0, chars, 0, index);
             chars[index] = ' ';
-            chars[index+1] = '(';
+            chars[index + 1] = '(';
             index += 2;
             for (ulong i = num; i < max; i++) {
                 // int len = TextIncrement.GetChars(i, chars, index);

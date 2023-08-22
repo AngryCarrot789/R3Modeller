@@ -5,6 +5,7 @@ using R3Modeller.Core.Utils;
 namespace R3Modeller.Core.AdvancedContextService {
     public class ActionCheckableContextEntry : ActionContextEntry {
         private bool isChecked;
+
         public bool IsChecked {
             get => this.isChecked;
             set {

@@ -53,7 +53,8 @@ namespace R3Modeller.Core.Shortcuts.Usage {
                 this.currentStroke = this.currentStroke.Next;
                 return true;
             }
-            else if (this.currentStroke.Value.EqualsWithoutClick(stroke)) { // this allows double or triple clicking
+            else if (this.currentStroke.Value.EqualsWithoutClick(stroke)) {
+                // this allows double or triple clicking
                 // this.clickCounter++;
                 return true;
             }

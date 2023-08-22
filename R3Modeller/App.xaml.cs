@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,6 +17,7 @@ using R3Modeller.Core.Shortcuts.ViewModels;
 using R3Modeller.Core.Utils;
 using R3Modeller.Shortcuts;
 using R3Modeller.Shortcuts.Converters;
+using R3Modeller.Themes;
 using R3Modeller.Utils;
 using R3Modeller.Views;
 
@@ -24,28 +28,38 @@ namespace R3Modeller {
     public partial class App : Application {
         private AppSplashScreen splash;
 
+        public static ThemeType CurrentTheme { get; set; }
+
+        public static ResourceDictionary ThemeDictionary {
+            get => Current.Resources.MergedDictionaries[0];
+            set => Current.Resources.MergedDictionaries[0] = value;
+        }
+
+        public static ResourceDictionary ControlColours {
+            get => Current.Resources.MergedDictionaries[1];
+            set => Current.Resources.MergedDictionaries[1] = value;
+        }
+
+        public static ResourceDictionary I18NText {
+            get => Current.Resources.MergedDictionaries[3];
+            set => Current.Resources.MergedDictionaries[3] = value;
+        }
+
+        public static void RefreshControlsDictionary() {
+            ResourceDictionary resource = Current.Resources.MergedDictionaries[2];
+            Current.Resources.MergedDictionaries.RemoveAt(2);
+            Current.Resources.MergedDictionaries.Insert(2, resource);
+        }
+
         public App() {
         }
 
         public void RegisterActions() {
             // ActionManager.SearchAndRegisterActions(ActionManager.Instance);
             // TODO: Maybe use an XML file to store this, similar to how intellij registers actions?
-            // ActionManager.Instance.Register("actions.project.Open", new OpenProjectAction());
-            // ActionManager.Instance.Register("actions.project.Save", new SaveProjectAction());
-            // ActionManager.Instance.Register("actions.project.SaveAs", new SaveProjectAsAction());
             ActionManager.Instance.Register("actions.project.history.Undo", new UndoAction());
             ActionManager.Instance.Register("actions.project.history.Redo", new RedoAction());
             ActionManager.Instance.Register("actions.objlist.RenameItem", new RenameObjectAction());
-            // ActionManager.Instance.Register("actions.automation.AddKeyFrame", new AddKeyFrameAction());
-            // ActionManager.Instance.Register("actions.editor.timeline.TogglePlayPause", new TogglePlayPauseAction());
-            // ActionManager.Instance.Register("actions.resources.DeleteItems", new DeleteResourcesAction());
-            // ActionManager.Instance.Register("actions.resources.GroupSelection", new GroupSelectedResourcesAction());
-            // ActionManager.Instance.Register("actions.resources.RenameItem", new RenameResourceAction());
-            // ActionManager.Instance.Register("actions.resources.ToggleOnlineState", new ToggleResourceOnlineStateAction());
-            // ActionManager.Instance.Register("actions.editor.timeline.DeleteSelectedClips", new DeleteSelectedClips());
-            // ActionManager.Instance.Register("actions.editor.NewVideoTrack", new NewVideoTrackAction());
-            // ActionManager.Instance.Register("actions.editor.NewAudioTrack", new NewAudioTrackAction());
-            // ActionManager.Instance.Register("actions.editor.timeline.SliceClips", new SliceClipsAction());
         }
 
         private async Task SetActivity(string activity) {
@@ -56,12 +70,10 @@ namespace R3Modeller {
 
         public async Task InitApp() {
             await this.SetActivity("Loading services...");
-            string[] envArgs = Environment.GetCommandLineArgs();
+                        string[] envArgs = Environment.GetCommandLineArgs();
             if (envArgs.Length > 0 && Path.GetDirectoryName(envArgs[0]) is string dir && dir.Length > 0) {
                 Directory.SetCurrentDirectory(dir);
             }
-
-            ResourceLocator.Setup();
 
             IoC.Dispatcher = new DispatcherDelegate(this.Dispatcher);
             IoC.OnShortcutModified = (x) => {
@@ -70,8 +82,38 @@ namespace R3Modeller {
                     GlobalUpdateShortcutGestureConverter.BroadcastChange();
                 }
             };
+            IoC.BroadcastShortcutActivity = (x) => {
+            };
 
-            IoC.LoadServicesFromAttributes();
+            List<(TypeInfo, ServiceImplementationAttribute)> serviceAttributes = new List<(TypeInfo, ServiceImplementationAttribute)>();
+            List<(TypeInfo, ActionRegistrationAttribute)> attributes = new List<(TypeInfo, ActionRegistrationAttribute)>();
+
+            // Process all attributes in a single scan, instead of multiple scans for services, actions, etc
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                foreach (TypeInfo typeInfo in assembly.DefinedTypes) {
+                    ServiceImplementationAttribute serviceAttribute = typeInfo.GetCustomAttribute<ServiceImplementationAttribute>();
+                    if (serviceAttribute?.Type != null) {
+                        serviceAttributes.Add((typeInfo, serviceAttribute));
+                    }
+
+                    ActionRegistrationAttribute actionAttribute = typeInfo.GetCustomAttribute<ActionRegistrationAttribute>();
+                    if (actionAttribute != null) {
+                        attributes.Add((typeInfo, actionAttribute));
+                    }
+                }
+            }
+
+            foreach ((TypeInfo, ServiceImplementationAttribute) tuple in serviceAttributes) {
+                object instance;
+                try {
+                    instance = Activator.CreateInstance(tuple.Item1);
+                }
+                catch (Exception e) {
+                    throw new Exception($"Failed to create implementation of {tuple.Item2.Type} as {tuple.Item1}", e);
+                }
+
+                IoC.Instance.Register(tuple.Item2.Type, instance);
+            }
 
             await this.SetActivity("Loading shortcut and action managers...");
             ShortcutManager.Instance = new WPFShortcutManager();
@@ -80,6 +122,22 @@ namespace R3Modeller {
             InputStrokeViewModel.MouseToReadableString = MouseStrokeStringConverter.ToStringFunction;
 
             this.RegisterActions();
+
+            foreach ((TypeInfo type, ActionRegistrationAttribute attribute) in attributes.OrderBy(x => x.Item2.RegistrationOrder)) {
+                AnAction action;
+                try {
+                    action = (AnAction) Activator.CreateInstance(type, true);
+                }
+                catch (Exception e) {
+                    throw new Exception($"Failed to create an instance of the registered action '{type.FullName}'", e);
+                }
+
+                if (attribute.OverrideExisting && ActionManager.Instance.GetAction(attribute.ActionId) != null) {
+                    ActionManager.Instance.Unregister(attribute.ActionId);
+                }
+
+                ActionManager.Instance.Register(attribute.ActionId, action);
+            }
 
             await this.SetActivity("Loading keymap...");
             string keymapFilePath = Path.GetFullPath(@"Keymap.xml");
@@ -98,11 +156,6 @@ namespace R3Modeller {
             // Dialogs may be shown, becoming the main window, possibly causing the
             // app to shutdown when the mode is OnMainWindowClose or OnLastWindowClose
 
-#if false
-            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            this.MainWindow = new PropertyPageDemoWindow();
-            this.MainWindow.Show();
-#else
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.MainWindow = this.splash = new AppSplashScreen();
             this.splash.Show();
@@ -115,10 +168,10 @@ namespace R3Modeller {
             }
             catch (Exception ex) {
                 if (IoC.MessageDialogs != null) {
-                    await IoC.MessageDialogs.ShowMessageExAsync("App init failed", "Failed to start FramePFX", ex.GetToString());
+                    await IoC.MessageDialogs.ShowMessageExAsync("App init failed", "Failed to start R3Modeller", ex.GetToString());
                 }
                 else {
-                    MessageBox.Show("Failed to start FramePFX:\n\n" + ex, "Fatal App init failure");
+                    MessageBox.Show("Failed to start R3Modeller:\n\n" + ex, "Fatal App init failure");
                 }
 
                 this.Dispatcher.Invoke(() => {
@@ -128,33 +181,12 @@ namespace R3Modeller {
             }
 #endif
 
-            await this.SetActivity("Loading FramePFX main window...");
+            await this.SetActivity("Loading R3Modeller main window...");
             MainWindow window = new MainWindow();
             this.splash.Close();
             this.MainWindow = window;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             window.Show();
-            await this.Dispatcher.Invoke(async () => {
-                await this.OnVideoEditorLoaded(window);
-            }, DispatcherPriority.Loaded);
-#endif
-        }
-
-        public async Task OnVideoEditorLoaded(MainWindow editor) {
-            // await Task.Delay(2500);
-            // editor.Width = 3500;
-            // editor.Height = 1000;
-            // editor.Top = 20;
-            // editor.Left = -1900;
-            // for (int i = 0; i < 200; i++) {
-            //     editor.Width--;
-            //     await Task.Delay(35);
-            //     long time = editor.OGLViewPort.PART_RenderTarget.lastLockTime;
-            //     if (time > 0) {
-            //         editor.OGLViewPort.PART_RenderTarget.lastLockTime = 0;
-            //         Debug.WriteLine($"Win width = {Math.Round(editor.ActualWidth, 1).ToString("F1").FitLength(8)} | Bitmap width = {Math.Round(editor.OGLViewPort.PART_RenderTarget.ActualWidth, 1).ToString("F1").FitLength(8)} | Render Time = {Time.TicksToMillis(time).ToString("F2")}");
-            //     }
-            // }
         }
 
         protected override void OnExit(ExitEventArgs e) {

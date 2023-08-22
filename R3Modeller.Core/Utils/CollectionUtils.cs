@@ -25,7 +25,7 @@ namespace R3Modeller.Core.Utils {
         }
 
         public static void ForEachThenClear<T>(this ICollection<T> list, Action<T> consumer) {
-            using (ExceptionStack stack = new ExceptionStack()) {
+            using (ErrorList stack = new ErrorList()) {
                 int i = 0;
                 foreach (T item in list) {
                     try {
@@ -56,6 +56,28 @@ namespace R3Modeller.Core.Utils {
 
         public static IEnumerable<T> SingleItem<T>(in T value) {
             return new List<T> {value};
+        }
+
+        public static void AddAll<T>(this ICollection<T> collection, IEnumerable<T> items) {
+            foreach (T item in items) {
+                collection.Add(item);
+            }
+        }
+
+        public static int GetSortInsertionIndex<T>(IReadOnlyList<T> list, T item, Comparison<T> comparer) {
+            int left = 0;
+            int right = list.Count - 1;
+            while (left <= right) {
+                int middle = left + (right - left) / 2;
+                int comparison = comparer(item, list[middle]);
+                if (comparison < 0)
+                    right = middle - 1;
+                else if (comparison > 0)
+                    left = middle + 1;
+                else return middle;
+            }
+
+            return left;
         }
     }
 }

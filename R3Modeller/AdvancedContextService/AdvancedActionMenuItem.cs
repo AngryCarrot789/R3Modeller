@@ -69,6 +69,7 @@ namespace R3Modeller.AdvancedContextService {
         public bool IsExecuting { get; private set; }
 
         private bool canExecute;
+
         protected bool CanExecute {
             get => this.canExecute;
             set {
@@ -150,6 +151,10 @@ namespace R3Modeller.AdvancedContextService {
                 context.AddContext(obj);
                 ItemsControl itemsControl = ItemsControlFromItemContainer(obj);
                 if (itemsControl != null && itemsControl.IsItemItsOwnContainer(obj)) {
+                    if (itemsControl.DataContext is object dc2) {
+                        context.AddContext(dc2);
+                    }
+
                     context.AddContext(itemsControl);
                 }
             }

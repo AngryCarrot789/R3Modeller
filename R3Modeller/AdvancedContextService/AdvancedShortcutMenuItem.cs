@@ -113,7 +113,8 @@ namespace R3Modeller.AdvancedContextService {
         }
 
         protected bool IsValueUnset(DependencyProperty property) {
-            if (this.GetValue(property) == null) {  // allow empty bound strings
+            if (this.GetValue(property) == null) {
+                // allow empty bound strings
                 return this.ReadLocalValue(property) == DependencyProperty.UnsetValue;
             }
 

@@ -3,6 +3,9 @@ using R3Modeller.Core.Shortcuts.Inputs;
 using R3Modeller.Core.Shortcuts.Usage;
 
 namespace R3Modeller.Core.Shortcuts {
+    /// <summary>
+    /// An interface for shortcuts that accept mouse inputs
+    /// </summary>
     public interface IMouseShortcut : IShortcut {
         /// <summary>
         /// All of the Mouse Strokes that this shortcut contains

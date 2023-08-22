@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Utils {
     public class ThreadTimer {
@@ -77,7 +76,6 @@ namespace R3Modeller.Utils {
         public Thread Thread { get; private set; }
 
         public ThreadTimer() {
-
         }
 
         public ThreadTimer(TimeSpan interval) {

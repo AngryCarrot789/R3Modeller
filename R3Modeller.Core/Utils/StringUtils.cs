@@ -1,9 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace R3Modeller.Core.Utils {
     public static class StringUtils {
+        /// <summary>
+        /// Replaces multiple spaces with a single space.
+        /// where dots are spaces, '.....' or '.........' becomes '.'
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string CollapseSpaces(this string value) {
+            return Regex.Replace(value, @"\s+", " ");
+        }
+
         public static string JSubstring(this string @this, int startIndex, int endIndex) {
             return @this.Substring(startIndex, endIndex - startIndex);
         }
@@ -231,55 +242,38 @@ namespace R3Modeller.Core.Utils {
             return index == -1 ? str : str.Substring(index + 1);
         }
 
-        private class FastStringBuf {
-            private char[] buffer;
-            public int count;
-
-            public FastStringBuf(int initialCapacity) {
-                this.buffer = new char[initialCapacity];
+        public static string GetTypeName(string className) {
+            if (string.IsNullOrEmpty(className)) {
+                return "";
             }
 
-            public void append(object value) {
-                if (value == null) {
-                    this.append("null", 0, 4);
-                }
-                else {
-                    this.append(value.ToString(), 0, value.ToString().Length);
-                }
+            int lastIndex = className.LastIndexOf('/');
+            return lastIndex == -1 ? className : className.Substring(lastIndex + 1);
+        }
+
+        public static string GetNonDescriptiveTypeName(string className) {
+            if (string.IsNullOrEmpty(className)) {
+                return "";
             }
 
-            public void append(string str, int startIndex, int endIndex) {
-                int len = endIndex - startIndex;
-                if (len > 0) {
-                    this.EnsureCapacityForAddition(len);
-                    str.CopyTo(startIndex, this.buffer, this.count, len);
-                    this.count += len;
-                }
+            // Remove L; (Lpackage/Class;)
+            if (className.Length > 0 && className[0] == 'L' && className[className.Length - 1] == ';') {
+                className = className.Substring(1, className.Length - 2);
             }
 
-            private void EnsureCapacityForAddition(int additional) {
-                if (((this.count + additional) - this.buffer.Length) > 0) {
-                    this.grow(this.count + additional);
-                }
+            int lastIndex = className.LastIndexOf('/');
+            if (lastIndex != -1) {
+                className = className.Substring(lastIndex + 1);
             }
 
-            private void grow(int minCapacity) {
-                int oldCapacity = this.buffer.Length;
-                int newCapacity = oldCapacity + (oldCapacity >> 1);
-                if (newCapacity - minCapacity < 0)
-                    newCapacity = minCapacity;
+            return className;
+        }
 
-                char[] buff = new char[newCapacity];
-                for (int i = 0, end = Math.Min(this.count, newCapacity); i < end; i++) {
-                    buff[i] = this.buffer[i];
-                }
-
-                this.buffer = buff;
-            }
-
-            public override string ToString() {
-                return new String(this.buffer, 0, this.count);
-            }
+        public static int CountCharsAtStart(string str, char character, int startIndex = 0) {
+            int j = startIndex, len = str.Length;
+            while (j < len && str[j] == character)
+                ++j;
+            return j - startIndex;
         }
     }
 }

@@ -19,6 +19,8 @@ namespace R3Modeller.Converters {
 
         public abstract object Convert(object value, Type targetType, object parameter, CultureInfo culture);
 
-        public abstract object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
+        public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
     }
 }

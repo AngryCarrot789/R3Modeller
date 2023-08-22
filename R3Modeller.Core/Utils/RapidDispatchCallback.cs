@@ -43,7 +43,6 @@ namespace R3Modeller.Core.Utils {
 
                 return true;
             }
-
         }
 
         public bool Invoke(Action action) {

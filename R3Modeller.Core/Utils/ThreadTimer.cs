@@ -76,7 +76,6 @@ namespace R3Modeller.Core.Utils {
         public Thread Thread { get; private set; }
 
         public ThreadTimer() {
-
         }
 
         public ThreadTimer(TimeSpan interval) {

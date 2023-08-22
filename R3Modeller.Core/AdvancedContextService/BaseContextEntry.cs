@@ -11,18 +11,21 @@ namespace R3Modeller.Core.AdvancedContextService {
         public IDataContext Context => this.context;
 
         private string header;
+
         public string Header {
             get => this.header;
             set => this.RaisePropertyChanged(ref this.header, value);
         }
 
         private string description;
+
         public string Description {
             get => this.description;
             set => this.RaisePropertyChanged(ref this.description, value);
         }
 
         private IconType iconType;
+
         public IconType IconType {
             get => this.iconType;
             set => this.RaisePropertyChanged(ref this.iconType, value);
@@ -40,11 +43,9 @@ namespace R3Modeller.Core.AdvancedContextService {
         }
 
         protected BaseContextEntry(object dataContext, IEnumerable<IContextEntry> children = null) : this(dataContext, null, null, children) {
-
         }
 
         protected BaseContextEntry(IEnumerable<IContextEntry> children = null) : this(null, null, null, children) {
-
         }
 
         protected void SetContextKey(string key, object value) {

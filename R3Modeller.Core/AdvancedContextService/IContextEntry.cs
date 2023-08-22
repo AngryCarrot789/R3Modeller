@@ -9,6 +9,5 @@ namespace R3Modeller.Core.AdvancedContextService {
     /// </para>
     /// </summary>
     public interface IContextEntry {
-
     }
 }

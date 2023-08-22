@@ -27,6 +27,7 @@ namespace R3Modeller.Core {
         public static ActionManager ActionManager { get; } = new ActionManager();
         public static ShortcutManager ShortcutManager { get; set; }
         public static IShortcutManagerDialogService ShortcutManagerDialog => Provide<IShortcutManagerDialogService>();
+        
         public static Action<string> OnShortcutModified { get; set; }
         public static Action<string> BroadcastShortcutActivity { get; set; }
 
@@ -42,6 +43,8 @@ namespace R3Modeller.Core {
         public static IExplorerService ExplorerService => Provide<IExplorerService>();
         public static IKeyboardDialogService KeyboardDialogs => Provide<IKeyboardDialogService>();
         public static IMouseDialogService MouseDialogs => Provide<IMouseDialogService>();
+
+        public static ITranslator Translator => Provide<ITranslator>();
 
         public static HistoryManagerViewModel HistoryManager => Provide<HistoryManagerViewModel>();
 

@@ -3,6 +3,7 @@ using R3Modeller.Core.Shortcuts.Managing;
 namespace R3Modeller.Core.Shortcuts.ViewModels {
     public class ShortcutManagerViewModel : BaseViewModel {
         private ShortcutGroupViewModel root;
+
         public ShortcutGroupViewModel Root {
             get => this.root;
             private set => this.RaisePropertyChanged(ref this.root, value);

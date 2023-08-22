@@ -24,7 +24,6 @@ namespace R3Modeller.Shortcuts.Converters {
             }
 
             throw new Exception("Parameter is not a shortcut string");
-
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

@@ -9,7 +9,8 @@ namespace R3Modeller.Core.Utils {
                 return false;
             }
             else {
-                IoC.Clipboard.ReadableText = text;
+                if (!IoC.Clipboard.SetText(text))
+                    await Dialogs.ClipboardUnavailableDialog.ShowAsync("Clipboard Failure", "Failed to set the clipboard to:\n" + text);
                 return true;
             }
         }

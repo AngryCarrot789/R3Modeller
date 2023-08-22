@@ -13,8 +13,12 @@ namespace R3Modeller.Converters {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             double input;
             switch (value) {
-                case float f: input = f; break;
-                case double d: input = d; break;
+                case float f:
+                    input = f;
+                    break;
+                case double d:
+                    input = d;
+                    break;
                 default: return DependencyProperty.UnsetValue;
             }
 

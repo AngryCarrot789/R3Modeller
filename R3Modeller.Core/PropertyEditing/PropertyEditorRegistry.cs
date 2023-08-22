@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace R3Modeller.Core.PropertyEditing {
     /// <summary>
-    /// A register for mapping a data source to a collection of properties that can be modified
+    /// A base class for a register, used for setting up a property editor hierarchy based on a collection of data sources
     /// </summary>
     public class PropertyEditorRegistry {
         /// <summary>
@@ -24,7 +23,11 @@ namespace R3Modeller.Core.PropertyEditing {
             return this.Root.CreateSubGroup(type, name, isExpandedByDefault);
         }
 
-        public void SetupObjects(List<object> dataSources) {
+        /// <summary>
+        /// Sets up this registry for the given collection of data sources
+        /// </summary>
+        /// <param name="dataSources">A input list of data sources</param>
+        public void SetupObjects(IReadOnlyList<object> dataSources) {
             this.Root.ClearHandlersRecursive();
             if (dataSources.Count > 0) {
                 this.Root.SetupHierarchyState(dataSources);

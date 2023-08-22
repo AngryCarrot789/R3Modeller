@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using R3Modeller.Core;
 
-namespace R3Modeller.Resources {
+namespace MCNBTEditor.WPF.Resources {
     /// <summary>
     /// A converter for converting an <see cref="IconType"/> into an <see cref="ImageSource"/>
     /// </summary>
@@ -64,7 +64,7 @@ namespace R3Modeller.Resources {
         }
 
         private static string GetResourcePath(string fileInResources) {
-            return $"/R3Modeller;component/Resources/{fileInResources}";
+            return $"/MCNBTEditor;component/Resources/{fileInResources}";
         }
 
         private static Uri GetUri(string fileInResources) {

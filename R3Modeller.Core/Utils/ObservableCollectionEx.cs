@@ -22,15 +22,12 @@ namespace R3Modeller.Core.Utils {
         public bool UseRangeActions { get; set; }
 
         public ObservableCollectionEx() {
-
         }
 
         public ObservableCollectionEx(IEnumerable<T> collection) : base(collection) {
-
         }
 
         public ObservableCollectionEx(List<T> list) : base(list) {
-
         }
 
         public TResult FirstOfType<TResult>() {
@@ -265,8 +262,6 @@ namespace R3Modeller.Core.Utils {
             this.OnCollectionChanged(EventArgsCache.ResetCollectionChanged);
         }
 
-        public IEnumerable<T> ReverseEnumerable() {
-            return this.Items.Reverse();
-        }
+        public IEnumerable<T> ReverseEnumerable() => this.Items.Reverse();
     }
 }

@@ -14,10 +14,10 @@ namespace R3Modeller.Views.Message {
             bool b = (bool) values[1]; // isAlwaysUseNextResult
             bool c = (bool) values[2]; // showOptionAlwaysUseResultForCurrent
             if (a && b && c) {
-                return NullToVisibilityConverter.VisibleBox;
+                return NullToVisibilityConverter._VisibleBox;
             }
 
-            return NullToVisibilityConverter.CollapsedBox;
+            return NullToVisibilityConverter._CollapsedBox;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {

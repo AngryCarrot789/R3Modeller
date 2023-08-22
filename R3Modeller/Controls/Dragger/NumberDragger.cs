@@ -87,6 +87,13 @@ namespace R3Modeller.Controls.Dragger {
                 typeof(NumberDragger),
                 new PropertyMetadata(null, (d, e) => ((NumberDragger) d).OnRoundedPlacesChanged((int?) e.OldValue, (int?) e.NewValue)));
 
+        public static readonly DependencyProperty PreviewRoundedPlacesProperty =
+            DependencyProperty.Register(
+                "PreviewRoundedPlaces",
+                typeof(int?),
+                typeof(NumberDragger),
+                new PropertyMetadata((int?) 4, (d, e) => ((NumberDragger) d).OnPreviewRoundedPlacesChanged((int?) e.OldValue, (int?) e.NewValue)));
+
         public static readonly DependencyProperty LockCursorWhileDraggingProperty =
             DependencyProperty.Register(
                 "LockCursorWhileDragging",
@@ -129,7 +136,6 @@ namespace R3Modeller.Controls.Dragger {
                 typeof(NumberDragger),
                 new PropertyMetadata(null));
 
-        public static readonly DependencyProperty ValueFormatterProperty = DependencyProperty.Register("ValueFormatter", typeof(IValueFormatter), typeof(NumberDragger), new PropertyMetadata(null));
         public static readonly DependencyProperty EditStartedCommandProperty = DependencyProperty.Register("EditStartedCommand", typeof(ICommand), typeof(NumberDragger), new PropertyMetadata(null));
         public static readonly DependencyProperty EditCompletedCommandProperty = DependencyProperty.Register("EditCompletedCommand", typeof(ICommand), typeof(NumberDragger), new PropertyMetadata(null));
 
@@ -184,11 +190,33 @@ namespace R3Modeller.Controls.Dragger {
         }
 
         /// <summary>
-        /// The number of digits to round the actual value to. Set to null to disable rounding
+        /// The number of digits to round the actual value to. Set to null to disable rounding.
+        /// <para>
+        /// When <see cref="RangeBase.ValueProperty"/> is bound to non floating point, this value should be ignored
+        /// </para>
+        /// <para>
+        /// However when binding to floating point numbers, this value should ideally be 6 or 7. For doubles,
+        /// this should be 14 or 15. This is to combat floating point rounding issues, causing the the
+        /// </para>
         /// </summary>
         public int? RoundedPlaces {
             get => (int?) this.GetValue(RoundedPlacesProperty);
             set => this.SetValue(RoundedPlacesProperty, value);
+        }
+
+        /// <summary>
+        /// The number of digits to round the preview value to. Set to null to disable rounding.
+        /// <para>
+        /// When <see cref="RangeBase.ValueProperty"/> is bound to non floating point, this value should be ignored
+        /// </para>
+        /// <para>
+        /// However when binding to floating point numbers, this value should ideally be 6 or 7. For doubles,
+        /// this should be 14 or 15. This is to combat floating point rounding issues, causing the the
+        /// </para>
+        /// </summary>
+        public int? PreviewRoundedPlaces {
+            get => (int?) this.GetValue(PreviewRoundedPlacesProperty);
+            set => this.SetValue(PreviewRoundedPlacesProperty, value);
         }
 
         public bool LockCursorWhileDragging {
@@ -232,14 +260,6 @@ namespace R3Modeller.Controls.Dragger {
         }
 
         /// <summary>
-        /// An interface used to convert the value into a string in any form
-        /// </summary>
-        public IValueFormatter ValueFormatter {
-            get => (IValueFormatter) this.GetValue(ValueFormatterProperty);
-            set => this.SetValue(ValueFormatterProperty, value);
-        }
-
-        /// <summary>
         /// Gets or sets a command executed when an edit begins
         /// </summary>
         public ICommand EditStartedCommand {
@@ -262,10 +282,15 @@ namespace R3Modeller.Controls.Dragger {
 
                 Binding binding;
                 BindingExpression expression = this.GetBindingExpression(ValueProperty);
-                if (expression == null || (binding = expression.ParentBinding) == null || binding.Mode == BindingMode.Default)
+                if (expression == null || (binding = expression.ParentBinding) == null)
                     return false;
 
-                return binding.Mode == BindingMode.OneWay || binding.Mode == BindingMode.OneTime;
+                switch (binding.Mode) {
+                    case BindingMode.OneWay:
+                    case BindingMode.OneTime:
+                        return true;
+                    default: return false;
+                }
             }
         }
 
@@ -294,6 +319,7 @@ namespace R3Modeller.Controls.Dragger {
         private double? previousValue;
         private bool ignoreMouseMove;
         private bool isUpdatingExternalMouse;
+        private bool ignoreLostFocus;
 
         public NumberDragger() {
             this.Loaded += (s, e) => {
@@ -309,15 +335,13 @@ namespace R3Modeller.Controls.Dragger {
         }
 
         private object OnCoerceValue(object value) {
-            double val = Maths.Clamp(this.GetRoundedValue((double) value, false), this.Minimum, this.Maximum);
+            double src = (double) value;
+            double dst = Maths.Clamp(this.GetRoundedValue(src, false, out _), this.Minimum, this.Maximum);
             if (this.ValuePreProcessor is IValuePreProcessor processor) {
-                double proc = processor.Process(val, this.Minimum, this.Maximum);
-                if (!Maths.Equals(val, proc, 0.00000000001d)) {
-                    return proc;
-                }
+                dst = processor.Process(dst, this.Minimum, this.Maximum);
             }
 
-            return val;
+            return Maths.Equals(dst, src, 0.00000000001d) ? dst : value;
         }
 
         public override void OnApplyTemplate() {
@@ -328,7 +352,6 @@ namespace R3Modeller.Controls.Dragger {
             this.PART_TextBox.KeyDown += this.OnTextBoxKeyDown;
             this.PART_TextBox.GotFocus += (s, e) => {
                 if (this.PART_TextBox.IsFocused || this.PART_TextBox.IsMouseCaptured) {
-                    this.IsEditingTextBox = true;
                 }
             };
 
@@ -346,16 +369,19 @@ namespace R3Modeller.Controls.Dragger {
         }
 
         public double GetRoundedValue(double value, bool isPreview, out int? places) {
-            if ((places = this.RoundedPlaces) is int rounding) {
-                value = Math.Round(value, rounding);
+            places = this.RoundedPlaces;
+            if (places.HasValue) {
+                value = Math.Round(value, places.Value);
             }
 
-            return value;
-        }
+            if (isPreview) {
+                int? preview = this.PreviewRoundedPlaces;
+                if (preview.HasValue) {
+                    value = Math.Round(value, preview.Value);
+                    places = preview;
+                }
+            }
 
-        public double GetRoundedValue(double value, bool isPreview) {
-            if (this.RoundedPlaces is int rounding)
-                value = Math.Round(value, rounding);
             return value;
         }
 
@@ -376,10 +402,17 @@ namespace R3Modeller.Controls.Dragger {
                 this.CancelDrag();
             }
 
+            this.UpdatePreviewVisibilities();
             this.UpdateText();
             if (oldValue != newValue) {
-                this.PART_TextBox.Focus();
-                this.PART_TextBox.SelectAll();
+                this.ignoreLostFocus = true;
+                try {
+                    this.PART_TextBox.Focus();
+                    this.PART_TextBox.SelectAll();
+                }
+                finally {
+                    this.ignoreLostFocus = false;
+                }
             }
 
             this.UpdateCursor();
@@ -390,7 +423,12 @@ namespace R3Modeller.Controls.Dragger {
                 return isEditing;
             }
 
-            if ((bool) isEditing) {
+            this.UpdatePreviewVisibilities();
+            return isEditing;
+        }
+
+        private void UpdatePreviewVisibilities() {
+            if (this.IsEditingTextBox) {
                 this.PART_TextBox.Visibility = Visibility.Visible;
                 this.PART_TextBlock.Visibility = Visibility.Hidden;
             }
@@ -400,7 +438,6 @@ namespace R3Modeller.Controls.Dragger {
             }
 
             this.PART_TextBox.IsReadOnly = this.IsValueReadOnly;
-            return isEditing;
         }
 
         public void UpdateCursor() {
@@ -461,15 +498,13 @@ namespace R3Modeller.Controls.Dragger {
         }
 
         protected virtual void OnRoundedPlacesChanged(int? oldValue, int? newValue) {
-            if (newValue != null) {
+            if (newValue != null)
                 this.UpdateText();
-            }
         }
 
         protected virtual void OnPreviewRoundedPlacesChanged(int? oldValue, int? newValue) {
-            if (newValue != null) {
+            if (newValue != null)
                 this.UpdateText();
-            }
         }
 
         protected override void OnValueChanged(double oldValue, double newValue) {
@@ -492,31 +527,36 @@ namespace R3Modeller.Controls.Dragger {
             }
         }
 
-        private string GetPreviewText(out double value) {
-            value = this.GetRoundedValue(this.Value, true, out int? places);
-            if (this.ValueFormatter is IValueFormatter formatter) {
-                return formatter.ToString(value, places);
-            }
-
-            return places.HasValue ? value.ToString("F" + places.Value.ToString()) : value.ToString();
-        }
-
         protected void UpdateText() {
             if (this.PART_TextBox == null && this.PART_TextBlock == null) {
                 return;
             }
 
             if (this.IsEditingTextBox) {
+                if (this.PART_TextBlock != null)
+                    this.PART_TextBlock.Text = "";
+
                 if (this.PART_TextBox == null)
                     return;
-                this.PART_TextBox.Text = this.GetPreviewText(out _);
+                // don't use preview for text box; only round to RoundedPlaces, if possible
+                double value = this.GetRoundedValue(this.Value, false, out int? places);
+                this.PART_TextBox.Text = (places.HasValue ? Math.Round(value, places.Value) : value).ToString();
             }
             else {
+                // prevents problems where the text box could be very large due
+                // to an un-rounded value, affecting the entire control size
+                // 0.300000011920929 for example when it should be 0.3
+                if (this.PART_TextBox != null)
+                    this.PART_TextBox.Text = "";
+
                 if (this.PART_TextBlock == null)
                     return;
                 string text = this.DisplayTextOverride;
-                if (string.IsNullOrEmpty(text))
-                    text = this.GetPreviewText(out _);
+                if (string.IsNullOrEmpty(text)) {
+                    double value = this.GetRoundedValue(this.Value, true, out int? places);
+                    text = places.HasValue ? value.ToString("F" + places.Value.ToString()) : value.ToString();
+                }
+
                 this.PART_TextBlock.Text = text;
             }
         }
@@ -699,8 +739,8 @@ namespace R3Modeller.Controls.Dragger {
                 newValue = this.Value - change;
             }
 
-            double roundedValue = Maths.Clamp(this.GetRoundedValue(newValue, false), this.Minimum, this.Maximum);
-            if (Maths.Equals(this.GetRoundedValue(this.Value, false), roundedValue)) {
+            double roundedValue = Maths.Clamp(this.GetRoundedValue(newValue, false, out _), this.Minimum, this.Maximum);
+            if (Maths.Equals(this.GetRoundedValue(this.Value, false, out _), roundedValue)) {
                 return;
             }
 
@@ -710,17 +750,35 @@ namespace R3Modeller.Controls.Dragger {
 
         protected override void OnKeyDown(KeyEventArgs e) {
             base.OnKeyDown(e);
-            if (e.Handled || !this.IsDragging || e.Key != Key.Escape) {
-                return;
-            }
+            if (!e.Handled) {
+                if (this.IsDragging) {
+                    if (e.Key == Key.Escape) {
+                        e.Handled = true;
+                        this.CancelInputEdit();
+                        if (this.IsDragging) {
+                            this.CancelDrag();
+                        }
 
-            e.Handled = true;
-            this.CancelInputEdit();
-            if (this.IsDragging) {
-                this.CancelDrag();
-            }
+                        this.IsEditingTextBox = false;
+                    }
+                }
+                // If the user previously edited another NumberDragger, then once they complete/cancel an edit, WPF
+                // auto-focused that number dragger. Then they can press tab to navigate nearby draggers, and they can
+                // edit them by just clicking a key. Massive convenience feature, saves having to use the mouse as much
+                else if (this.CanEnableAutoEdit(e.Key) && !this.IsValueReadOnly && (this.HasEffectiveKeyboardFocus || this.IsFocused)) {
+                    if (this.IsMouseCaptured) {
+                        Debug.WriteLine("Unexpected mouse capture for KeyDown event");
+                        this.ReleaseMouseCapture();
+                    }
 
-            this.IsEditingTextBox = false;
+                    this.IsEditingTextBox = true;
+                    this.UpdateCursor();
+                }
+            }
+        }
+
+        private bool CanEnableAutoEdit(Key k) {
+            return k >= Key.D0 && k <= Key.D9 || k == Key.Enter;
         }
 
         private void OnTextBoxKeyDown(object sender, KeyEventArgs e) {
@@ -737,11 +795,13 @@ namespace R3Modeller.Controls.Dragger {
 
         protected override void OnLostFocus(RoutedEventArgs e) {
             base.OnLostFocus(e);
-            if (this.IsDragging) {
-                this.CancelDrag();
-            }
+            if (!this.ignoreLostFocus) {
+                if (this.IsDragging) {
+                    this.CancelDrag();
+                }
 
-            this.IsEditingTextBox = false;
+                this.IsEditingTextBox = false;
+            }
         }
 
         public bool TryCompleteEdit() {

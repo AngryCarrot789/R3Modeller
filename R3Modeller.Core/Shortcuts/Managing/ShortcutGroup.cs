@@ -13,13 +13,14 @@ namespace R3Modeller.Core.Shortcuts.Managing {
 
         private readonly List<ShortcutGroup> groups;
         private readonly List<GroupedShortcut> shortcuts;
+        private readonly List<GroupedInputState> inputStates;
         private readonly Dictionary<string, object> mapToItem;
 
         public ShortcutGroup Parent { get; }
 
         /// <summary>
-        /// This group's full path (containing the parent's path and this group's name into one).
-        /// It will either be null (meaning no parent), or a non-empty string; it will never consist of only whitespaces
+        /// This group's full path (containing the parent's path and this group's name into one). It will either be
+        /// null (meaning we are a root group), or a non-empty string; it will never consist of only whitespaces
         /// </summary>
         public string FullPath { get; }
 
@@ -54,6 +55,11 @@ namespace R3Modeller.Core.Shortcuts.Managing {
         public IEnumerable<GroupedShortcut> Shortcuts => this.shortcuts;
 
         /// <summary>
+        /// All input states in this focus group
+        /// </summary>
+        public IEnumerable<GroupedInputState> InputStates => this.inputStates;
+
+        /// <summary>
         /// All child-groups in this focus group
         /// </summary>
         public IEnumerable<ShortcutGroup> Groups => this.groups;
@@ -68,6 +74,7 @@ namespace R3Modeller.Core.Shortcuts.Managing {
             this.Parent = parent;
             this.groups = new List<ShortcutGroup>();
             this.shortcuts = new List<GroupedShortcut>();
+            this.inputStates = new List<GroupedInputState>();
             this.mapToItem = new Dictionary<string, object>();
         }
 
@@ -96,12 +103,21 @@ namespace R3Modeller.Core.Shortcuts.Managing {
             this.groups.Add(group);
         }
 
-        public GroupedShortcut AddShortcut(string name, IShortcut shortcut, bool isGlobal = false, bool inherit = true) {
+        public GroupedShortcut AddShortcut(string name, IShortcut shortcut, bool isGlobal = false) {
             ValidateName(name, "Shortcut name cannot be null or consist of only whitespaces");
             this.ValidateNameNotInUse(name);
-            GroupedShortcut managed = new GroupedShortcut(this, name, shortcut, isGlobal, inherit);
+            GroupedShortcut managed = new GroupedShortcut(this, name, shortcut, isGlobal);
             this.mapToItem[name] = managed;
             this.shortcuts.Add(managed);
+            return managed;
+        }
+
+        public GroupedInputState AddInputState(string name, IInputStroke activation, IInputStroke deactivation) {
+            ValidateName(name, "Shortcut name cannot be null or consist of only whitespaces");
+            this.ValidateNameNotInUse(name);
+            GroupedInputState managed = new GroupedInputState(this, name, activation, deactivation);
+            this.mapToItem[name] = managed;
+            this.inputStates.Add(managed);
             return managed;
         }
 
@@ -113,33 +129,41 @@ namespace R3Modeller.Core.Shortcuts.Managing {
             return this.mapToItem.TryGetValue(name, out object value) && value is ShortcutGroup;
         }
 
-        public List<GroupedShortcut> GetShortcutsWithPrimaryStroke(IInputStroke stroke, string focus) {
-            List<GroupedShortcut> list = new List<GroupedShortcut>();
-            this.CollectShortcutsWithPrimaryStroke(stroke, focus, list);
-            return list;
+        /// <summary>
+        /// Old name: CollectShortcutsWithPrimaryStroke
+        /// </summary>
+        public void DoEvaulateShortcutsAndInputStates(ref GroupEvaulationArgs args, string focus, bool allowDuplicateInheritedShortcuts = false) {
+            this.CollectShortcutsInternal(ref args, string.IsNullOrWhiteSpace(focus) ? null : focus, allowDuplicateInheritedShortcuts);
         }
 
-        public void CollectShortcutsWithPrimaryStroke(IInputStroke stroke, string focus, List<GroupedShortcut> list, bool allowDuplicateInheritedShortcuts = false) {
-            this.CollectShortcutsInternal(stroke, string.IsNullOrWhiteSpace(focus) ? null : focus, list, allowDuplicateInheritedShortcuts);
+        private static bool FindPrimaryStroke(List<GroupedShortcut> list, IInputStroke stroke) {
+            for (int i = 0, c = list.Count; i < c; i++) {
+                if (list[i].Shortcut.IsPrimaryStroke(stroke)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        private void CollectShortcutsInternal(IInputStroke stroke, string focus, List<GroupedShortcut> list, bool allowDuplicateInheritedShortcuts = false) {
+        private void CollectShortcutsInternal(ref GroupEvaulationArgs args, string focus, bool allowDuplicateInheritedShortcuts = false) {
             // Searching groups first is what allows inheritance to work properly, because you search the deepest
             // levels first and make your way to the root. Similar to how bubble events work
-            foreach (ShortcutGroup group in this.Groups) {
-                group.CollectShortcutsInternal(stroke, focus, list);
+            foreach (ShortcutGroup group in this.groups) {
+                group.CollectShortcutsInternal(ref args, focus);
             }
 
             bool requireGlobal = !this.IsGlobal && !IsFocusPathInScope(this.FullPath, focus, this.Inherit);
             foreach (GroupedShortcut shortcut in this.shortcuts) {
+                if (args.filter != null && !args.filter(shortcut)) {
+                    continue;
+                }
+
                 if (requireGlobal && !shortcut.IsGlobal) {
-                    // I actually can't remember if this.FullPath should be used here or shortcut.Path
+                    // I actually can't remember if this.FullPath should be used here or shortcut.FullPath
                     if (shortcut.IsInherited && IsFocusPathInScope(this.FullPath, focus, true)) {
-                        if (!allowDuplicateInheritedShortcuts && list.Count > 0) {
-                            IInputStroke primary = shortcut.Shortcut.PrimaryStroke; // saves potentially boxing Key/Mouse strokes multiple times
-                            if (list.Find(x => x.Shortcut.IsPrimaryStroke(primary)) != null) {
-                                continue;
-                            }
+                        if (!allowDuplicateInheritedShortcuts && FindPrimaryStroke(args.shortcuts, shortcut.Shortcut.PrimaryStroke)) {
+                            continue;
                         }
                     }
                     else {
@@ -147,8 +171,17 @@ namespace R3Modeller.Core.Shortcuts.Managing {
                     }
                 }
 
-                if (shortcut.Shortcut != null && !shortcut.Shortcut.IsEmpty && shortcut.Shortcut.IsPrimaryStroke(stroke)) {
-                    list.Add(shortcut);
+                if (!shortcut.Shortcut.IsEmpty && shortcut.Shortcut.IsPrimaryStroke(args.stroke)) {
+                    args.shortcuts.Add(shortcut);
+                }
+            }
+
+            foreach (GroupedInputState state in this.inputStates) {
+                if (state.ActivationStroke.Equals(args.stroke)) {
+                    args.inputStates.Add((state, true));
+                }
+                else if (state.DeactivationStroke.Equals(args.stroke)) {
+                    args.inputStates.Add((state, false));
                 }
             }
         }
@@ -263,6 +296,10 @@ namespace R3Modeller.Core.Shortcuts.Managing {
                 string path = this.FullPath != null ? StringUtils.Join(this.FullPath, name, SeparatorChar) : name;
                 throw new Exception($"Group or shortcut already exists with name: '{path}'");
             }
+        }
+
+        public override string ToString() {
+            return $"{nameof(ShortcutGroup)} ({this.FullPath ?? "<root>"}{(!string.IsNullOrWhiteSpace(this.DisplayName) ? $" \"{this.DisplayName}\"" : "")})";
         }
     }
 }
