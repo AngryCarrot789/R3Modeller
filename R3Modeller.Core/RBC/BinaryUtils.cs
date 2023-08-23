@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using OpenTK.Graphics.ES11;
 
 namespace R3Modeller.Core.RBC {
     public static class BinaryUtils {
@@ -102,15 +103,24 @@ namespace R3Modeller.Core.RBC {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe T ReadStruct<T>(byte[] array, int offset, int size) where T : unmanaged {
+            // return MemoryMarshal.Read<T>(new ReadOnlySpan<byte>(array, offset, size));
             T value = default;
             Unsafe.CopyBlock(ref *(byte*) &value, ref array[offset], (uint) size);
             return value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteStruct<T>(T value, byte[] array, int offset, int size) where T : unmanaged {
+        public static unsafe void WriteStruct<T>(T value, byte[] array, int offset) where T : unmanaged {
+            // MemoryMarshal.Write(new Span<byte>(array, offset, size), ref value);
             byte* src = (byte*) &value;
-            Unsafe.CopyBlock(ref array[offset], ref *src, (uint) size);
+            Unsafe.CopyBlock(ref array[offset], ref *src, (uint) sizeof(T));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteEmpty(byte[] array, int offset, int size) {
+            // byte zero = 0;
+            // MemoryMarshal.Write(new Span<byte>(array, offset, size), ref zero);
+            Unsafe.InitBlock(ref array[offset], 0, (uint) size);
         }
 
         public static unsafe void WriteStruct<T>(this BinaryWriter writer, T value) where T : unmanaged {

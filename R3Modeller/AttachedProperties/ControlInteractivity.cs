@@ -1,7 +1,6 @@
 using System;
 using System.Windows;
 using System.Windows.Input;
-using R3Modeller.Controls.Dragger;
 using R3Modeller.Core.Utils;
 
 namespace R3Modeller.AttachedProperties {

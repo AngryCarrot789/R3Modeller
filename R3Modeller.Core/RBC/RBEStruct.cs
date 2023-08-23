@@ -75,7 +75,7 @@ namespace R3Modeller.Core.RBC {
             }
 
             this.data = new byte[size];
-            BinaryUtils.WriteStruct(value, this.data, 0, size);
+            BinaryUtils.WriteStruct(value, this.data, 0);
         }
 
         public override RBEBase Clone() => this.CloneCore();

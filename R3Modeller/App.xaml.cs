@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using OpenTK.Graphics;
 using R3Modeller.Core;
 using R3Modeller.Core.Actions;
 using R3Modeller.Core.Engine.Objs.Actions;
+using R3Modeller.Core.Engine.Properties;
 using R3Modeller.Core.History.Actions;
 using R3Modeller.Core.Shortcuts.Managing;
 using R3Modeller.Core.Shortcuts.ViewModels;
-using R3Modeller.Core.Utils;
 using R3Modeller.Shortcuts;
 using R3Modeller.Shortcuts.Converters;
 using R3Modeller.Themes;
@@ -153,6 +151,62 @@ namespace R3Modeller {
         }
 
         private async void Application_Startup(object sender, StartupEventArgs e) {
+            {
+                ObjectC actualC = new ObjectC();
+                ObjectB actualB = new ObjectB();
+                ObjectA actualA = new ObjectA();
+
+                actualA.SetValueU(ObjectA.ItemA, int.MaxValue / 2);
+                R3Property.ProcessUpdates();
+                int a1 = actualA.ReadValueU(ObjectA.ItemA);
+
+                actualA.SetValueU(ObjectA.Item, (byte) (byte.MaxValue / 2));
+                actualA.SetValueU(ObjectA.ItemC, int.MaxValue / 2);
+                actualA.SetValueM(ObjectA.NameA1, "my name 1 1");
+                actualA.SetValueM(ObjectA.NameA2, "my name 1 2");
+                actualB.SetValueU(ObjectA.ItemA, int.MaxValue / 2);
+                actualB.SetValueU(ObjectA.Item, (byte) (byte.MaxValue / 2));
+                actualB.SetValueU(ObjectA.ItemC, int.MaxValue / 2);
+                actualB.SetValueU(ObjectB.ItemD, long.MaxValue / 2);
+                actualB.SetValueM(ObjectA.NameA1, "my name 2 1");
+                actualB.SetValueM(ObjectA.NameA2, "my name 2 2");
+                actualB.SetValueM(ObjectB.NameB1, "my name 2 3");
+                actualC.SetValueU(ObjectA.ItemA, int.MaxValue / 2);
+                actualC.SetValueU(ObjectA.Item, (byte) (byte.MaxValue / 2));
+                actualC.SetValueU(ObjectA.ItemC, int.MaxValue / 2);
+                actualC.SetValueU(ObjectB.ItemD, long.MaxValue / 20);
+                actualC.SetValueM(ObjectA.NameA1, "my name 3 1");
+                actualC.SetValueM(ObjectA.NameA2, "my name 3 2");
+                actualC.SetValueM(ObjectB.NameB1, "my name 3 3");
+                actualC.SetValueM(ObjectC.NameC1, "my name 3 4");
+                actualC.SetValueM(ObjectC.NameC2, "my name 3 5");
+                actualC.SetValueM(ObjectC.NameC3, "my name 3 6");
+
+                byte a2 = actualA.ReadValueU(ObjectA.Item);
+                int a3 = actualA.ReadValueU(ObjectA.ItemC);
+                string a4 = actualA.ReadValueM(ObjectA.NameA1);
+                string a5 = actualA.ReadValueM(ObjectA.NameA2);
+                int a6 = actualB.ReadValueU(ObjectA.ItemA);
+                byte a7 = actualB.ReadValueU(ObjectA.Item);
+                int a8 = actualB.ReadValueU(ObjectA.ItemC);
+                long a9 = actualB.ReadValueU(ObjectB.ItemD);
+                string aa = actualB.ReadValueM(ObjectA.NameA1);
+                string ab = actualB.ReadValueM(ObjectA.NameA2);
+                string ac = actualB.ReadValueM(ObjectB.NameB1);
+                int ad = actualC.ReadValueU(ObjectA.ItemA);
+                byte ae = actualC.ReadValueU(ObjectA.Item);
+                int af = actualC.ReadValueU(ObjectA.ItemC);
+                long b1 = actualC.ReadValueU(ObjectB.ItemD);
+                string b2 = actualC.ReadValueM(ObjectA.NameA1);
+                string b3 = actualC.ReadValueM(ObjectA.NameA2);
+                string b4 = actualC.ReadValueM(ObjectB.NameB1);
+                string b5 = actualC.ReadValueM(ObjectC.NameC1);
+                string b6 = actualC.ReadValueM(ObjectC.NameC2);
+                string b7 = actualC.ReadValueM(ObjectC.NameC3);
+
+                Console.WriteLine("ok");
+            }
+
             // Dialogs may be shown, becoming the main window, possibly causing the
             // app to shutdown when the mode is OnMainWindowClose or OnLastWindowClose
 
@@ -189,8 +243,33 @@ namespace R3Modeller {
             window.Show();
         }
 
-        protected override void OnExit(ExitEventArgs e) {
-            base.OnExit(e);
+        public class ObjectA : R3Object {
+            public static readonly R3Property<int> ItemA = R3Property.RegisterU<int>(typeof(ObjectA), "ItemA");
+            public static readonly R3Property<byte> Item = R3Property.RegisterU<byte>(typeof(ObjectA), "ItemB");
+            public static readonly R3Property<int> ItemC = R3Property.RegisterU<int>(typeof(ObjectA), "ItemC");
+            public static readonly R3Property<string> NameA1 = R3Property.Register<string>(typeof(ObjectA), "NameA1");
+            public static readonly R3Property<string> NameA2 = R3Property.Register<string>(typeof(ObjectA), "NameA2");
+
+            public ObjectA() {
+
+            }
+        }
+
+        public class ObjectB : ObjectA {
+            public static readonly R3Property<long> ItemD = R3Property.RegisterU<long>(typeof(ObjectB), "ItemD");
+            public static readonly R3Property<string> NameB1 = R3Property.Register<string>(typeof(ObjectB), "NameB1");
+
+            public ObjectB() {
+            }
+        }
+
+        public class ObjectC : ObjectB {
+            public static readonly R3Property<string> NameC1 = R3Property.Register<string>(typeof(ObjectC), "NameC1");
+            public static readonly R3Property<string> NameC2 = R3Property.Register<string>(typeof(ObjectC), "NameC2");
+            public static readonly R3Property<string> NameC3 = R3Property.Register<string>(typeof(ObjectC), "NameC3");
+
+            public ObjectC() {
+            }
         }
     }
 }

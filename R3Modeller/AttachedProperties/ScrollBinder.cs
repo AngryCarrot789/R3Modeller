@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using R3Modeller.Core.Utils;
 
 namespace R3Modeller.AttachedProperties {
     public static class ScrollBinder {

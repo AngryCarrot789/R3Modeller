@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using R3Modeller.Core.Engine.Properties;
 using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Core.Engine.Objs {
-    public class SceneObject {
+    public class SceneObject : R3Object {
+        public static readonly R3Property<Matrix4x4> ModelMatrixProperty = R3Property.RegisterU<Matrix4x4>(typeof(SceneObject), "ModelMatrix");
+
         // bit1 = pos, bit2 = scale, bit3 = rotation
         private bool isPositionAbs;
         private bool isScaleAbs;

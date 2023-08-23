@@ -8,7 +8,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using R3Modeller.Core.Utils;
 using R3Modeller.Utils;
-using Rect = System.Windows.Rect;
 
 namespace R3Modeller.Controls.Dragger {
     [TemplatePart(Name = "PART_TextBlock", Type = typeof(TextBlock))]
@@ -328,6 +327,8 @@ namespace R3Modeller.Controls.Dragger {
                 this.UpdateCursor();
                 this.RequeryChangeMapper(this.Value);
             };
+
+            object isChecked = this.GetValue(Window.TitleProperty);
         }
 
         static NumberDragger() {

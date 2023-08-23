@@ -401,7 +401,7 @@ namespace R3Modeller.Core.RBC {
                 int length = values.Length;
                 byte[] array = this.data = new byte[size * length];
                 for (int i = 0, offset = 0; i < length; i++, offset += size) {
-                    BinaryUtils.WriteStruct(values[i], array, offset, size);
+                    BinaryUtils.WriteStruct(values[i], array, offset);
                 }
             }
         }

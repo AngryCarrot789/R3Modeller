@@ -1,10 +1,8 @@
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xaml;
 using R3Modeller.Core.Utils;
 using Rect = System.Windows.Rect;
 
