@@ -27,8 +27,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 this.treeView,
                 this.treeView.Template.FindName("selectionBorder", this.treeView) as Border,
                 this.treeView.Template.FindName("scrollViewer", this.treeView) as ScrollViewer,
-                this.treeView.Template.FindName("content", this.treeView) as ItemsPresenter,
-                MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false));
+                this.treeView.Template.FindName("content", this.treeView) as ItemsPresenter);
         }
 
         public bool Select(MultiSelectTreeViewItem item) {
@@ -37,7 +36,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     return this.Deselect(item, true);
                 }
                 else {
-                    var e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
+                    PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
                     this.OnPreviewSelectionChanged(e);
                     if (e.CancelAny) {
                         FocusHelper.Focus(item, true);
@@ -70,16 +69,16 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 this.lastShiftRoot = item.DataContext;
             }
             else if (IsShiftKeyDown && this.treeView.SelectedItems.Count > 0) {
-                object firstSelectedItem = this.lastShiftRoot ?? ListUtils.First(this.treeView.SelectedItems);
+                object firstSelectedItem = this.lastShiftRoot ?? this.treeView.SelectedItems.First();
                 MultiSelectTreeViewItem shiftRootItem = this.treeView.GetTreeViewItemsFor(new List<object> {firstSelectedItem}).First();
 
-                var newSelection = this.treeView.GetNodesToSelectBetween(shiftRootItem, item).Select(n => n.DataContext).ToList();
+                List<object> newSelection = this.treeView.GetNodesToSelectBetween(shiftRootItem, item).Select(n => n.DataContext).ToList();
                 // Make a copy of the list because we're modifying it while enumerating it
-                var selectedItems = new object[this.treeView.SelectedItems.Count];
+                object[] selectedItems = new object[this.treeView.SelectedItems.Count];
                 this.treeView.SelectedItems.CopyTo(selectedItems, 0);
                 // Remove all items no longer selected
-                foreach (var selItem in selectedItems.Where(i => !newSelection.Contains(i))) {
-                    var e = new PreviewSelectionChangedEventArgs(false, selItem);
+                foreach (object selItem in selectedItems.Where(i => !newSelection.Contains(i))) {
+                    PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, selItem);
                     this.OnPreviewSelectionChanged(e);
                     if (e.CancelAll) {
                         FocusHelper.Focus(item);
@@ -92,8 +91,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 }
 
                 // Add new selected items
-                foreach (var newItem in newSelection.Where(i => !selectedItems.Contains(i))) {
-                    var e = new PreviewSelectionChangedEventArgs(true, newItem);
+                foreach (object newItem in newSelection.Where(i => !selectedItems.Contains(i))) {
+                    PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, newItem);
                     this.OnPreviewSelectionChanged(e);
                     if (e.CancelAll) {
                         FocusHelper.Focus(item, true);
@@ -107,8 +106,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             }
             else {
                 if (this.treeView.SelectedItems.Count > 0) {
-                    foreach (var selItem in new ArrayList(this.treeView.SelectedItems)) {
-                        var e2 = new PreviewSelectionChangedEventArgs(false, selItem);
+                    foreach (object selItem in new ArrayList(this.treeView.SelectedItems)) {
+                        PreviewSelectionChangedEventArgs e2 = new PreviewSelectionChangedEventArgs(false, selItem);
                         this.OnPreviewSelectionChanged(e2);
                         if (e2.CancelAll) {
                             FocusHelper.Focus(item);
@@ -122,7 +121,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     }
                 }
 
-                var e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
+                PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
                 this.OnPreviewSelectionChanged(e);
                 if (e.CancelAny) {
                     FocusHelper.Focus(item, true);
@@ -140,7 +139,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         public bool SelectCurrentBySpace() {
             // Another item was focused by Ctrl+Arrow key
-            var item = this.GetFocusedItem();
+            MultiSelectTreeViewItem item = this.GetFocusedItem();
             if (this.treeView.SelectedItems.Contains(item.DataContext)) {
                 // With Ctrl key, toggle this item selection (deselect now).
                 // Without Ctrl key, always select it (is already selected).
@@ -151,7 +150,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 }
             }
             else {
-                var e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
+                PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
                 this.OnPreviewSelectionChanged(e);
                 if (e.CancelAny) {
                     FocusHelper.Focus(item, true);
@@ -169,25 +168,25 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         public bool SelectNextFromKey() {
-            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             MultiSelectTreeViewItem item = this.treeView.GetNextItem(this.GetFocusedItem(), items);
             return this.SelectFromKey(item);
         }
 
         public bool SelectPreviousFromKey() {
-            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             MultiSelectTreeViewItem item = this.treeView.GetPreviousItem(this.GetFocusedItem(), items);
             return this.SelectFromKey(item);
         }
 
         public bool SelectFirstFromKey() {
-            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             MultiSelectTreeViewItem item = this.treeView.GetFirstItem(items);
             return this.SelectFromKey(item);
         }
 
         public bool SelectLastFromKey() {
-            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             MultiSelectTreeViewItem item = this.treeView.GetLastItem(items);
             return this.SelectFromKey(item);
         }
@@ -201,10 +200,10 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         public bool SelectAllFromKey() {
-            var items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             // Add new selected items
-            foreach (var item in items.Where(i => !this.treeView.SelectedItems.Contains(i.DataContext))) {
-                var e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
+            foreach (MultiSelectTreeViewItem item in items.Where(i => !this.treeView.SelectedItems.Contains(i.DataContext))) {
+                PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
                 this.OnPreviewSelectionChanged(e);
                 if (e.CancelAll) {
                     return false;
@@ -230,7 +229,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         public bool Deselect(MultiSelectTreeViewItem item, bool bringIntoView = false) {
-            var e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
+            PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
             this.OnPreviewSelectionChanged(e);
             if (e.CancelAny)
                 return false;
@@ -260,7 +259,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         internal bool SelectByRectangle(MultiSelectTreeViewItem item) {
-            var e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
+            PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(true, item.DataContext);
             this.OnPreviewSelectionChanged(e);
             if (e.CancelAny) {
                 this.lastShiftRoot = item.DataContext;
@@ -276,7 +275,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         internal bool DeselectByRectangle(MultiSelectTreeViewItem item) {
-            var e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
+            PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
             this.OnPreviewSelectionChanged(e);
             if (e.CancelAny) {
                 this.lastShiftRoot = item.DataContext;
@@ -292,12 +291,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         private MultiSelectTreeViewItem GetFocusedItem() {
-            foreach (var item in MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false)) {
-                if (item.IsFocused)
-                    return item;
-            }
-
-            return null;
+            return MultiSelectTreeView.EnumerableTreeRecursiveFirst(x => x.IsFocused, this.treeView, false, false);
         }
 
         private bool SelectFromKey(MultiSelectTreeViewItem item) {
@@ -316,7 +310,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         private bool SelectPageUpDown(bool down) {
-            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.RecursiveTreeViewItemEnumerable(this.treeView, false, false).ToList();
+            List<MultiSelectTreeViewItem> items = MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false);
             MultiSelectTreeViewItem item = this.GetFocusedItem();
             if (item == null) {
                 return down ? this.SelectLastFromKey() : this.SelectFirstFromKey();
@@ -329,7 +323,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 offset = -offset;
             targetY += offset;
             while (true) {
-                var newItem = down ? this.treeView.GetNextItem(item, items) : this.treeView.GetPreviousItem(item, items);
+                MultiSelectTreeViewItem newItem = down ? this.treeView.GetNextItem(item, items) : this.treeView.GetPreviousItem(item, items);
                 if (newItem == null)
                     break;
                 item = newItem;
@@ -344,7 +338,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         protected void OnPreviewSelectionChanged(PreviewSelectionChangedEventArgs e) {
-            var handler = this.PreviewSelectionChanged;
+            EventHandler<PreviewSelectionChangedEventArgs> handler = this.PreviewSelectionChanged;
             if (handler != null) {
                 handler(this, e);
                 this.LastCancelAll = e.CancelAll;

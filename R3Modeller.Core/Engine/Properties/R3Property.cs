@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace R3Modeller.Core.Engine.Properties {
@@ -12,12 +10,10 @@ namespace R3Modeller.Core.Engine.Properties {
     /// The base class for <see cref="R3Property{T}"/>
     /// </summary>
     public abstract class R3Property {
-        private static readonly List<TransferValueCommand> UpdateQueue;
         private static readonly object RegistrationLock = typeof(R3Property);
         private static volatile int NextGlobalIndex;
 
         private readonly R3TypeRegistration registration;
-
         internal int structOffset;
         internal int structSize;
         internal int objectIndex;
@@ -30,7 +26,7 @@ namespace R3Modeller.Core.Engine.Properties {
         /// <summary>
         /// The index of this property for the type hierarchy
         /// </summary>
-        public int HierarchialIndex { get; }
+        public int HierarchicalIndex { get; }
 
         /// <summary>
         /// The index of this property for its owner type
@@ -71,36 +67,15 @@ namespace R3Modeller.Core.Engine.Properties {
             get => this.IsStruct ? throw new InvalidOperationException("Not a struct property") : this.structSize;
         }
 
-        protected R3Property(R3TypeRegistration registration, int globalIndex, int hierarchialIndex, int localIndex, Type ownerType, Type targetType, string name, bool isStruct) {
+        protected R3Property(R3TypeRegistration registration, int globalIndex, int hierarchicalIndex, int localIndex, Type ownerType, Type targetType, string name, bool isStruct) {
             this.registration = registration;
             this.GlobalIndex = globalIndex;
-            this.HierarchialIndex = hierarchialIndex;
+            this.HierarchicalIndex = hierarchicalIndex;
             this.LocalIndex = localIndex;
             this.OwnerType = ownerType;
             this.TargetType = targetType;
             this.Name = name;
             this.IsStruct = isStruct;
-        }
-
-        static R3Property() {
-            UpdateQueue = new List<TransferValueCommand>();
-        }
-
-        /// <summary>
-        /// Enqueues a command that indicates that the BufferA data (from the given owner) for the given property
-        /// should be written to BufferB when the main and render threads are synchronized
-        /// </summary>
-        /// <param name="owner">Owner instance</param>
-        /// <param name="property">Property whose value has changed</param>
-        /// <typeparam name="T">The type of value</typeparam>
-        public static void PushUpdateU(R3Object owner, R3Property property) {
-            UpdateQueue.Add(new TransferValueCommand(owner, property));
-        }
-
-        public static void ProcessUpdates() {
-            foreach (TransferValueCommand command in UpdateQueue) {
-                command.Owner.TransferValue(command.Property);
-            }
         }
 
         private static void ValidateArgs(Type owner, string name, StackFrame srcFrame) {
@@ -145,7 +120,7 @@ namespace R3Modeller.Core.Engine.Properties {
             ValidateArgs(owner, name, new StackFrame(1, false));
             lock (RegistrationLock) {
                 R3TypeRegistration registration = GetRegistrationHelper(owner, name);
-                int hIndex = registration.nextHierarchialIndex++;
+                int hIndex = registration.NextHierarchicalIndex++;
                 int lIndex = registration.nextLocalIndex++;
                 int gIndex = Interlocked.Increment(ref NextGlobalIndex);
                 R3Property<TValue> property = new R3Property<TValue>(registration, gIndex, hIndex, lIndex, owner, typeof(TValue), name, true) {
@@ -168,7 +143,7 @@ namespace R3Modeller.Core.Engine.Properties {
             ValidateArgs(owner, name, new StackFrame(1, false));
             lock (RegistrationLock) {
                 R3TypeRegistration registration = GetRegistrationHelper(owner, name);
-                int hIndex = registration.nextHierarchialIndex++;
+                int hIndex = registration.NextHierarchicalIndex++;
                 int lIndex = registration.nextLocalIndex++;
                 int gIndex = Interlocked.Increment(ref NextGlobalIndex);
                 R3Property<TValue> property = new R3Property<TValue>(registration, gIndex, hIndex, lIndex, owner, typeof(TValue), name, false);
@@ -178,17 +153,16 @@ namespace R3Modeller.Core.Engine.Properties {
         }
 
         public override string ToString() {
-            return $"R3BProperty({this.Name} @ {this.GlobalIndex})";
+            return $"R3BProperty[{this.OwnerType}.{this.Name} | {this.TargetType} (G{this.GlobalIndex}, H{this.HierarchicalIndex}, L{this.LocalIndex})]";
         }
     }
 
+    /// <summary>
+    /// The main implementation of <see cref="R3Property"/>
+    /// </summary>
+    /// <typeparam name="T">The type of value being stored</typeparam>
     public class R3Property<T> : R3Property {
-        static R3Property() {
-
-        }
-
-        public R3Property(R3TypeRegistration registration, int globalIndex, int hierarchialIndex, int localIndex, Type ownerType, Type targetType, string name, bool isStruct) : base(registration, globalIndex, hierarchialIndex, localIndex, ownerType, targetType, name, isStruct) {
-
+        internal R3Property(R3TypeRegistration registration, int globalIndex, int hierarchicalIndex, int localIndex, Type ownerType, Type targetType, string name, bool isStruct) : base(registration, globalIndex, hierarchicalIndex, localIndex, ownerType, targetType, name, isStruct) {
         }
     }
 }

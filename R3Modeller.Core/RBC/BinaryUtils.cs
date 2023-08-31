@@ -102,18 +102,20 @@ namespace R3Modeller.Core.RBC {
         public static long FromEnum64<TEnum>(TEnum value) where TEnum : unmanaged, Enum => Unsafe.As<TEnum, long>(ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T ReadStruct<T>(byte[] array, int offset, int size) where T : unmanaged {
+        public static T ReadStruct<T>(byte[] array, int offset) where T : unmanaged {
             // return MemoryMarshal.Read<T>(new ReadOnlySpan<byte>(array, offset, size));
-            T value = default;
-            Unsafe.CopyBlock(ref *(byte*) &value, ref array[offset], (uint) size);
-            return value;
+            // T value = default;
+            // Unsafe.CopyBlock(ref *(byte*) &value, ref array[offset], (uint) size);
+            // return value;
+            return Unsafe.ReadUnaligned<T>(ref array[offset]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteStruct<T>(T value, byte[] array, int offset) where T : unmanaged {
+        public static void WriteStruct<T>(T value, byte[] array, int offset) where T : unmanaged {
             // MemoryMarshal.Write(new Span<byte>(array, offset, size), ref value);
-            byte* src = (byte*) &value;
-            Unsafe.CopyBlock(ref array[offset], ref *src, (uint) sizeof(T));
+            // byte* src = (byte*) &value;
+            // Unsafe.CopyBlock(ref array[offset], ref *src, (uint) sizeof(T));
+            Unsafe.WriteUnaligned(ref array[offset], value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

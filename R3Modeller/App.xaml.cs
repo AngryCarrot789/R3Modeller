@@ -68,7 +68,7 @@ namespace R3Modeller {
 
         public async Task InitApp() {
             await this.SetActivity("Loading services...");
-                        string[] envArgs = Environment.GetCommandLineArgs();
+            string[] envArgs = Environment.GetCommandLineArgs();
             if (envArgs.Length > 0 && Path.GetDirectoryName(envArgs[0]) is string dir && dir.Length > 0) {
                 Directory.SetCurrentDirectory(dir);
             }
@@ -157,7 +157,7 @@ namespace R3Modeller {
                 ObjectA actualA = new ObjectA();
 
                 actualA.SetValueU(ObjectA.ItemA, int.MaxValue / 2);
-                R3Property.ProcessUpdates();
+                R3Object.ProcessUpdates();
                 int a1 = actualA.ReadValueU(ObjectA.ItemA);
 
                 actualA.SetValueU(ObjectA.Item, (byte) (byte.MaxValue / 2));
@@ -182,21 +182,22 @@ namespace R3Modeller {
                 actualC.SetValueM(ObjectC.NameC2, "my name 3 5");
                 actualC.SetValueM(ObjectC.NameC3, "my name 3 6");
 
-                byte a2 = actualA.ReadValueU(ObjectA.Item);
-                int a3 = actualA.ReadValueU(ObjectA.ItemC);
+                R3Object.ProcessUpdates();
+                byte a2 =   actualA.ReadValueU(ObjectA.Item);
+                int a3 =    actualA.ReadValueU(ObjectA.ItemC);
                 string a4 = actualA.ReadValueM(ObjectA.NameA1);
                 string a5 = actualA.ReadValueM(ObjectA.NameA2);
-                int a6 = actualB.ReadValueU(ObjectA.ItemA);
-                byte a7 = actualB.ReadValueU(ObjectA.Item);
-                int a8 = actualB.ReadValueU(ObjectA.ItemC);
-                long a9 = actualB.ReadValueU(ObjectB.ItemD);
+                int a6 =    actualB.ReadValueU(ObjectA.ItemA);
+                byte a7 =   actualB.ReadValueU(ObjectA.Item);
+                int a8 =    actualB.ReadValueU(ObjectA.ItemC);
+                long a9 =   actualB.ReadValueU(ObjectB.ItemD);
                 string aa = actualB.ReadValueM(ObjectA.NameA1);
                 string ab = actualB.ReadValueM(ObjectA.NameA2);
                 string ac = actualB.ReadValueM(ObjectB.NameB1);
-                int ad = actualC.ReadValueU(ObjectA.ItemA);
-                byte ae = actualC.ReadValueU(ObjectA.Item);
-                int af = actualC.ReadValueU(ObjectA.ItemC);
-                long b1 = actualC.ReadValueU(ObjectB.ItemD);
+                int ad =    actualC.ReadValueU(ObjectA.ItemA);
+                byte ae =   actualC.ReadValueU(ObjectA.Item);
+                int af =    actualC.ReadValueU(ObjectA.ItemC);
+                long b1 =   actualC.ReadValueU(ObjectB.ItemD);
                 string b2 = actualC.ReadValueM(ObjectA.NameA1);
                 string b3 = actualC.ReadValueM(ObjectA.NameA2);
                 string b4 = actualC.ReadValueM(ObjectB.NameB1);
@@ -217,7 +218,7 @@ namespace R3Modeller {
 #if !DEBUG // allow debug mode to catch the exception
             try {
 #endif
-                await this.InitApp();
+            await this.InitApp();
 #if !DEBUG
             }
             catch (Exception ex) {

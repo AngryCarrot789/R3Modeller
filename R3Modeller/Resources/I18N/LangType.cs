@@ -1,4 +1,4 @@
-﻿namespace MCNBTEditor.WPF.Resources.I18N {
+﻿namespace R3Modeller.Resources.I18N {
     public enum LangType {
         En, De
     }

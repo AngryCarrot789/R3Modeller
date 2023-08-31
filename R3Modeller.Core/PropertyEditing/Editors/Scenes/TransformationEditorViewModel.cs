@@ -10,6 +10,9 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         private Vector3 pos;
         private Vector3 scale;
         private Vector3 rot;
+        private bool? isAbsolutePos;
+        private bool? isAbsoluteScale;
+        private bool? isAbsoluteRotation;
 
         // A lot of this code may end up being duplicated between the scene object view model and this class...
 
@@ -22,6 +25,54 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
         public float ScaleX { get => this.scale.X; set => this.OnModifiedScale(this.scale, this.scale.WithX(value)); }
         public float ScaleY { get => this.scale.Y; set => this.OnModifiedScale(this.scale, this.scale.WithY(value)); }
         public float ScaleZ { get => this.scale.Z; set => this.OnModifiedScale(this.scale, this.scale.WithZ(value)); }
+
+        public bool? IsAbsolutePos {
+            get => this.isAbsolutePos;
+            set {
+                bool? old = this.isAbsolutePos;
+                if (!old.HasValue && !value.HasValue || old.HasValue && value.HasValue && old.Value == value.Value) {
+                    return;
+                }
+
+                bool val = value ?? false;
+                this.RaisePropertyChanged(ref this.isAbsolutePos, value);
+                foreach (object handler in this.Handlers) {
+                    ((SceneObjectViewModel) handler).IsPositionAbsolute = val;
+                }
+            }
+        }
+
+        public bool? IsAbsoluteScale {
+            get => this.isAbsoluteScale;
+            set {
+                bool? old = this.isAbsoluteScale;
+                if (!old.HasValue && !value.HasValue || old.HasValue && value.HasValue && old.Value == value.Value) {
+                    return;
+                }
+
+                bool val = value ?? false;
+                this.RaisePropertyChanged(ref this.isAbsoluteScale, value);
+                foreach (object handler in this.Handlers) {
+                    ((SceneObjectViewModel) handler).IsScaleAbsolute = val;
+                }
+            }
+        }
+
+        public bool? IsAbsoluteRotation {
+            get => this.isAbsoluteRotation;
+            set {
+                bool? old = this.isAbsoluteRotation;
+                if (!old.HasValue && !value.HasValue || old.HasValue && value.HasValue && old.Value == value.Value) {
+                    return;
+                }
+
+                bool val = value ?? false;
+                this.RaisePropertyChanged(ref this.isAbsoluteRotation, value);
+                foreach (object handler in this.Handlers) {
+                    ((SceneObjectViewModel) handler).IsRotationAbsolute = val;
+                }
+            }
+        }
 
         // the user has their mouse down
         private bool isEditingPosX;
@@ -76,6 +127,10 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             this.FinishEditPitchCommand = new RelayCommand(() => this.isEditingPitch = false, () => this.isEditingPitch);
             this.FinishEditRollCommand = new RelayCommand(() => this.isEditingRoll = false, () => this.isEditingRoll);
         }
+
+        public bool? CalculateDefaultPosition() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsPositionAbsolute, out bool v) ? v : (bool?) null;
+        public bool? CalculateDefaultScale() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsScaleAbsolute, out bool v) ? v : (bool?) null;
+        public bool? CalculateDefaultRotation() => GetEqualValue(this.Handlers, (x) => ((SceneObjectViewModel) x).IsRotationAbsolute, out bool v) ? v : (bool?) null;
 
 #if RELEASE
         public override bool IsApplicable(object value) => value is SceneObjectViewModel;
@@ -167,6 +222,15 @@ namespace R3Modeller.Core.PropertyEditing.Editors.Scenes {
             this.pos = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).Pos, out Vector3 a) ? a : Vector3.Zero;
             this.scale = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).Scale, out Vector3 b) ? b : Vector3.One;
             this.rot = GetEqualValue(this.Handlers, x => ((SceneObjectViewModel) x).PitchYawRoll, out Vector3 c) ? c : Vector3.Zero;
+
+            if (!this.IsEmpty) {
+                this.isAbsolutePos = this.CalculateDefaultPosition();
+                this.isAbsoluteScale = this.CalculateDefaultScale();
+                this.isAbsoluteRotation = this.CalculateDefaultRotation();
+                this.RaisePropertyChanged(nameof(this.IsAbsolutePos));
+                this.RaisePropertyChanged(nameof(this.IsAbsoluteScale));
+                this.RaisePropertyChanged(nameof(this.IsAbsoluteRotation));
+            }
 
             this.RaisePositionChanged();
             this.RaiseRotationChanged();

@@ -8,12 +8,12 @@
                     xmlns:adc="clr-namespace:AvalonDock.Converters;assembly=AvalonDock" 
                     xmlns:adp="clr-namespace:AvalonDock.Properties;assembly=AvalonDock" 
                     xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=AvalonDock"
-                    xmlns:rk="clr-namespace:FramePFX.WPF.Themes.AvalonDock.Themes">
+                    xmlns:rk="clr-namespace:R3Modeller.Themes.AvalonDock.Themes">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/FramePFX.WPF;component/Themes/AvalonDock/DarkBrushes.xaml" />
-        <ResourceDictionary Source="/FramePFX.WPF;component/Themes/AvalonDock/Themes/OverlayButtons.xaml" />
-        <ResourceDictionary Source="/FramePFX.WPF;component/Themes/AvalonDock/Themes/Menu/MenuItem.xaml" />
-        <ResourceDictionary Source="/FramePFX.WPF;component/Themes/AvalonDock/Themes/Icons/IconGeometry.xaml" />
+        <ResourceDictionary Source="/R3Modeller;component/Themes/AvalonDock/DarkBrushes.xaml" />
+        <ResourceDictionary Source="/R3Modeller;component/Themes/AvalonDock/Themes/OverlayButtons.xaml" />
+        <ResourceDictionary Source="/R3Modeller;component/Themes/AvalonDock/Themes/Menu/MenuItem.xaml" />
+        <ResourceDictionary Source="/R3Modeller;component/Themes/AvalonDock/Themes/Icons/IconGeometry.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="DropDownControlArea" TargetType="{x:Type ctrl:DropDownControlArea}" />
     <Style TargetType="{x:Type ContextMenuEx}" BasedOn="{StaticResource {x:Type ContextMenu}}"/>

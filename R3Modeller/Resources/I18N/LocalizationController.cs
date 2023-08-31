@@ -2,7 +2,7 @@
 using System.Windows;
 using R3Modeller.Core;
 
-namespace MCNBTEditor.WPF.Resources.I18N {
+namespace R3Modeller.Resources.I18N {
     public class LocalizationController {
         public static ResourceDictionary I18NText {
             get => Application.Current.Resources.MergedDictionaries[3];

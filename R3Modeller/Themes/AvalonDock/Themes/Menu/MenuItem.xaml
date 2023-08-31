@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:reskeys="clr-namespace:FramePFX.WPF.Themes.AvalonDock.Themes.Menu">
+    xmlns:reskeys="clr-namespace:R3Modeller.Themes.AvalonDock.Themes.Menu">
 
     <!--  Source https://github.com/Dirkster99/MLib/blob/master/source/Components/MLib/Controls/Menu/ContextMenu.xaml  -->
     <ControlTemplate x:Key="MLibMenuItem" TargetType="{x:Type MenuItem}">

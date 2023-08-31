@@ -1,29 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace R3Modeller.Core.Engine.Properties {
     /// <summary>
     /// Stores information about a specific type that contains registered properties
     /// </summary>
     public class R3TypeRegistration {
-        private readonly struct TypeAddition {
-            public readonly Type type;
-            public readonly R3TypeRegistration registration;
-
-            public TypeAddition(Type type, R3TypeRegistration registration) {
-                this.type = type;
-                this.registration = registration;
-            }
-        }
-
-        // Maps the owner type to the properties
         private static readonly Dictionary<Type, R3TypeRegistration> RegisteredTypes = new Dictionary<Type, R3TypeRegistration>();
 
         internal readonly List<R3Property> properties;
-        internal int nextHierarchialIndex;
         internal int nextLocalIndex;
         internal bool isPacked;
 
@@ -45,12 +30,14 @@ namespace R3Modeller.Core.Engine.Properties {
         /// <summary>
         /// The total number of bytes that a packed array of bytes contains for storing struct entries this hierarchy stores
         /// </summary>
-        public int HierarchialStructSize { get; private set; }
+        public int HierarchicalStructSize { get; private set; }
 
         /// <summary>
         /// The total number of object and managed struct entries this hierarchy stores
         /// </summary>
-        public int HierarchialObjectCount { get; private set; }
+        public int HierarchicalObjectCount { get; private set; }
+
+        public int NextHierarchicalIndex { get; internal set; }
 
         internal R3TypeRegistration(Type ownerType) {
             this.OwnerType = ownerType;
@@ -66,7 +53,7 @@ namespace R3Modeller.Core.Engine.Properties {
                     RegisteredTypes[ownerType] = registration = new R3TypeRegistration(ownerType);
                     R3TypeRegistration parent = GetParentRegistration(registration);
                     if (parent != null) {
-                        registration.nextHierarchialIndex = parent.nextHierarchialIndex;
+                        registration.NextHierarchicalIndex = parent.NextHierarchicalIndex;
                     }
                 }
 
@@ -92,19 +79,19 @@ namespace R3Modeller.Core.Engine.Properties {
                     PackStructure(parent);
                 }
 
-                r.HierarchialObjectCount = parent.HierarchialObjectCount;
-                r.HierarchialStructSize = parent.HierarchialStructSize;
+                r.HierarchicalObjectCount = parent.HierarchicalObjectCount;
+                r.HierarchicalStructSize = parent.HierarchicalStructSize;
             }
 
             foreach (R3Property property in r.properties) {
                 if (property.IsStruct) {
-                    property.structOffset = r.HierarchialStructSize;
-                    r.HierarchialStructSize += property.structSize;
+                    property.structOffset = r.HierarchicalStructSize;
+                    r.HierarchicalStructSize += property.structSize;
                     r.LocalPackedStructSize += property.structSize;
                 }
                 else {
-                    property.objectIndex = r.HierarchialObjectCount;
-                    r.HierarchialObjectCount++;
+                    property.objectIndex = r.HierarchicalObjectCount;
+                    r.HierarchicalObjectCount++;
                     r.LocalPackedObjectSize++;
                 }
             }

@@ -8,193 +8,121 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using R3Modeller.Controls.TreeViews.Automation.Peers;
+using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Controls.TreeViews.Controls {
-    public class MultiSelectTreeViewItem : HeaderedItemsControl {
-        #region Public methods
+    [TemplatePart(Name = "ItemsHost", Type = typeof (ItemsPresenter))]
+    [StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof (MultiSelectTreeViewItem))]
+    public class MultiSelectTreeViewItem : HeaderedItemsControl { // IHierarchicalVirtualizationAndScrollInfo
+        public static readonly DependencyProperty BackgroundFocusedProperty = DependencyProperty.Register("BackgroundFocused", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(SystemColors.HighlightBrush, null));
+        public static readonly DependencyProperty BackgroundSelectedHoveredProperty = DependencyProperty.Register("BackgroundSelectedHovered", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.DarkGray, null));
+        public static readonly DependencyProperty BackgroundSelectedProperty = DependencyProperty.Register("BackgroundSelected", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(SystemColors.HighlightBrush, null));
+        public static readonly DependencyProperty ForegroundSelectedProperty = DependencyProperty.Register("ForegroundSelected", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(SystemColors.HighlightTextBrush, null));
+        public static readonly DependencyProperty BackgroundHoveredProperty = DependencyProperty.Register("BackgroundHovered", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.LightGray, null));
+        public static readonly DependencyProperty BackgroundInactiveProperty = DependencyProperty.Register("BackgroundInactive", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(SystemColors.ControlBrush, null));
+        public static readonly DependencyProperty ForegroundInactiveProperty = DependencyProperty.Register("ForegroundInactive", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, null));
+        public static readonly DependencyProperty BorderBrushHoveredProperty = DependencyProperty.Register("BorderBrushHovered", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.Transparent, null));
+        public static readonly DependencyProperty BorderBrushFocusedProperty = DependencyProperty.Register("BorderBrushFocused", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.Transparent, null));
+        public static readonly DependencyProperty BorderBrushInactiveProperty = DependencyProperty.Register("BorderBrushInactive", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.Black, null));
+        public static readonly DependencyProperty BorderBrushSelectedProperty = DependencyProperty.Register("BorderBrushSelected", typeof(Brush), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(Brushes.Transparent, null));
+        public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register("IsExpanded", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register("IsEditable", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(true));
+        public new static readonly DependencyProperty IsVisibleProperty = DependencyProperty.Register("IsVisible", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(true));
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register("IsSelected", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(new PropertyChangedCallback(OnIsSelectedChanged)));
+        public static readonly DependencyProperty IsEditingProperty = DependencyProperty.Register("IsEditing", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty ContentTemplateEditProperty = DependencyProperty.Register("ContentTemplateEdit", typeof(DataTemplate), typeof(MultiSelectTreeViewItem));
+        public static readonly DependencyProperty DisplayNameProperty = DependencyProperty.Register("DisplayName", typeof(string), typeof(MultiSelectTreeViewItem));
+        public static readonly DependencyProperty HoverHighlightingProperty = DependencyProperty.Register("HoverHighlighting", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty ItemIndentProperty = DependencyProperty.Register("ItemIndent", typeof(int), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(13));
+        public static readonly DependencyProperty IsKeyboardModeProperty = DependencyProperty.Register("IsKeyboardMode", typeof(bool), typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(BoolBox.False));
+        public static readonly DependencyProperty RemarksProperty = DependencyProperty.Register("Remarks", typeof(string), typeof(MultiSelectTreeViewItem));
+        public static readonly DependencyProperty RemarksTemplateProperty = DependencyProperty.Register("RemarksTemplate", typeof(DataTemplate), typeof(MultiSelectTreeViewItem));
 
-        public override string ToString() {
-            if (this.DataContext != null) {
-                return string.Format("{0} ({1})", this.DataContext, base.ToString());
-            }
-
-            return base.ToString();
-        }
-
-        #endregion Public methods
-
-        #region Internal methods
-
-        internal void InvokeMouseDown() {
-            var e = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right);
-            e.RoutedEvent = Mouse.MouseDownEvent;
-            this.OnMouseDown(e);
-        }
-
-        #endregion Internal methods
-
-        #region Dependency properties
-
-        #region Brushes
-
-        public static readonly DependencyProperty BackgroundFocusedProperty = DependencyProperty.Register(
-            "BackgroundFocused",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(SystemColors.HighlightBrush, null));
-
-        public static readonly DependencyProperty BackgroundSelectedHoveredProperty = DependencyProperty.Register(
-            "BackgroundSelectedHovered",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.DarkGray, null));
-
-        public static readonly DependencyProperty BackgroundSelectedProperty = DependencyProperty.Register(
-            "BackgroundSelected",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(SystemColors.HighlightBrush, null));
-
-        public static readonly DependencyProperty ForegroundSelectedProperty = DependencyProperty.Register(
-            "ForegroundSelected",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(SystemColors.HighlightTextBrush, null));
-
-        public static readonly DependencyProperty BackgroundHoveredProperty = DependencyProperty.Register(
-            "BackgroundHovered",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.LightGray, null));
-
-        public static readonly DependencyProperty BackgroundInactiveProperty = DependencyProperty.Register(
-            "BackgroundInactive",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(SystemColors.ControlBrush, null));
-
-        public static readonly DependencyProperty ForegroundInactiveProperty = DependencyProperty.Register(
-            "ForegroundInactive",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, null));
-
-        public static readonly DependencyProperty BorderBrushHoveredProperty = DependencyProperty.Register(
-            "BorderBrushHovered",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.Transparent, null));
-
-        public static readonly DependencyProperty BorderBrushFocusedProperty = DependencyProperty.Register(
-            "BorderBrushFocused",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.Transparent, null));
-
-        public static readonly DependencyProperty BorderBrushInactiveProperty = DependencyProperty.Register(
-            "BorderBrushInactive",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.Black, null));
-
-        public static readonly DependencyProperty BorderBrushSelectedProperty = DependencyProperty.Register(
-            "BorderBrushSelected",
-            typeof(Brush),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(Brushes.Transparent, null));
-
-        #endregion Brushes
-
-        #region Others
-
-        public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register(
-            "IsExpanded",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(false));
-
-        public static readonly DependencyProperty IsEditableProperty = DependencyProperty.Register(
-            "IsEditable",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(true));
-
-        public static new DependencyProperty IsVisibleProperty = DependencyProperty.Register(
-            "IsVisible",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(true));
-
-        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
-            "IsSelected",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(new PropertyChangedCallback(OnIsSelectedChanged)));
-
-        public static readonly DependencyProperty IsEditingProperty = DependencyProperty.Register(
-            "IsEditing",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(false));
-
-        public static readonly DependencyProperty ContentTemplateEditProperty = DependencyProperty.Register(
-            "ContentTemplateEdit",
-            typeof(DataTemplate),
-            typeof(MultiSelectTreeViewItem));
-
-        public static readonly DependencyProperty DisplayNameProperty = DependencyProperty.Register(
-            "DisplayName",
-            typeof(string),
-            typeof(MultiSelectTreeViewItem));
-
-        public static readonly DependencyProperty HoverHighlightingProperty = DependencyProperty.Register(
-            "HoverHighlighting",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(false));
-
-        public static readonly DependencyProperty ItemIndentProperty = DependencyProperty.Register(
-            "ItemIndent",
-            typeof(int),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(13));
-
-        public static readonly DependencyProperty IsKeyboardModeProperty = DependencyProperty.Register(
-            "IsKeyboardMode",
-            typeof(bool),
-            typeof(MultiSelectTreeViewItem),
-            new FrameworkPropertyMetadata(false));
-
-        public static readonly DependencyProperty RemarksProperty = DependencyProperty.Register(
-            "Remarks",
-            typeof(string),
-            typeof(MultiSelectTreeViewItem));
-
-        public static readonly DependencyProperty RemarksTemplateProperty = DependencyProperty.Register(
-            "RemarksTemplate",
-            typeof(DataTemplate),
-            typeof(MultiSelectTreeViewItem));
-
-        #endregion Others
-
-        #endregion Dependency properties
-
-        #region Constructors and Destructors
-
-        static MultiSelectTreeViewItem() {
-            DefaultStyleKeyProperty.OverrideMetadata(
-                typeof(MultiSelectTreeViewItem),
-                new FrameworkPropertyMetadata(typeof(MultiSelectTreeViewItem)));
-        }
+        // private static readonly FieldInfo FIELD_HVCF_UncommonField;
+        // private static readonly MethodInfo METHOD_HVCF_UncommonField_SetValue;
+        // private static readonly MethodInfo METHOD_HVCF_UncommonField_GetValue;
+        // private static readonly FieldInfo FIELD_HVIDSF_UncommonField;
+        // private static readonly MethodInfo METHOD_HVIDSF_UncommonField_SetValue;
+        // private static readonly MethodInfo METHOD_HVIDSF_UncommonField_GetValue;
+        // private static readonly PropertyInfo itemsHostPropertyInfo = typeof(ItemsControl).GetProperty("ItemsHost", BindingFlags.Instance | BindingFlags.NonPublic);
+        //
+        // HierarchicalVirtualizationConstraints IHierarchicalVirtualizationAndScrollInfo.Constraints {
+        //     get => (HierarchicalVirtualizationConstraints) METHOD_HVCF_UncommonField_GetValue.Invoke(FIELD_HVCF_UncommonField.GetValue(null), new object[] {this});
+        //     set {
+        //         if (value.CacheLengthUnit == VirtualizationCacheLengthUnit.Page)
+        //             throw new InvalidOperationException("Page cache not allowed");
+        //         METHOD_HVCF_UncommonField_SetValue.Invoke(FIELD_HVCF_UncommonField.GetValue(null), new object[] {this, value});
+        //     }
+        // }
+        //
+        // HierarchicalVirtualizationHeaderDesiredSizes IHierarchicalVirtualizationAndScrollInfo.HeaderDesiredSizes {
+        //     get {
+        //         Size headerSize = !this.IsVisible || !(this.Header is FrameworkElement headerElement) ? new Size() : headerElement.DesiredSize;
+        //
+        //         Type helperType = Type.GetType("MS.Internal.Helper"); // Get the type of MS.Internal.Helper
+        //
+        //         // Find the method using reflection
+        //         MethodInfo methodInfo = helperType.GetMethod("ApplyCorrectionFactorToPixelHeaderSize", BindingFlags.NonPublic | BindingFlags.Static);
+        //         methodInfo.Invoke(null, new object[] {this.ParentTreeView, this, itemsHostPropertyInfo.GetValue(this), headerSize});
+        //         return new HierarchicalVirtualizationHeaderDesiredSizes(new Size(headerSize.Width > 0 ? 1.0 : 0.0, headerSize.Height > 0 ? 1.0 : 0.0), headerSize);
+        //     }
+        // }
+        //
+        // HierarchicalVirtualizationItemDesiredSizes IHierarchicalVirtualizationAndScrollInfo.ItemDesiredSizes {
+        //     get {
+        //         Type helperType = Type.GetType("MS.Internal.Helper"); // Get the type of MS.Internal.Helper
+        //         // Find the method using reflection
+        //         MethodInfo methodInfo = helperType.GetMethod("ApplyCorrectionFactorToItemDesiredSizes", BindingFlags.NonPublic | BindingFlags.Static);
+        //         return (HierarchicalVirtualizationItemDesiredSizes) methodInfo.Invoke(null, new[] {this, itemsHostPropertyInfo.GetValue(this)});
+        //     }
+        //     set => METHOD_HVIDSF_UncommonField_SetValue.Invoke(FIELD_HVIDSF_UncommonField.GetValue(null), new object[] {this, value});
+        // }
+        //
+        // public new Panel ItemsHost => (Panel) itemsHostPropertyInfo.GetValue(this);
+        //
+        // public bool MustDisableVirtualization { get; set; }
+        //
+        // public bool InBackgroundLayout { get; set; }
 
         public MultiSelectTreeViewItem() {
         }
 
-        #endregion
+        static MultiSelectTreeViewItem() {
+            // {
+            //     FIELD_HVCF_UncommonField = typeof(GroupItem).GetField("HierarchicalVirtualizationConstraintsField", BindingFlags.Static | BindingFlags.NonPublic) ?? throw new Exception("Could not find HierarchicalVirtualizationConstraintsField ");
+            //     Type UncommonFieldType = FIELD_HVCF_UncommonField.FieldType;
+            //     METHOD_HVCF_UncommonField_GetValue = UncommonFieldType.GetMethod("GetValue", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public);
+            //     METHOD_HVCF_UncommonField_SetValue = UncommonFieldType.GetMethod("SetValue", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public);
+            // }
+            // {
+            //     FIELD_HVIDSF_UncommonField = typeof(GroupItem).GetField("HierarchicalVirtualizationItemDesiredSizesField", BindingFlags.Static | BindingFlags.NonPublic) ?? throw new Exception("Could not find HierarchicalVirtualizationItemDesiredSizesField ");
+            //     Type UncommonFieldType = FIELD_HVIDSF_UncommonField.FieldType;
+            //     METHOD_HVIDSF_UncommonField_GetValue = UncommonFieldType.GetMethod("GetValue", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public);
+            //     METHOD_HVIDSF_UncommonField_SetValue = UncommonFieldType.GetMethod("SetValue", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.Public);
+            // }
 
-        #region Public Properties
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(typeof(MultiSelectTreeViewItem)));
+            VirtualizingPanel.IsVirtualizingProperty.OverrideMetadata(typeof(MultiSelectTreeViewItem), new FrameworkPropertyMetadata(BoolBox.False));
+        }
 
-        #region Brushes
+        public override string ToString() {
+            return this.DataContext != null ? $"{this.DataContext} ({base.ToString()})" : base.ToString();
+        }
+
+        internal void InvokeMouseDown() {
+            MouseButtonEventArgs e = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right);
+            e.RoutedEvent = Mouse.MouseDownEvent;
+            this.OnMouseDown(e);
+        }
+
+        // HierarchicalVirtualizationConstraints IHierarchicalVirtualizationAndScrollInfo.Constraints {
+        //     get => GroupItem.HierarchicalVirtualizationConstraintsField.GetValue((DependencyObject) this);
+        //     set {
+        //         if (value.CacheLengthUnit == VirtualizationCacheLengthUnit.Page)
+        //             throw new InvalidOperationException(System.Windows.SR.Get("PageCacheSizeNotAllowed"));
+        //         GroupItem.HierarchicalVirtualizationConstraintsField.SetValue((DependencyObject) this, value);
+        //     }
+        // }
 
         public Brush BackgroundFocused {
             get { return (Brush) this.GetValue(BackgroundFocusedProperty); }
@@ -251,10 +179,6 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             set { this.SetValue(BorderBrushSelectedProperty, value); }
         }
 
-        #endregion Brushes
-
-        #region Others
-
         public DataTemplate ContentTemplateEdit {
             get { return (DataTemplate) this.GetValue(ContentTemplateEditProperty); }
             set { this.SetValue(ContentTemplateEditProperty, value); }
@@ -262,27 +186,27 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         public bool IsExpanded {
             get { return (bool) this.GetValue(IsExpandedProperty); }
-            set { this.SetValue(IsExpandedProperty, value); }
+            set { this.SetValue(IsExpandedProperty, value.Box()); }
         }
 
         public bool IsEditable {
             get { return (bool) this.GetValue(IsEditableProperty); }
-            set { this.SetValue(IsEditableProperty, value); }
+            set { this.SetValue(IsEditableProperty, value.Box()); }
         }
 
         public new bool IsVisible {
             get { return (bool) this.GetValue(IsVisibleProperty); }
-            set { this.SetValue(IsVisibleProperty, value); }
+            set { this.SetValue(IsVisibleProperty, value.Box()); }
         }
 
         public bool IsEditing {
             get { return (bool) this.GetValue(IsEditingProperty); }
-            set { this.SetValue(IsEditingProperty, value); }
+            set { this.SetValue(IsEditingProperty, value.Box()); }
         }
 
         public bool IsSelected {
             get { return (bool) this.GetValue(IsSelectedProperty); }
-            set { this.SetValue(IsSelectedProperty, value); }
+            set { this.SetValue(IsSelectedProperty, value.Box()); }
         }
 
         public string DisplayName {
@@ -292,7 +216,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         public bool HoverHighlighting {
             get { return (bool) this.GetValue(HoverHighlightingProperty); }
-            set { this.SetValue(HoverHighlightingProperty, value); }
+            set { this.SetValue(HoverHighlightingProperty, value.Box()); }
         }
 
         public int ItemIndent {
@@ -302,7 +226,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         public bool IsKeyboardMode {
             get { return (bool) this.GetValue(IsKeyboardModeProperty); }
-            set { this.SetValue(IsKeyboardModeProperty, value); }
+            set { this.SetValue(IsKeyboardModeProperty, value.Box()); }
         }
 
         public string Remarks {
@@ -314,12 +238,6 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             get { return (DataTemplate) this.GetValue(RemarksTemplateProperty); }
             set { this.SetValue(RemarksTemplateProperty, value); }
         }
-
-        #endregion Others
-
-        #endregion
-
-        #region Non-public properties
 
         private MultiSelectTreeView lastParentTreeView;
 
@@ -367,10 +285,6 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 return ItemsControlFromItemContainer(this);
             }
         }
-
-        #endregion Non-public properties
-
-        #region Protected methods
 
         protected static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             // The item has been selected through its IsSelected property. Update the SelectedItems
@@ -605,19 +519,15 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e) {
             MultiSelectTreeView parentTV;
-
             switch (e.Action) {
                 case NotifyCollectionChangedAction.Remove:
                     // Remove all items from the SelectedItems list that have been removed from the
                     // Items list
-                    parentTV = this.ParentTreeView;
-                    if (parentTV == null)
-                        parentTV = this.lastParentTreeView;
+                    parentTV = this.ParentTreeView ?? this.lastParentTreeView;
                     if (parentTV != null) {
-                        foreach (var item in e.OldItems) {
+                        foreach (object item in e.OldItems) {
                             parentTV.SelectedItems.Remove(item);
-                            var multiselection = parentTV.Selection as SelectionMultiple;
-                            if (multiselection != null) {
+                            if (parentTV.Selection is SelectionMultiple multiselection) {
                                 multiselection.InvalidateLastShiftRoot(item);
                             }
                             // Don't preview and ask, it is already gone so it must be removed from
@@ -629,14 +539,12 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 case NotifyCollectionChangedAction.Reset:
                     // Remove all items from the SelectedItems list that are no longer in the Items
                     // list
-                    parentTV = this.ParentTreeView;
-                    if (parentTV == null)
-                        parentTV = this.lastParentTreeView;
+                    parentTV = this.ParentTreeView ?? this.lastParentTreeView;
                     if (parentTV != null) {
-                        var selection = new object[parentTV.SelectedItems.Count];
+                        object[] selection = new object[parentTV.SelectedItems.Count];
                         parentTV.SelectedItems.CopyTo(selection, 0);
-                        HashSet<object> dataItems = new HashSet<object>(parentTV.GetAllDataItems().Cast<object>());
-                        foreach (var item in selection) {
+                        HashSet<object> dataItems = new HashSet<object>(MultiSelectTreeView.GetEntireTreeRecursive(parentTV, true).Select(x => x.DataContext));
+                        foreach (object item in selection) {
                             if (!dataItems.Contains(item)) {
                                 parentTV.SelectedItems.Remove(item);
                                 // Don't preview and ask, it is already gone so it must be removed
@@ -650,7 +558,5 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
             base.OnItemsChanged(e);
         }
-
-        #endregion Protected methods
     }
 }

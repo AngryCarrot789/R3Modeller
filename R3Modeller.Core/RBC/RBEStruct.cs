@@ -54,7 +54,7 @@ namespace R3Modeller.Core.RBC {
                 throw new Exception($"Binary data size does not match struct size (binary({array.Length}) != struct({size}) for struct {typeof(T)})");
             }
 
-            return BinaryUtils.ReadStruct<T>(array, 0, size);
+            return BinaryUtils.ReadStruct<T>(array, 0);
         }
 
         public bool TryGetValue<T>(out T value) where T : unmanaged {
@@ -64,7 +64,7 @@ namespace R3Modeller.Core.RBC {
                 return false;
             }
 
-            value = BinaryUtils.ReadStruct<T>(this.data, 0, size);
+            value = BinaryUtils.ReadStruct<T>(this.data, 0);
             return true;
         }
 

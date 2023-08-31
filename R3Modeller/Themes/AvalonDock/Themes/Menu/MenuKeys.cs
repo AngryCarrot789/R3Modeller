@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace FramePFX.WPF.Themes.AvalonDock.Themes.Menu {
+namespace R3Modeller.Themes.AvalonDock.Themes.Menu {
     /// <summary>
     /// Class implements static resource keys that should be referenced to configure
     /// menu specific colors, styles and other elements that are typically changed

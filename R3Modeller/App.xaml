@@ -11,7 +11,11 @@
                 <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml" />
                 <ResourceDictionary Source="Themes/ControlColours.xaml" />
                 <ResourceDictionary Source="Themes/Controls.xaml" />
-                <ResourceDictionary Source="/Controls/TreeViews/Themes/Aero2.NormalColor.xaml" />
+
+                <!-- Tree -->
+                <ResourceDictionary Source="/Controls/TreeViews/Themes/EditTextBox.xaml" />
+                <ResourceDictionary Source="/Controls/TreeViews/Themes/MultiSelectTreeView.Aero2.xaml" />
+                <ResourceDictionary Source="/Controls/TreeViews/Themes/MultiSelectTreeViewItem.Aero2.xaml" />
 
                 <ResourceDictionary Source="Themes/Globals.xaml"/>
 

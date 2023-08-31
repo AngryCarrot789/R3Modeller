@@ -8,12 +8,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using R3Modeller.Controls.TreeViews.Automation.Peers;
 using R3Modeller.Core.Utils;
 
 namespace R3Modeller.Controls.TreeViews.Controls {
+    [StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof (MultiSelectTreeViewItem))]
     public class MultiSelectTreeView : ItemsControl {
         #region Constants and Fields
 
@@ -174,8 +176,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         public bool ClearSelection() {
             if (this.SelectedItems.Count > 0) {
                 // Make a copy of the list and ignore changes to the selection while raising events
-                foreach (var selItem in new ArrayList(this.SelectedItems)) {
-                    var e = new PreviewSelectionChangedEventArgs(false, selItem);
+                foreach (object selItem in new ArrayList(this.SelectedItems)) {
+                    PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, selItem);
                     this.OnPreviewSelectionChanged(e);
                     if (e.CancelAny) {
                         return false;
@@ -233,7 +235,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             List<MultiSelectTreeViewItem> selectedChildren = new List<MultiSelectTreeViewItem>();
             if (includeSelf) {
                 if (item.IsSelected) {
-                    var e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
+                    PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, item.DataContext);
                     this.OnPreviewSelectionChanged(e);
                     if (e.CancelAny) {
                         return false;
@@ -247,7 +249,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 return false;
             }
 
-            foreach (var child in selectedChildren) {
+            foreach (MultiSelectTreeViewItem child in selectedChildren) {
                 child.IsSelected = false;
             }
 
@@ -255,11 +257,11 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         private bool CollectDeselectRecursive(MultiSelectTreeViewItem item, List<MultiSelectTreeViewItem> selectedChildren) {
-            foreach (var child in item.Items) {
+            foreach (object child in item.Items) {
                 MultiSelectTreeViewItem tvi = item.ItemContainerGenerator.ContainerFromItem(child) as MultiSelectTreeViewItem;
                 if (tvi != null) {
                     if (tvi.IsSelected) {
-                        var e = new PreviewSelectionChangedEventArgs(false, child);
+                        PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, child);
                         this.OnPreviewSelectionChanged(e);
                         if (e.CancelAny) {
                             return false;
@@ -278,8 +280,8 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         internal bool ClearSelectionByRectangle() {
-            foreach (var item in new ArrayList(this.SelectedItems)) {
-                var e = new PreviewSelectionChangedEventArgs(false, item);
+            foreach (object item in new ArrayList(this.SelectedItems)) {
+                PreviewSelectionChangedEventArgs e = new PreviewSelectionChangedEventArgs(false, item);
                 this.OnPreviewSelectionChanged(e);
                 if (e.CancelAny)
                     return false;
@@ -365,7 +367,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Replace:
                     if (e.OldItems != null) {
-                        foreach (var item in e.OldItems) {
+                        foreach (object item in e.OldItems) {
                             this.SelectedItems.Remove(item);
                             // Don't preview and ask, it is already gone so it must be removed from
                             // the SelectedItems list
@@ -383,39 +385,86 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             base.OnItemsChanged(e);
         }
 
-        internal static IEnumerable<MultiSelectTreeViewItem> RecursiveTreeViewItemEnumerable(ItemsControl parent, bool includeInvisible) {
-            return RecursiveTreeViewItemEnumerable(parent, includeInvisible, true);
+        internal static List<MultiSelectTreeViewItem> GetEntireTreeRecursive(ItemsControl parent, bool includeInvisible, bool includeDisabled = true) {
+            List<MultiSelectTreeViewItem> list = new List<MultiSelectTreeViewItem>(128);
+            GetEntireTreeRecursive(list, parent, includeInvisible, includeDisabled);
+            return list;
         }
 
-        internal static IEnumerable<MultiSelectTreeViewItem> RecursiveTreeViewItemEnumerable(ItemsControl parent, bool includeInvisible, bool includeDisabled) {
-            foreach (var item in parent.Items) {
-                MultiSelectTreeViewItem tve = (MultiSelectTreeViewItem) parent.ItemContainerGenerator.ContainerFromItem(item);
+        internal static void GetEntireTreeRecursive(List<MultiSelectTreeViewItem> dst, ItemsControl parent, bool includeInvisible, bool includeDisabled = true) {
+            if (parent.ItemContainerGenerator.Status == GeneratorStatus.NotStarted) {
+                return;
+            }
+
+            for (int i = 0, count = parent.Items.Count; i < count; i++) {
+                MultiSelectTreeViewItem tve = (MultiSelectTreeViewItem) parent.ItemContainerGenerator.ContainerFromIndex(i);
                 if (tve == null) {
-                    // Container was not generated, therefore it is probably not visible, so we can ignore it.
-                    continue;
+                    continue; // Container was not generated, therefore it is probably not visible, so we can ignore it.
                 }
 
-                if (!includeInvisible && !tve.IsVisible) {
-                    continue;
-                }
-
-                if (!includeDisabled && !tve.IsEnabled) {
-                    continue;
-                }
-
-                yield return tve;
-                if (includeInvisible || tve.IsExpanded) {
-                    foreach (var childItem in RecursiveTreeViewItemEnumerable(tve, includeInvisible, includeDisabled)) {
-                        yield return childItem;
+                if ((includeInvisible || tve.IsVisible) && (includeDisabled || tve.IsEnabled)) {
+                    dst.Add(tve);
+                    if (includeInvisible || tve.IsExpanded) {
+                        GetEntireTreeRecursive(dst, tve, includeInvisible, includeDisabled);
                     }
                 }
             }
         }
 
+        internal static IEnumerable<MultiSelectTreeViewItem> EnumerableTreeRecursive(ItemsControl parent, bool includeInvisible, bool includeDisabled = true) {
+            if (parent.ItemContainerGenerator.Status == GeneratorStatus.NotStarted) {
+                yield break;
+            }
+
+            for (int i = 0, count = parent.Items.Count; i < count; i++) {
+                MultiSelectTreeViewItem tve = (MultiSelectTreeViewItem) parent.ItemContainerGenerator.ContainerFromIndex(i);
+                if (tve == null) {
+                    continue; // Container was not generated, therefore it is probably not visible, so we can ignore it.
+                }
+
+                if ((includeInvisible || tve.IsVisible) && (includeDisabled || tve.IsEnabled)) {
+                    yield return tve;
+                    if (includeInvisible || tve.IsExpanded) {
+                        foreach (MultiSelectTreeViewItem tvi in EnumerableTreeRecursive(tve, includeInvisible, includeDisabled)) {
+                            yield return tvi;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal static MultiSelectTreeViewItem EnumerableTreeRecursiveFirst(Predicate<MultiSelectTreeViewItem> accept, ItemsControl parent, bool includeInvisible, bool includeDisabled = true) {
+            if (parent.ItemContainerGenerator.Status == GeneratorStatus.NotStarted) {
+                return null;
+            }
+
+            for (int i = 0, count = parent.Items.Count; i < count; i++) {
+                MultiSelectTreeViewItem tve = (MultiSelectTreeViewItem) parent.ItemContainerGenerator.ContainerFromIndex(i);
+                if (tve == null) {
+                    continue; // Container was not generated, therefore it is probably not visible, so we can ignore it.
+                }
+
+                if ((includeInvisible || tve.IsVisible) && (includeDisabled || tve.IsEnabled)) {
+                    if (accept(tve)) {
+                        return tve;
+                    }
+
+                    if (includeInvisible || tve.IsExpanded) {
+                        MultiSelectTreeViewItem item = EnumerableTreeRecursiveFirst(accept, tve, includeInvisible, includeDisabled);
+                        if (item != null) {
+                            return item;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         internal IEnumerable<MultiSelectTreeViewItem> GetNodesToSelectBetween(MultiSelectTreeViewItem firstNode, MultiSelectTreeViewItem lastNode) {
-            var allNodes = RecursiveTreeViewItemEnumerable(this, false, false).ToList();
-            var firstIndex = allNodes.IndexOf(firstNode);
-            var lastIndex = allNodes.IndexOf(lastNode);
+            List<MultiSelectTreeViewItem> allNodes = GetEntireTreeRecursive(this, false, false);
+            int firstIndex = allNodes.IndexOf(firstNode);
+            int lastIndex = allNodes.IndexOf(lastNode);
 
             if (firstIndex >= allNodes.Count) {
                 throw new InvalidOperationException(
@@ -427,7 +476,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     "Last node index " + lastIndex + " greater or equal than count " + allNodes.Count + ".");
             }
 
-            var nodesToSelect = new List<MultiSelectTreeViewItem>();
+            List<MultiSelectTreeViewItem> nodesToSelect = new List<MultiSelectTreeViewItem>();
 
             if (lastIndex == firstIndex) {
                 return new List<MultiSelectTreeViewItem> {firstNode};
@@ -461,10 +510,10 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 yield break;
             }
 
-            foreach (var dataItem in dataItems) {
-                foreach (var treeViewItem in RecursiveTreeViewItemEnumerable(this, true)) {
-                    if (treeViewItem.DataContext == dataItem) {
-                        yield return treeViewItem;
+            foreach (object dataItem in dataItems) {
+                foreach (MultiSelectTreeViewItem tvi in GetEntireTreeRecursive(this, true)) {
+                    if (tvi.DataContext == dataItem) {
+                        yield return tvi;
                         break;
                     }
                 }
@@ -475,11 +524,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         /// Gets all data items referenced in all treeview items of the entire control.
         /// </summary>
         /// <returns></returns>
-        internal IEnumerable GetAllDataItems() {
-            foreach (var treeViewItem in RecursiveTreeViewItemEnumerable(this, true)) {
-                yield return treeViewItem.DataContext;
-            }
-        }
+        internal IEnumerable GetAllDataItems() => GetEntireTreeRecursive(this, true).Select(x => x.DataContext);
 
         // this eventhandler reacts on the firing control to, in order to update the own status
         private void OnSelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -491,7 +536,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                         throw new ArgumentException("A MultiSelectTreeViewItem instance was added to the SelectedItems collection. Only their DataContext instances must be added to this list!");
 #endif
                     object last = null;
-                    foreach (var item in this.GetTreeViewItemsFor(e.NewItems)) {
+                    foreach (MultiSelectTreeViewItem item in this.GetTreeViewItemsFor(e.NewItems)) {
                         if (!item.IsSelected) {
                             item.IsSelected = true;
                         }
@@ -502,7 +547,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                     this.LastSelectedItem = last;
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var item in this.GetTreeViewItemsFor(e.OldItems)) {
+                    foreach (MultiSelectTreeViewItem item in this.GetTreeViewItemsFor(e.OldItems)) {
                         item.IsSelected = false;
                         if (item.DataContext == this.LastSelectedItem) {
                             if (this.SelectedItems.Count > 0) {
@@ -516,7 +561,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var item in RecursiveTreeViewItemEnumerable(this, true)) {
+                    foreach (MultiSelectTreeViewItem item in GetEntireTreeRecursive(this, true)) {
                         if (item.IsSelected) {
                             item.IsSelected = false;
                         }
@@ -541,7 +586,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 switch (key) {
                     case Key.Up:
                         // Select last item
-                        var lastNode = RecursiveTreeViewItemEnumerable(this, false).LastOrDefault();
+                        MultiSelectTreeViewItem lastNode = GetEntireTreeRecursive(this, false).LastOrDefault();
                         if (lastNode != null) {
                             this.Selection.Select(lastNode);
                             e.Handled = true;
@@ -550,7 +595,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                         break;
                     case Key.Down:
                         // Select first item
-                        var firstNode = RecursiveTreeViewItemEnumerable(this, false).FirstOrDefault();
+                        MultiSelectTreeViewItem firstNode = GetEntireTreeRecursive(this, false).FirstOrDefault();
                         if (firstNode != null) {
                             this.Selection.Select(firstNode);
                             e.Handled = true;
@@ -599,12 +644,12 @@ namespace R3Modeller.Controls.TreeViews.Controls {
             // i.e. be queued in the dispatcher. Otherwise the TreeView could keep its focus
             // because other focus things are still going on and interfering this final request.
 
-            var lastFocusedItem = this.LastFocusedItem;
+            MultiSelectTreeViewItem lastFocusedItem = this.LastFocusedItem;
             if (lastFocusedItem != null) {
                 this.Dispatcher.BeginInvoke((Action) (() => FocusHelper.Focus(lastFocusedItem)));
             }
             else {
-                var firstNode = RecursiveTreeViewItemEnumerable(this, false).FirstOrDefault();
+                MultiSelectTreeViewItem firstNode = GetEntireTreeRecursive(this, false).FirstOrDefault();
                 if (firstNode != null) {
                     this.Dispatcher.BeginInvoke((Action) (() => FocusHelper.Focus(firstNode)));
                 }
@@ -620,14 +665,14 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         }
 
         protected void OnPreviewSelectionChanged(PreviewSelectionChangedEventArgs e) {
-            var handler = this.PreviewSelectionChanged;
+            EventHandler<PreviewSelectionChangedEventArgs> handler = this.PreviewSelectionChanged;
             if (handler != null) {
                 handler(this, e);
             }
         }
 
         protected void OnSelectionChanged() {
-            var handler = this.SelectionChanged;
+            EventHandler handler = this.SelectionChanged;
             if (handler != null) {
                 handler(this, EventArgs.Empty);
             }

@@ -14,7 +14,6 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         private readonly Border border;
         private readonly ScrollViewer scrollViewer;
         private readonly ItemsPresenter content;
-        private readonly IEnumerable<MultiSelectTreeViewItem> items;
 
         private bool isFirstMove;
         private bool mouseDown;
@@ -22,27 +21,17 @@ namespace R3Modeller.Controls.TreeViews.Controls {
         private DateTime lastScrollTime;
         private HashSet<object> initialSelection;
 
+        public static (int millis, int lines) AutoScrollData = (25, 2);
+
         #endregion Private fields
 
         #region Constructor
 
-        public BorderSelectionLogic(MultiSelectTreeView treeView, Border selectionBorder, ScrollViewer scrollViewer, ItemsPresenter content, IEnumerable<MultiSelectTreeViewItem> items) {
-            if (treeView == null)
-                throw new ArgumentNullException(nameof(treeView));
-            if (selectionBorder == null)
-                throw new ArgumentNullException(nameof(selectionBorder));
-            if (scrollViewer == null)
-                throw new ArgumentNullException(nameof(scrollViewer));
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            this.treeView = treeView;
-            this.border = selectionBorder;
-            this.scrollViewer = scrollViewer;
-            this.content = content;
-            this.items = items;
+        public BorderSelectionLogic(MultiSelectTreeView treeView, Border selectionBorder, ScrollViewer scrollViewer, ItemsPresenter content) {
+            this.treeView = treeView ?? throw new ArgumentNullException(nameof(treeView));
+            this.border = selectionBorder ?? throw new ArgumentNullException(nameof(selectionBorder));
+            this.scrollViewer = scrollViewer ?? throw new ArgumentNullException(nameof(scrollViewer));
+            this.content = content ?? throw new ArgumentNullException(nameof(content));
 
             treeView.MouseDown += this.OnMouseDown;
             treeView.MouseMove += this.OnMouseMove;
@@ -87,16 +76,18 @@ namespace R3Modeller.Controls.TreeViews.Controls {
 
         private void OnMouseMove(object sender, MouseEventArgs e) {
             if (this.mouseDown) {
-                if (DateTime.UtcNow > this.lastScrollTime.AddMilliseconds(100)) {
+                if (DateTime.UtcNow > this.lastScrollTime.AddMilliseconds(AutoScrollData.millis)) {
                     Point currentPointWin = Mouse.GetPosition(this.scrollViewer);
                     if (currentPointWin.Y < 16) {
-                        this.scrollViewer.LineUp();
+                        for (int i = AutoScrollData.lines; i > 0; i--)
+                            this.scrollViewer.LineUp();
                         this.scrollViewer.UpdateLayout();
                         this.lastScrollTime = DateTime.UtcNow;
                     }
 
                     if (currentPointWin.Y > this.scrollViewer.ActualHeight - 16) {
-                        this.scrollViewer.LineDown();
+                        for (int i = AutoScrollData.lines; i > 0; i--)
+                            this.scrollViewer.LineDown();
                         this.scrollViewer.UpdateLayout();
                         this.lastScrollTime = DateTime.UtcNow;
                     }
@@ -109,8 +100,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 double top = this.startPoint.Y;
 
                 if (this.isFirstMove) {
-                    if (Math.Abs(width) <= SystemParameters.MinimumHorizontalDragDistance &&
-                        Math.Abs(height) <= SystemParameters.MinimumVerticalDragDistance) {
+                    if (Math.Abs(width) <= SystemParameters.MinimumHorizontalDragDistance && Math.Abs(height) <= SystemParameters.MinimumVerticalDragDistance) {
                         return;
                     }
 
@@ -149,7 +139,7 @@ namespace R3Modeller.Controls.TreeViews.Controls {
                 bool foundFocusItem = false;
 
                 IList selectedItems = this.treeView.SelectedItems;
-                foreach (var item in this.items) {
+                foreach (MultiSelectTreeViewItem item in MultiSelectTreeView.GetEntireTreeRecursive(this.treeView, false, false)) {
                     FrameworkElement itemContent = (FrameworkElement) item.Template.FindName("headerBorder", item);
                     Point p = itemContent.TransformToAncestor(this.content).Transform(new Point());
                     double itemLeft = p.X;

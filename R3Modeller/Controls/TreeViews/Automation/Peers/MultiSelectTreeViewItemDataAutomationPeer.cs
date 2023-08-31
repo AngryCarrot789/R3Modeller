@@ -30,7 +30,7 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
                     }
                 }
 
-                var treeViewItemAutomationPeer = automationPeer as MultiSelectTreeViewItemAutomationPeer;
+                MultiSelectTreeViewItemAutomationPeer treeViewItemAutomationPeer = automationPeer as MultiSelectTreeViewItemAutomationPeer;
 
                 if (treeViewItemAutomationPeer == null) {
                     throw new InvalidOperationException("Could not find parent automation peer.");

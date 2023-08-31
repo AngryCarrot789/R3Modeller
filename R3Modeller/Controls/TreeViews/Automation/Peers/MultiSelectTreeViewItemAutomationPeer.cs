@@ -68,8 +68,8 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
         #endregion IInvokeProvider members
 
         protected override Rect GetBoundingRectangleCore() {
-            var treeViewItem = (MultiSelectTreeViewItem) this.Owner;
-            var contentPresenter = GetContentPresenter(treeViewItem);
+            MultiSelectTreeViewItem treeViewItem = (MultiSelectTreeViewItem) this.Owner;
+            ContentPresenter contentPresenter = GetContentPresenter(treeViewItem);
             if (contentPresenter != null) {
                 Vector offset = VisualTreeHelper.GetOffset(contentPresenter);
                 Point p = new Point(offset.X, offset.Y);
@@ -81,8 +81,8 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
         }
 
         protected override Point GetClickablePointCore() {
-            var treeViewItem = (MultiSelectTreeViewItem) this.Owner;
-            var contentPresenter = GetContentPresenter(treeViewItem);
+            MultiSelectTreeViewItem treeViewItem = (MultiSelectTreeViewItem) this.Owner;
+            ContentPresenter contentPresenter = GetContentPresenter(treeViewItem);
             if (contentPresenter != null) {
                 Vector offset = VisualTreeHelper.GetOffset(contentPresenter);
                 Point p = new Point(offset.X, offset.Y);
@@ -94,7 +94,7 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
         }
 
         private static ContentPresenter GetContentPresenter(MultiSelectTreeViewItem treeViewItem) {
-            var contentPresenter = treeViewItem.Template.FindName("PART_Header", treeViewItem) as ContentPresenter;
+            ContentPresenter contentPresenter = treeViewItem.Template.FindName("PART_Header", treeViewItem) as ContentPresenter;
             return contentPresenter;
         }
 
@@ -108,16 +108,16 @@ namespace R3Modeller.Controls.TreeViews.Automation.Peers {
             MultiSelectTreeViewItem owner = (MultiSelectTreeViewItem) this.Owner;
 
             List<AutomationPeer> children = new List<AutomationPeer>();
-            var button = owner.Template.FindName("Expander", owner) as ToggleButton;
+            ToggleButton button = owner.Template.FindName("Expander", owner) as ToggleButton;
             AddAutomationPeer(children, button);
             //System.Diagnostics.Trace.WriteLine("- Adding ToggleButton, " + (button == null ? "IS" : "is NOT") + " null, now " + children.Count + " items");
 
-            var contentPresenter = GetContentPresenter(owner);
+            ContentPresenter contentPresenter = GetContentPresenter(owner);
 
             if (contentPresenter != null) {
                 int childrenCount = VisualTreeHelper.GetChildrenCount(contentPresenter);
                 for (int i = 0; i < childrenCount; i++) {
-                    var child = VisualTreeHelper.GetChild(contentPresenter, i) as UIElement;
+                    UIElement child = VisualTreeHelper.GetChild(contentPresenter, i) as UIElement;
                     AddAutomationPeer(children, child);
                     //System.Diagnostics.Trace.WriteLine("- Adding child UIElement, " + (child == null ? "IS" : "is NOT") + " null, now " + children.Count + " items");
                 }

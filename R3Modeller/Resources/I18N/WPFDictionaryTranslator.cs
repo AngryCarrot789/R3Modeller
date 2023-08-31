@@ -1,7 +1,7 @@
 using System.Windows;
 using R3Modeller.Core;
 
-namespace MCNBTEditor.WPF.Resources.I18N {
+namespace R3Modeller.Resources.I18N {
     [ServiceImplementation(typeof(ITranslator))]
     public class WPFDictionaryTranslator : ITranslator {
         public ResourceDictionary Dictionary { get; set; }

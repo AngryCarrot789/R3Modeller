@@ -3,9 +3,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using MCNBTEditor.WPF.Resources;
 using R3Modeller.Core;
 using R3Modeller.Core.Utils;
+using R3Modeller.Resources;
 
 namespace R3Modeller.AdvancedContextService {
     public class AdvancedMenuItem : MenuItem {

@@ -1,9 +1,7 @@
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using FramePFX.PropertyEditing;
 
-namespace FramePFX.WPF.PropertyEditing {
+namespace R3Modeller.PropertyEditing {
     public class PropertyEditorItem : ContentPresenter {
         // The commented out code was going to be used to support a hard-coded left indentation for deeper items...
         // but due to how the visual tree is constructed, it's hard to only indent the editor content but not the group header

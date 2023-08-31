@@ -24,7 +24,6 @@ namespace R3Modeller.Core.PropertyEditing {
             //     CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Scale", (x) => x.IsScaleAbsolute, (x, v) => x.IsScaleAbsolute = v),
             //     CheckBoxEditorViewModel.ForGeneric<SceneObjectViewModel>("Abs Rotate", (x) => x.IsRotationAbsolute, (x, v) => x.IsRotationAbsolute = v),
             // });
-            transformation.AddPropertyEditor("Absolute Coord Grid", new AbsControlsEditorViewModel(typeof(SceneObjectViewModel)));
             transformation.AddPropertyEditor("Transformation", new TransformationEditorViewModel(typeof(SceneObjectViewModel)));
 
             // only for testing the UI and the applicability calculators.

@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using R3Modeller.Core;
 
-namespace MCNBTEditor.WPF.Resources {
+namespace R3Modeller.Resources {
     /// <summary>
     /// A converter for converting an <see cref="IconType"/> into an <see cref="ImageSource"/>
     /// </summary>

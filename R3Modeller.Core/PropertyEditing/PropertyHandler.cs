@@ -4,7 +4,7 @@ namespace R3Modeller.Core.PropertyEditing {
     /// </summary>
     public class PropertyHandler {
         /// <summary>
-        /// The handler that can be modified by the property
+        /// The actual handler object that can be modified by the property editors
         /// </summary>
         public object Target { get; }
 

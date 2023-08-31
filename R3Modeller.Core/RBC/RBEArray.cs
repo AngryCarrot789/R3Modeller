@@ -369,7 +369,7 @@ namespace R3Modeller.Core.RBC {
                 int len = array.Length / size;
                 T[] values = new T[len];
                 for (int i = 0, offset = 0; i < len; i++, offset += size) {
-                    values[i] = BinaryUtils.ReadStruct<T>(array, offset, size);
+                    values[i] = BinaryUtils.ReadStruct<T>(array, offset);
                 }
 
                 return values;
@@ -388,7 +388,7 @@ namespace R3Modeller.Core.RBC {
                 int len = array.Length / size;
                 values = new T[len];
                 for (int i = 0, offset = 0; i < len; i++, offset += size) {
-                    values[i] = BinaryUtils.ReadStruct<T>(array, offset, size);
+                    values[i] = BinaryUtils.ReadStruct<T>(array, offset);
                 }
 
                 return true;
@@ -409,7 +409,7 @@ namespace R3Modeller.Core.RBC {
         public override RBEBase Clone() => this.CloneCore();
 
         public RBEStructArray CloneCore() {
-            return new RBEStructArray {data = Arrays.CopyArrayUnsafe(this.data)};
+            return new RBEStructArray {data = this.data.CopyArrayUnsafe()};
         }
     }
 }

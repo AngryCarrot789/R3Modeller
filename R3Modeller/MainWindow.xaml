@@ -15,8 +15,8 @@
         xmlns:pe="clr-namespace:R3Modeller.PropertyEditing"
         xmlns:pe1="clr-namespace:R3Modeller.Core.PropertyEditing;assembly=R3Modeller.Core"
         xmlns:c="clr-namespace:R3Modeller.Controls.TreeViews.Controls"
-        xmlns:vm="clr-namespace:R3Modeller.Core.Engine.Objs.ViewModels;assembly=R3Modeller.Core"
-        mc:Ignorable="d"
+        xmlns:vm="clr-namespace:R3Modeller.Core.Engine.Objs.ViewModels;assembly=R3Modeller.Core" xmlns:avalonDock="clr-namespace:R3Modeller.Themes.AvalonDock"
+                mc:Ignorable="d"
         Title="R3Modeller - v0.0.1" Height="576" Width="1024"
         d:DataContext="{d:DesignInstance viewModels:EditorViewModel}"
         Style="{StaticResource CustomWindowStyleEx}"
@@ -40,171 +40,153 @@
                     <MenuItem Header="Light Theme (PLEASE DONT USE FOR YOUR OWN GOOD D:)"   Click="SetThemeClick" Uid="5"/>
                 </MenuItem>
             </Menu>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1"/>
-                    <ColumnDefinition Width="300"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}" FocusVisualStyle="{x:Null}"/>
-                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
-                                       VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="5000"
-                                       Value="{Binding OrbitRange, Mode=TwoWay}"
-                                       EditStartedCommand="{Binding BeginOrbitRangeModificationCommand, Mode=OneTime}"
-                                       EditCompletedCommand="{Binding EndOrbitRangeModificationCommand, Mode=OneTime}"
-                                       TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
-                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2"
-                                       VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120"
-                                       Value="{Binding Fov, Mode=TwoWay}"
-                                       EditStartedCommand="{Binding BeginFovModificationCommand, Mode=OneTime}"
-                                       EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
-                                       TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
-                    <ScrollViewer VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="250" Margin="0,80,10,10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl DataContext="{Binding Project}" ItemsSource="{Binding Scene.SelectedItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel Orientation="Vertical"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:SceneObjectViewModel}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="52"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
+            <DockingManager Padding="0">
+                <DockingManager.Theme>
+                    <avalonDock:GeneralDockTheme/>
+                </DockingManager.Theme>
+                <LayoutRoot x:Name="LayoutRoot">
+                    <LayoutPanel Orientation="Horizontal">
+                        <LayoutDocumentPane DockWidth="*">
+                            <LayoutAnchorable>
+                                <Grid Grid.Column="0">
+                                    <viewport:OGLRenderSurface x:Name="OGLViewPort" Viewport="{Binding MainViewport}" Background="{DynamicResource ABrush.Tone2.Background.Static}" FocusVisualStyle="{x:Null}"/>
+                                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="3"
+                                                           VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,30" Minimum="0.0001" Maximum="5000"
+                                                           Value="{Binding OrbitRange, Mode=TwoWay}"
+                                                           EditStartedCommand="{Binding BeginOrbitRangeModificationCommand, Mode=OneTime}"
+                                                           EditCompletedCommand="{Binding EndOrbitRangeModificationCommand, Mode=OneTime}"
+                                                           TinyChange="0.0001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
 
-                                        <Grid Grid.Row="0" Grid.ColumnSpan="4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Border Margin="0,0,10,0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
-                                            <Border Margin="10,0,0,0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontWeight="Bold" TextDecorations="Underline"/>
+                                    <dragger:NumberDragger DataContext="{Binding MainViewport.Camera}" Style="{StaticResource AbletonNumberDraggerStyle}" RoundedPlaces="2"
+                                                           VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75" Height="20" Margin="5,0,0,5" Minimum="20" Maximum="120"
+                                                           Value="{Binding Fov, Mode=TwoWay}"
+                                                           EditStartedCommand="{Binding BeginFovModificationCommand, Mode=OneTime}"
+                                                           EditCompletedCommand="{Binding EndFovModificationCommand, Mode=OneTime}"
+                                                           TinyChange="0.001" SmallChange="0.01" LargeChange="0.1" MassiveChange="1"/>
+                                    <ScrollViewer VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="250" Margin="0,80,10,10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl DataContext="{Binding Project}" ItemsSource="{Binding Scene.SelectedItems}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel Orientation="Vertical"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type vm:SceneObjectViewModel}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="52"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <Grid Grid.Row="0" Grid.ColumnSpan="4">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Border Margin="0,0,10,0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
+                                                            <Border Margin="10,0,0,0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="1" Background="{DynamicResource ABrush.Glyph.Static}"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontWeight="Bold" TextDecorations="Underline"/>
+                                                        </Grid>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Relative"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="X"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" TextAlignment="Center" Text="Y"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="3" TextAlignment="Center" Text="Z"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Pos"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Scale"/>
+                                                        <TextBlock Grid.Row="4" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Rotation"/>
+
+                                                        <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="{Binding PosX, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="2" TextAlignment="Center" Text="{Binding PosY, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="3" TextAlignment="Center" Text="{Binding PosZ, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Center" Text="{Binding ScaleX, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="2" TextAlignment="Center" Text="{Binding ScaleY, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="3" TextAlignment="Center" Text="{Binding ScaleZ, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="{Binding Pitch, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="4" Grid.Column="2" TextAlignment="Center" Text="{Binding Yaw, StringFormat={}{0:F2}}"/>
+                                                        <TextBlock Grid.Row="4" Grid.Column="3" TextAlignment="Center" Text="{Binding Roll, StringFormat={}{0:F2}}"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </LayoutAnchorable>
+                        </LayoutDocumentPane>
+                        <LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="300">
+                            <LayoutDocumentPane>
+                                <LayoutAnchorable Title="Object Browser" ContentId="ObjectBrowser" CanHide="False" CanClose="False" CanAutoHide="False" CanDockAsTabbedDocument="True" CanFloat="True">
+                                    <c:MultiSelectTreeView DataContext="{Binding Project.Scene}"
+                                                           SelectedItems="{Binding SelectedItems, Mode=OneWay}" Grid.Row="0"
+                                                           ItemsSource="{Binding RootObject.Children}"
+                                                           BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0">
+                                        <c:MultiSelectTreeView.Style>
+                                            <Style TargetType="{x:Type c:MultiSelectTreeView}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeView}}">
+                                                <Setter Property="Background" Value="{DynamicResource TreeView.Static.Background}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource TreeView.Static.Border}"/>
+                                                <Setter Property="BackgroundSelectionRectangle" Value="Transparent"/>
+                                                <Setter Property="BorderBrushSelectionRectangle" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                                <Setter Property="BorderThickness" Value="1"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}" />
+                                                <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+                                                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                                            </Style>
+                                        </c:MultiSelectTreeView.Style>
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="{x:Type c:MultiSelectTreeViewItem}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeViewItem}}">
+                                                <Setter Property="Background" Value="{DynamicResource TreeViewItem.Static.Background}"/>
+                                                <Setter Property="BackgroundHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
+                                                <Setter Property="BorderBrushHovered" Value="{DynamicResource TreeViewItem.MouseOver.Border}"/>
+                                                <Setter Property="BackgroundSelected" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                                <Setter Property="BorderBrushSelected" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                                <Setter Property="BackgroundSelectedHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
+                                                <Setter Property="BackgroundFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                                <Setter Property="BorderBrushFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                                <Setter Property="BackgroundInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
+                                                <Setter Property="BorderBrushInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                                <Setter Property="Padding" Value="1,0,0,0"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
+                                                <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+                                                <Setter Property="shortcuts:UIInputManager.FocusPath" Value="Application/Editor/ObjectList/Item"/>
+                                                <Setter Property="IsSelected" Value="{Binding IsObjectSelected, Mode=OneWayToSource}"/>
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemTemplate>
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                <TextBlock Text="{Binding DisplayName}"/>
+                                            </HierarchicalDataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </c:MultiSelectTreeView>
+                                </LayoutAnchorable>
+                            </LayoutDocumentPane>
+                            <LayoutDocumentPane>
+                                <LayoutAnchorable Title="Property Editor" ContentId="PropertyEditor" CanHide="False" CanClose="False" CanAutoHide="False" CanDockAsTabbedDocument="True" CanFloat="True">
+                                    <Border Grid.Row="2" BorderThickness="0" Background="{DynamicResource ABrush.Tone4.Background.Static}">
+                                        <Grid>
+                                            <TextBlock Text="{Binding Project.Scene.SelectedItems.Count, StringFormat={}{0} selected items(s)}" Margin="2,0" Padding="2"/>
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
+                                                <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
+                                            </ScrollViewer>
                                         </Grid>
-
-                                        <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Relative"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="1" TextAlignment="Center" Text="X"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="2" TextAlignment="Center" Text="Y"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="3" TextAlignment="Center" Text="Z"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Pos"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Scale"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="0" TextAlignment="Right" Padding="0,0,4,0" Text="Rotation"/>
-
-                                        <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="{Binding PosX, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="2" TextAlignment="Center" Text="{Binding PosY, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="3" TextAlignment="Center" Text="{Binding PosZ, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Center" Text="{Binding ScaleX, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="2" TextAlignment="Center" Text="{Binding ScaleY, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="3" TextAlignment="Center" Text="{Binding ScaleZ, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="{Binding Pitch, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="2" TextAlignment="Center" Text="{Binding Yaw, StringFormat={}{0:F2}}"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="3" TextAlignment="Center" Text="{Binding Roll, StringFormat={}{0:F2}}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
-                <Border Grid.Column="2" BorderThickness="0" shortcuts:UIInputManager.FocusPath="Application/Editor/ObjectList">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="2*"/>
-                        </Grid.RowDefinitions>
-                        <c:MultiSelectTreeView DataContext="{Binding Project.Scene}"
-                                               SelectedItems="{Binding SelectedItems, Mode=OneWay}" Grid.Row="0"
-                                               ItemsSource="{Binding RootObject.Children}"
-                                               BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0">
-                            <c:MultiSelectTreeView.Style>
-                                <Style TargetType="{x:Type c:MultiSelectTreeView}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeView}}">
-                                    <Setter Property="Background" Value="{DynamicResource TreeView.Static.Background}"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource TreeView.Static.Border}"/>
-                                    <Setter Property="BackgroundSelectionRectangle" Value="Transparent"/>
-                                    <Setter Property="BorderBrushSelectionRectangle" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}" />
-                                    <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
-                                    <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                                </Style>
-                            </c:MultiSelectTreeView.Style>
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="{x:Type c:MultiSelectTreeViewItem}" BasedOn="{StaticResource {x:Type c:MultiSelectTreeViewItem}}">
-                                    <Setter Property="Background" Value="{DynamicResource TreeViewItem.Static.Background}"/>
-                                    <Setter Property="BackgroundHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
-                                    <Setter Property="BorderBrushHovered" Value="{DynamicResource TreeViewItem.MouseOver.Border}"/>
-                                    <Setter Property="BackgroundSelected" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
-                                    <Setter Property="BorderBrushSelected" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
-                                    <Setter Property="BackgroundSelectedHovered" Value="{DynamicResource TreeViewItem.MouseOver.Background}"/>
-                                    <Setter Property="BackgroundFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
-                                    <Setter Property="BorderBrushFocused" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
-                                    <Setter Property="BackgroundInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
-                                    <Setter Property="BorderBrushInactive" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-                                    <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-                                    <Setter Property="Padding" Value="1,0,0,0"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
-                                    <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
-                                    <Setter Property="shortcuts:UIInputManager.FocusPath" Value="Application/Editor/ObjectList/Item"/>
-                                    <Setter Property="IsSelected" Value="{Binding IsObjectSelected, Mode=OneWayToSource}"/>
-                                    <!--
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding (VirtualizingStackPanel.IsVirtualizing), RelativeSource={RelativeSource AncestorType={x:Type c:MultiSelectTreeView}}, FallbackValue=True}" Value="True">
-                                            <Setter Property="ItemsControl.ItemsPanel">
-                                                <Setter.Value>
-                                                    <ItemsPanelTemplate>
-                                                        <VirtualizingStackPanel IsItemsHost="True" />
-                                                    </ItemsPanelTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                    -->
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                    <TextBlock Text="{Binding DisplayName}"/>
-                                </HierarchicalDataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </c:MultiSelectTreeView>
-                        <ListBox DataContext="{Binding Project}" ItemsSource="{Binding Scene.RootObject.Children}"
-                                 Grid.Row="1" SelectionMode="Extended"
-                                 BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,1"
-                                 ap:MultiSelectorHelper.SelectedItems="{Binding Scene.SelectedItems}"
-                                 ap:MultiSelectorHelper.UpdateSelectedItemsOnChange="True">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding DisplayName}"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <Border Grid.Row="2" BorderThickness="0">
-                            <Grid>
-                                <TextBlock Text="{Binding Project.Scene.SelectedItems.Count, StringFormat={}{0} selected items(s)}" Margin="2,0" Padding="2"/>
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
-                                    <pe:PropertyEditor Margin="0,22,0,0" x:Name="VPPropertyEditor" EditorRegistry="{x:Static pe1:R3PropertyEditorRegistry.Instance}" InputItems="{Binding Project.Scene.SelectedItems}" BorderThickness="0"/>
-                                </ScrollViewer>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                </Border>
-                <Border Grid.Column="1" Background="{DynamicResource PanelBorderBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"/>
-                <GridSplitter ResizeDirection="Columns" Grid.Column="1" Margin="-4,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0"/>
-            </Grid>
+                                    </Border>
+                                </LayoutAnchorable>
+                            </LayoutDocumentPane>
+                        </LayoutDocumentPaneGroup>
+                    </LayoutPanel>
+                </LayoutRoot>
+            </DockingManager>
         </DockPanel>
         <Popup x:Name="NotificationPanelPopup" StaysOpen="True" AllowsTransparency="True" d:DataContext="{d:DesignInstance n1:NotificationPanelViewModel}">
             <Border Background="Transparent">
